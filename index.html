@@ -7,7 +7,7 @@
 :root{
   --paper:#f4f6f8; --card:#ffffff; --ink:#14202e; --muted:#5b6878; --line:#d8dee6;
   --accent:#d0102b; --accent-soft:#fbe5e8; --blue:#1f4f8f; --blue-soft:#e3ecf7;
-  --ok:#1d7a4a; --ok-soft:#e1f2e8; --warn:#9a6200; --warn-soft:#fbf0d9; --bad:#b4232c; --bad-soft:#fbe3e4;
+  --ok:#1d7a4a; --ok-soft:#e1f2e8; --warn:#9a6200; --warn-soft:#fbf0d9; --bad:#b4232c; --bad-soft:#fbe3e4; --bar:#ffffff; --bar-fg:#14202e;
   --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
@@ -15,12 +15,24 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --paper:#0f151d; --card:#17202b; --ink:#e6ebf1; --muted:#97a3b2; --line:#2a3644;
   --accent:#ff4d64; --accent-soft:#3a1820; --blue:#7fb0ef; --blue-soft:#1b2a3d;
-  --ok:#5fd394; --ok-soft:#163023; --warn:#f0b956; --warn-soft:#33270f; --bad:#ff7a82; --bad-soft:#3a1a1d; color-scheme:dark}}
+  --ok:#5fd394; --ok-soft:#163023; --warn:#f0b956; --warn-soft:#33270f; --bad:#ff7a82; --bad-soft:#3a1a1d; --bar:#000000; --bar-fg:#e6ebf1; color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#0f151d; --card:#17202b; --ink:#e6ebf1; --muted:#97a3b2; --line:#2a3644;
   --accent:#ff4d64; --accent-soft:#3a1820; --blue:#7fb0ef; --blue-soft:#1b2a3d;
-  --ok:#5fd394; --ok-soft:#163023; --warn:#f0b956; --warn-soft:#33270f; --bad:#ff7a82; --bad-soft:#3a1a1d; color-scheme:dark}
+  --ok:#5fd394; --ok-soft:#163023; --warn:#f0b956; --warn-soft:#33270f; --bad:#ff7a82; --bad-soft:#3a1a1d; --bar:#000000; --bar-fg:#e6ebf1; color-scheme:dark}
+/* the page's own Light / Dark switch wins over the system and viewer theme */
+:root[data-mode="light"]{
+  --paper:#f4f6f8; --card:#ffffff; --ink:#14202e; --muted:#5b6878; --line:#d8dee6;
+  --accent:#d0102b; --accent-soft:#fbe5e8; --blue:#1f4f8f; --blue-soft:#e3ecf7;
+  --ok:#1d7a4a; --ok-soft:#e1f2e8; --warn:#9a6200; --warn-soft:#fbf0d9; --bad:#b4232c; --bad-soft:#fbe3e4; --bar:#ffffff; --bar-fg:#14202e; color-scheme:light}
+:root[data-mode="dark"]{
+  --paper:#0f151d; --card:#17202b; --ink:#e6ebf1; --muted:#97a3b2; --line:#2a3644;
+  --accent:#ff4d64; --accent-soft:#3a1820; --blue:#7fb0ef; --blue-soft:#1b2a3d;
+  --ok:#5fd394; --ok-soft:#163023; --warn:#f0b956; --warn-soft:#33270f; --bad:#ff7a82; --bad-soft:#3a1a1d; --bar:#000000; --bar-fg:#e6ebf1; color-scheme:dark}
 *{box-sizing:border-box}
+.sumhead{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
+.sumhead .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.note{margin:0;font-size:13px;color:var(--muted);max-width:70ch}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
 .wrap{max-width:1080px;margin:0 auto;padding-block:20px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
 h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
@@ -67,12 +79,12 @@ button,select,input{font:inherit;color:inherit}
 
 /* semester picker bar */
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
-.picker{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--ink);color:var(--paper);border-radius:12px;padding:10px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.picker{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bar);color:var(--bar-fg);border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
 .picker .lab{font-size:11px;text-transform:uppercase;letter-spacing:.08em;opacity:.7}
 .picker .grp{display:flex;align-items:center;gap:8px}
-.picker .seg{background:transparent;border-color:color-mix(in srgb,var(--paper) 30%,transparent)}
-.picker .seg button{color:var(--paper);opacity:.75;padding:6px 14px}
-.picker .seg button[aria-pressed="true"]{background:var(--paper);color:var(--ink);opacity:1}
+.picker .seg{background:transparent;border-color:color-mix(in srgb,var(--bar-fg) 30%,transparent)}
+.picker .seg button{color:var(--bar-fg);opacity:.75;padding:6px 14px}
+.picker .seg button[aria-pressed="true"]{background:var(--bar-fg);color:var(--bar);opacity:1}
 .picker .pmeta{margin-left:auto;font-size:13px;opacity:.85}
 
 /* semester sections */
@@ -129,6 +141,15 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
 .src{font-size:11px;color:var(--muted)}
 .src a{color:var(--blue)}
 .addel{border:1px dashed var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:8px;background:transparent}
+.strikes{display:inline-flex;gap:4px}
+.sb{width:22px;height:22px;border:1.5px solid var(--line);border-radius:5px;display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:700;line-height:1}
+.sb.x{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
+.sb.ok{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.failrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.failrow .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.big3 .sb{width:30px;height:30px;font-size:17px}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line);justify-self:start}
+.btn.apply{background:var(--ok);border-color:var(--ok);color:var(--card);padding:8px 12px;justify-self:start}
 .addel>summary,.addt>summary{cursor:pointer;list-style:none}
 .addel>summary::-webkit-details-marker,.addt>summary::-webkit-details-marker{display:none}
 .addel h3{font-family:var(--f-body);font-size:13px;font-weight:600}
@@ -152,6 +173,10 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
     </div>
     <div class="tools">
       <span class="chip" id="savechip"><span class="dot"></span><span id="savetxt">Saved on this device</span></span>
+      <div class="seg" role="group" aria-label="Theme">
+        <button id="th-light" type="button" aria-pressed="false">Light</button>
+        <button id="th-dark" type="button" aria-pressed="false">Dark</button>
+      </div>
       <div class="seg" role="group" aria-label="Language">
         <button id="lang-en" type="button" aria-pressed="true">EN</button>
         <button id="lang-sk" type="button" aria-pressed="false">SK</button>
@@ -171,9 +196,9 @@ const P=(en,sk,max,min)=>({en,sk,max,min});
 const EX=(max,min)=>({max,min});
 const COURSES=[
  // 1st year, winter
- {c:"IDM",id:302514,en:"Discrete Mathematics",sk:"Diskrétna matematika",cr:4,t:"Cr+Ex",k:"C",s:"1W",parts:[P("Written tests at exercises","Písomky na cvičeniach",20)],exam:EX(80)},
+ {c:"IDM",id:302514,en:"Discrete Mathematics",sk:"Diskrétna matematika",cr:4,t:"Cr+Ex",k:"C",s:"1W",zeroMax:1,parts:[1,2,3,4,5].map(i=>P("Test "+i,"Písomka "+i,4)),exam:EX(80)},
  {c:"IEL",id:302517,en:"Electronics for Information Technology",sk:"Elektronika pre informačné technológie",cr:6,t:"Cr+Ex",k:"C",s:"1W",parts:[P("Labs (6 × 3 pts)","Laboratóriá (6 × 3 b)",18,9),P("Semester project","Semestrálny projekt",12,3),P("Mid-term test","Polsemestrálna písomka",15)],exam:EX(55,27)},
- {c:"ILG",id:302528,en:"Linear Algebra",sk:"Lineárna algebra",cr:5,t:"Cr+Ex",k:"C",s:"1W",parts:[1,2,3,4,5].map(i=>P("Test "+i,"Písomka "+i,4)),exam:EX(80)},
+ {c:"ILG",id:302528,en:"Linear Algebra",sk:"Lineárna algebra",cr:5,t:"Cr+Ex",k:"C",s:"1W",zeroMax:1,parts:[1,2,3,4,5].map(i=>P("Test "+i,"Písomka "+i,4)),exam:EX(80)},
  {c:"IUS",id:302578,en:"Introduction to Software Engineering",sk:"Úvod do softvérového inžinierstva",cr:5,t:"Cr+Ex",k:"C",s:"1W",credit:18,parts:[P("Exercises (4 × 3 pts)","Cvičenia (4 × 3 b)",12),P("Homework (ER diagram)","Domáca úloha (ER diagram)",12),P("Team project + defence","Tímový projekt + obhajoba",16)],exam:EX(60)},
  {c:"IZP",id:302589,en:"Introduction to Programming Systems",sk:"Základy programovania",cr:7,t:"Cr+Ex",k:"C",s:"1W",credit:25,parts:[P("Computer labs","Počítačové cvičenia",20,12),P("Project 1","Projekt 1",7.5,1),P("Project 2","Projekt 2",7.5,1),P("Mid-term test","Polsemestrálna písomka",12)],exam:EX(53)},
  {c:"ISM",id:302562,en:"Seminar of Mathematics",sk:"Seminár matematiky",cr:2,t:"Cr",k:"E",s:"1W",creditUnknown:true,parts:[P("Test 1","Písomka 1",10),P("Test 2","Písomka 2",10),P("Examples at the board (bonus)","Príklady pri tabuli (bonus)",3)]},
@@ -231,26 +256,26 @@ const T={
   passedW:"passed",notChosen:"not chosen yet",locked:"after all credits",
   sem:{W:"winter",S:"summer"},yearN:y=>`Year ${y}`,semTitle:(y,s)=>`Year ${y} · ${s} semester`,now:"current",
   cr:"cr",credits:"credits",
-  st:{planned:"Planned",enrolled:"In progress",credit:"Zápočet ✓",passed:"Passed",failed:"Failed"},
+  st:{planned:"Planned",enrolled:"In progress",credit:"Credit ✓",passed:"Passed",failed:"Failed"},
   status:"Status",taken:"Taken in",enroll:"Enrolment",e1:"1st time",e2:"Repeated (2nd)",
   partsH:"Points during the semester",sem_total:"Semester total",addItem:"Add a test or item",itemName:"Name, e.g. Test 3",max:"max",add:"Add",
   min:"min",exam:"Exam",examAttempts:"Exam attempts",regular:"Regular",resit1:"1st resit",resit2:"2nd resit",
-  needCredit:(n,t)=>`<b>${n} more points</b> needed for zápočet (${t} required).`,
-  creditOk:t=>`<b>Zápočet reached</b> (${t} required). You can sign up for the exam.`,
-  creditUnknown:"The course page does not list a zápočet threshold. Set the one your teacher announced:",
-  creditSet:"Zápočet threshold",
+  needCredit:(n,t)=>`<b>${n} more points</b> needed for the course credit (${t} required).`,
+  creditOk:t=>`<b>Course credit reached</b> (${t} required). You can sign up for the exam.`,
+  creditUnknown:"The course page does not list how many points the course credit needs. Set the one your teacher announced:",
+  creditSet:"Points needed for credit",
   partMin:(name,m)=>`${name}: at least ${m} pts needed`,
   needExam:(n,m)=>`You need <b>${n} pts</b> from the exam to reach 50.${m?` Exam minimum is ${m}.`:""}`,
   examBelowMin:m=>`Exam score is below the minimum of ${m} pts, so the exam counts as failed.`,
   totalLbl:"Total",gradeLbl:"Grade",
   passedMsg:g=>`Passed with ${g}.`,failedMsg:"Not passed yet (under 50 points).",
   lastTry:"This is your last exam attempt in this enrolment.",
-  noTriesLeft1:"All 3 exam attempts used. Re-enrol the course next year (2nd and last enrolment).",
-  noTriesLeft2:"All attempts in the repeated enrolment are used. Contact the study office right away: a compulsory course cannot be enrolled a third time.",
+  noTriesLeft1:"3 ✕: all exam terms failed. You must take the course again next year, and that is your last chance.",
+  noTriesLeft2:"3 ✕ in your repeated enrolment: you cannot continue your studies. Contact the study office right away.",
   repeatWarn:"Repeated enrolment: this is the last chance to pass the course.",
-  crOnly:"This course ends with zápočet only. Mark it as Passed once you get it.",
+  crOnly:"This course ends with a course credit only. Mark it as Passed once you get it.",
   noPts:"No points are tracked for this course. Change the status when it is done.",
-  ccNote:"Classified credit: the total from 100 points sets your grade.",
+  ccNote:"Graded course credit: the total from 100 points sets your grade.",
   src:"Rules from",fitPage:"the course page",remove:"Remove course",
   addElective:"Add an elective course",elCode:"Code",elName:"Name",elCr:"Cr",elType:"Ends with",
   pvaPick:"English course (PVA)",pvtPick:"Technical course (PVT)",choose:"Choose…",
@@ -258,7 +283,17 @@ const T={
   footH:"How the tracker counts",
   foot:["Credits count when you mark a course <b>Passed</b>. Every exam has a regular term and two resits. A failed course can be taken once more, the next year.","Grades follow the BUT scale. Every exam has a regular term and two resit terms. A course you fail can be enrolled one more time, and that repeated enrolment is your last.","Point splits and thresholds come from each course page on fit.vut.cz for 2026/27. Teachers sometimes change details in the first lecture, so you can edit any maximum or add your own items."],
   gradesH:"Grade scale",yearLbl:"Year",semLbl:"Semester",semCap:{W:"Winter",S:"Summer"},moreCourses:"English, technical course or elective",
-  retake:"Retake next year"},
+  retake:"Retake next year",zeroLbl:"Tests with 0 points",failLbl:"Failed courses",failNote:"Each failed course adds one ✕.",fail3:"3 ✕: you cannot continue your studies.",markPassed:n=>`Mark as passed (+${n} credits)`,
+  apply:n=>`✓ Passed · add ${n} credits to my progress`,
+  zeroBad:(z,m)=>`<b>${z} tests have 0 points.</b> Only ${m} is allowed, so the course credit is not met and the course is marked Failed.`,
+  zeroInfo:(z,m,left)=>`Tests with 0 points: <b>${z} of ${m} allowed</b>. ${left} test${left>1?"s":""} still to write.`,
+  zeroOk:"<b>Course credit reached.</b> All tests written, at most one with 0 points. You can sign up for the exam.",light:"Light",dark:"Dark",
+  viewLbl:"Progress",viewSem:"Semester minimum",viewAll:"Whole study",
+  minFirst:"credits passed · minimum for the 1st semester",minYear:y=>`credits passed in year ${y} · minimum for the year`,
+  minLeft:(n,p)=>`<b>${n} more credits</b> needed to reach the minimum.${p?` ${p} credits are in progress.`:""}`,
+  minOk:"<b>Minimum reached.</b> You can continue your study.",
+  note1S:"Year 1 needs 30 credits in total. If you passed 15 in winter, you need 15 more this summer.",
+  noteY:"From year 2 the minimum is 30 credits per year. Winter and summer count together."},
  sk:{title:"FIT študijný index",sub:"Bakalár · Informačné technológie (BIT) · Fakulta informačných technológií VUT v Brne",
   done:"hotovo",of:"zo 180 kreditov",earned:"získaných kreditov",inprog:"prebieha tento semester",
   lgPassed:"Absolvované",lgProg:"Zapísané teraz",lgLeft:"Ešte pred tebou",
@@ -282,8 +317,8 @@ const T={
   totalLbl:"Spolu",gradeLbl:"Známka",
   passedMsg:g=>`Absolvované so známkou ${g}.`,failedMsg:"Zatiaľ nesplnené (menej ako 50 bodov).",
   lastTry:"Toto je tvoj posledný termín v tomto zápise.",
-  noTriesLeft1:"Všetky 3 termíny sú vyčerpané. Predmet si zapíš znova budúci rok (2. a posledný zápis).",
-  noTriesLeft2:"Vyčerpal si termíny aj v opakovanom zápise. Hneď kontaktuj študijné oddelenie: povinný predmet sa nedá zapísať tretíkrát.",
+  noTriesLeft1:"3 ✕: všetky termíny skúšky neúspešné. Predmet si musíš zapísať znova budúci rok a to je posledná šanca.",
+  noTriesLeft2:"3 ✕ v opakovanom zápise: v štúdiu nemôžeš pokračovať. Hneď kontaktuj študijné oddelenie.",
   repeatWarn:"Opakovaný zápis: je to posledná šanca predmet splniť.",
   crOnly:"Predmet končí len zápočtom. Keď ho dostaneš, označ ho ako Absolvované.",
   noPts:"Pri tomto predmete sa body nesledujú. Po splnení zmeň stav.",
@@ -295,9 +330,19 @@ const T={
   footH:"Ako tracker počíta",
   foot:["Kredity sa započítajú, keď predmet označíš ako <b>Absolvované</b>. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz, budúci rok.","Známky podľa stupnice VUT. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz a tento opakovaný zápis je posledný.","Rozdelenie bodov a hranice sú zo stránok predmetov na fit.vut.cz pre 2026/27. Vyučujúci ich niekedy upresnia na prvej prednáške, preto môžeš každé maximum upraviť alebo pridať vlastné položky."],
   gradesH:"Stupnica hodnotenia",yearLbl:"Ročník",semLbl:"Semester",semCap:{W:"Zimný",S:"Letný"},moreCourses:"Angličtina, technický predmet alebo voliteľný predmet",
-  retake:"Opakovať budúci rok"}
+  retake:"Opakovať budúci rok",zeroLbl:"Písomky za 0 bodov",failLbl:"Neúspešné predmety",failNote:"Každý neúspešný predmet pridá jeden ✕.",fail3:"3 ✕: v štúdiu nemôžeš pokračovať.",markPassed:n=>`Označiť ako splnené (+${n} kreditov)`,
+  apply:n=>`✓ Splnené · pridať ${n} kreditov do postupu`,
+  zeroBad:(z,m)=>`<b>${z} písomky máš za 0 bodov.</b> Povolená je len ${m}, takže zápočet nie je splnený a predmet je označený ako neúspešný.`,
+  zeroInfo:(z,m,left)=>`Písomky za 0 bodov: <b>${z} z ${m} povolenej</b>. Ešte ťa čaká ${left} ${left===1?"písomka":left<5?"písomky":"písomiek"}.`,
+  zeroOk:"<b>Zápočet máš.</b> Všetky písomky napísané, najviac jedna za 0 bodov. Môžeš sa prihlásiť na skúšku.",light:"Svetlý",dark:"Tmavý",
+  viewLbl:"Postup",viewSem:"Minimum za semester",viewAll:"Celé štúdium",
+  minFirst:"získaných kreditov · minimum za 1. semester",minYear:y=>`získaných kreditov v ${y}. ročníku · minimum za ročník`,
+  minLeft:(n,p)=>`Do minima ti chýba <b>${n} kreditov</b>.${p?` Rozbehnutých máš ${p} kreditov.`:""}`,
+  minOk:"<b>Minimum máš splnené.</b> Môžeš pokračovať v štúdiu.",
+  note1S:"V 1. ročníku treba spolu 30 kreditov. Ak si v zime získal 15, v lete potrebuješ ďalších 15.",
+  noteY:"Od 2. ročníka je minimum 30 kreditov za ročník. Zimný a letný semester sa sčítavajú."}
 };
-const TYPE={en:{"Cr+Ex":"Zápočet + exam","Ex":"Exam","Cr":"Zápočet","ClCr":"Classified credit"},sk:{"Cr+Ex":"Zápočet + skúška","Ex":"Skúška","Cr":"Zápočet","ClCr":"Klasifikovaný zápočet"}};
+const TYPE={en:{"Cr+Ex":"Course credit + exam","Ex":"Exam","Cr":"Course credit","ClCr":"Graded course credit"},sk:{"Cr+Ex":"Zápočet + skúška","Ex":"Skúška","Cr":"Zápočet","ClCr":"Klasifikovaný zápočet"}};
 
 /* ---------- State ---------- */
 const LS="fit-index-state-v1";
@@ -364,14 +409,25 @@ function calc(d){
   const threshold=d.credit!=null?d.credit:(r.credit!=null?r.credit:null);
   const partFails=parts.filter(p=>p.min&& (num(p.val)||0)<p.min);
   const hasCreditStep=d.t==="Cr+Ex"||d.t==="Cr";
-  const creditOk=hasCreditStep && (threshold==null?partFails.length===0&&!d.creditUnknown:semPts>=threshold&&partFails.length===0);
+  let creditOk=hasCreditStep && (threshold==null?partFails.length===0&&!d.creditUnknown:semPts>=threshold&&partFails.length===0);
+  // zeroMax: course credit needs every test written and at most N of them with 0 points
+  let zeros=0,missing=0;
+  if(d.zeroMax!=null){const base=parts.filter(p=>!p.custom);zeros=base.filter(p=>num(p.val)===0).length;missing=base.filter(p=>num(p.val)==null).length;creditOk=zeros<=d.zeroMax&&missing===0}
   const tries=r.exam.map(num);
   const used=tries.filter(x=>x!=null).length;
   const lastExam=[...tries].reverse().find(x=>x!=null);
   const exMin=d.exam&&d.exam.min||0;
   const examOk=lastExam!=null&&lastExam>=exMin;
   const total=semPts+(d.exam&&examOk?lastExam:0);
-  return {r,parts,semPts,anyPts,threshold,partFails,creditOk,tries,used,lastExam,exMin,examOk,total};
+  // did the course pass on points? (decides when the "add credits" button appears)
+  let passedPts=false;
+  if(d.exam) passedPts=examOk&&total>=50&&(d.t!=="Cr+Ex"||creditOk||(threshold==null&&!d.zeroMax&&!d.creditUnknown&&!partFails.length));
+  else if(d.t==="ClCr") passedPts=anyPts&&semPts>=50;
+  else if(d.t==="Cr"&&parts.length) passedPts=creditOk&&threshold!=null;
+  // one box per exam term: X = failed attempt, ✓ = passed
+  const marks=tries.map(x=>x==null?"":(x>=exMin&&semPts+x>=50?"ok":"x"));
+  const fails=marks.filter(m=>m==="x").length;
+  return {r,parts,semPts,anyPts,threshold,partFails,creditOk,tries,used,lastExam,exMin,examOk,total,zeros,missing,passedPts,marks,fails};
 }
 function stats(){
   const list=allCourses();let passed=0,prog=0,comp=0,elec=0;
@@ -396,12 +452,24 @@ function renderSummary(){
   const y=+cur()[0];
   const first=st.bySlot["1W"]||0, yr=st.byYear[String(y)]||0;
   const req=(cls,k,v,s)=>`<div class="req ${cls}"><span class="k">${k}</span><span class="v">${v}</span><span class="s">${s}</span></div>`;
-  let h=`<div class="big"><span class="pct mono">${fmt(pct)}%</span><span class="of">${t.done} · <b class="mono">${st.passed}</b> ${t.of}</span><span class="of">· <b class="mono">${st.prog}</b> ${t.credits} ${t.inprog}</span></div>
+  const mode=S.view||"sem";
+  let h=`<div class="sumhead"><span class="k">${t.viewLbl}</span><div class="seg" role="group" aria-label="${t.viewLbl}"><button type="button" data-view="sem" aria-pressed="${mode==="sem"}">${t.viewSem}</button><button type="button" data-view="all" aria-pressed="${mode==="all"}">${t.viewAll}</button></div></div>`;
+  // failed-course counter: every failed course (now or before a retake) adds one ✕
+  const nf=st.list.reduce((a,d)=>{const r=cs(d.c);return a+(r.enroll===2?1:0)+(r.status!=="passed"&&(r.status==="failed"||(d.exam&&calc(d).fails>=3))?1:0)},0);
+  h+=`<div class="failrow"><span class="k">${t.failLbl}</span><span class="strikes big3">${[0,1,2].map(i=>`<i class="sb ${i<nf?"x":""}">${i<nf?"✕":""}</i>`).join("")}</span><span class="note">${nf>=3?`<b style="color:var(--bad)">${t.fail3}</b>`:t.failNote}</span></div>`;
+  if(mode==="sem"){
+    // Study rule: at least 15 credits in the 1st semester, at least 30 credits in every year
+    const c=cur(), isFirst=c==="1W", target=isFirst?15:30, val=isFirst?first:yr;
+    const progIn=st.list.filter(d=>{const r=cs(d.c);return (isFirst?r.taken===c:r.taken[0]===c[0])&&(r.status==="enrolled"||r.status==="credit")}).reduce((a,d)=>a+d.cr,0);
+    const pS=Math.min(100,val/target*100), ppS=Math.min(100-pS,progIn/target*100), left=Math.max(0,target-val);
+    h+=`<div class="big"><span class="pct mono">${val} / ${target}</span><span class="of">${isFirst?t.minFirst:t.minYear(c[0])}</span></div>
+    <div class="bar" role="img" aria-label="${val} / ${target}"><div class="prog" style="width:${pS+ppS}%"></div><div class="done" style="width:${pS}%"></div></div>    ${isFirst?"":`<p class="note">${c==="1S"?t.note1S:t.noteY}</p>`}`;
+    document.getElementById("summary").innerHTML=h;return;
+  }
+  h+=`<div class="big"><span class="pct mono">${fmt(pct)}%</span><span class="of">${t.done} · <b class="mono">${st.passed}</b> ${t.of}</span><span class="of">· <b class="mono">${st.prog}</b> ${t.credits} ${t.inprog}</span></div>
   <div><div class="bar" role="img" aria-label="${st.passed} / 180"><div class="prog" style="width:${pct+pp}%"></div><div class="done" style="width:${pct}%"></div>${[60,120].map(x=>`<div class="tick" style="left:${x/180*100}%"></div>`).join("")}</div>
   <div class="scale mono"><span style="left:0">0</span><span style="left:33.33%">60 · ${t.yearN(1)}</span><span style="left:66.67%">120 · ${t.yearN(2)}</span><span style="left:100%">180</span></div></div>
   <div class="reqs">`;
-  if(y===1&&cur()==="1W") h+=req(first>=15?"ok":"warn",t.rFirst,`${first} / 15`,t.rFirstS);
-  else h+=req(yr>=30?"ok":"warn",t.rYear.replace("{y}",y),`${yr} / 30`,t.rYearS);
   h+=req(st.comp>=146?"ok":"",t.rComp,`${st.comp} / 146`,t.rCompS);
   h+=req(engR&&engR.status==="passed"?"ok":"",t.rEng,engD?`${engD.c} · ${engR.status==="passed"?t.passedW:t.st[engR.status]}`:t.notChosen,"B1+");
   h+=req(tecR&&tecR.status==="passed"?"ok":"",t.rTech,tecD?`${tecD.c} · ${tecR.status==="passed"?t.passedW:t.st[tecR.status]}`:t.notChosen,t.rTechS);
@@ -415,8 +483,7 @@ function renderPicker(){
   const tot=inSlot.reduce((a,d)=>a+d.cr,0), got=inSlot.filter(d=>cs(d.c).status==="passed").reduce((a,d)=>a+d.cr,0);
   document.getElementById("picker").innerHTML=
    `<div class="grp"><span class="lab">${t.yearLbl}</span><div class="seg" role="group" aria-label="${t.yearLbl}">${years.map(y=>`<button type="button" data-year="${y}" aria-pressed="${c[0]===y}">${y}.</button>`).join("")}</div></div>
-    <div class="grp"><span class="lab">${t.semLbl}</span><div class="seg" role="group" aria-label="${t.semLbl}">${["W","S"].map(s=>`<button type="button" data-half="${s}" aria-pressed="${c[1]===s}">${t.semCap[s]}</button>`).join("")}</div></div>
-    <span class="pmeta mono">${got} / ${tot} ${t.cr} ${t.passedW}</span>`;
+    <div class="grp"><span class="lab">${t.semLbl}</span><div class="seg" role="group" aria-label="${t.semLbl}">${["W","S"].map(s=>`<button type="button" data-half="${s}" aria-pressed="${c[1]===s}">${t.semCap[s]}</button>`).join("")}</div></div>`;
 }
 function courseCard(d){
   const t=L(),k=calc(d),r=k.r,id=d.c;
@@ -445,10 +512,17 @@ function courseCard(d){
   // zápočet
   if(d.t==="Cr+Ex"||(crOnly&&k.parts.length)){
     const thr=k.threshold;
-    if(thr==null&&d.creditUnknown){
+    if(d.zeroMax!=null){
+      // one box per allowed zero + one more: a second ✕ means the course credit is lost
+      h+=`<div class="failrow"><span class="k">${t.zeroLbl}</span><span class="strikes">${Array.from({length:d.zeroMax+1},(_,i)=>`<i class="sb ${i<k.zeros?"x":""}">${i<k.zeros?"✕":""}</i>`).join("")}</span></div>`;
+      h+= k.zeros>d.zeroMax?`<div class="verdict bad">${t.zeroBad(k.zeros,d.zeroMax)}</div>`
+        : k.missing?`<div class="verdict info">${t.zeroInfo(k.zeros,d.zeroMax,k.missing)}</div>`
+        : `<div class="verdict ok">${t.zeroOk}</div>`;
+    }
+    else if(thr==null&&d.creditUnknown){
       h+=`<div class="verdict info">${t.creditUnknown}<label class="row" style="color:inherit">${t.creditSet} <input type="text" inputmode="decimal" id="cr-${id}" data-f="credit" data-c="${id}" value="${esc(r.credit==null?"":r.credit)}" style="width:60px"></label></div>`;
     }
-    if(thr!=null){
+    if(thr!=null&&d.zeroMax==null){
       const miss=Math.max(0,thr-k.semPts);
       h+= k.creditOk?`<div class="verdict ok">${t.creditOk(thr)}</div>`:`<div class="verdict warn">${miss>0?t.needCredit(fmt(miss),thr):""}${k.partFails.map(p=>`<span>${t.partMin(esc(p.n),p.min)}</span>`).join("")}</div>`;
     } else if(k.partFails.length){
@@ -460,7 +534,7 @@ function courseCard(d){
   // exam
   if(d.exam){
     const lbls=[t.regular,t.resit1,t.resit2];
-    h+=`<div><div class="row" style="justify-content:space-between"><b style="font-size:13px">${t.exam} <span class="mono" style="color:var(--muted);font-weight:400">/ ${d.exam.max}${d.exam.min?` · ${t.min} ${d.exam.min}`:""}</span></b><span style="font-size:12px;color:var(--muted)">${t.examAttempts}: <span class="mono">${k.used} / 3</span></span></div>
+    h+=`<div><div class="row" style="justify-content:space-between"><b style="font-size:13px">${t.exam} <span class="mono" style="color:var(--muted);font-weight:400">/ ${d.exam.max}${d.exam.min?` · ${t.min} ${d.exam.min}`:""}</span></b><span class="strikes" role="img" aria-label="${t.examAttempts}: ${k.fails} ✕">${k.marks.map(m=>`<i class="sb ${m}">${m==="x"?"✕":m==="ok"?"✓":""}</i>`).join("")}</span></div>
     <div class="attempts">${lbls.map((l,i)=>`<label>${l}<input type="text" inputmode="decimal" id="ex-${id}-${i}" data-f="exam" data-c="${id}" data-k="${i}" value="${esc(r.exam[i])}"></label>`).join("")}</div></div>`;
     const need=Math.max(k.exMin,50-k.semPts);
     if(k.lastExam==null){ if(!d.free||k.anyPts) h+=`<div class="verdict info">${t.needExam(fmt(Math.min(need,d.exam.max)),k.exMin)}</div>`; }
@@ -475,6 +549,7 @@ function courseCard(d){
     const g=grade(k.semPts);
     h+=`<div class="totline"><span>${t.totalLbl}: <b class="mono">${fmt(k.semPts)}</b> / 100</span><span>${t.gradeLbl} <span class="grade" style="color:var(${k.semPts>=50?"--ok":"--bad"})">${g}</span></span></div>`;
   }
+  if(r.status!=="passed") h+= k.passedPts?`<button class="btn apply" type="button" data-apply="${id}">${t.apply(d.cr)}</button>`:`<button class="btn ghost" type="button" data-apply="${id}">${t.markPassed(d.cr)}</button>`;
   h+=`<div class="row" style="justify-content:space-between">`;
   if(d.id) h+=`<span class="src">${t.src} <a href="https://www.fit.vut.cz/study/course/${d.id}/${S.lang==="sk"?"":".en"}" target="_blank" rel="noopener">${t.fitPage}</a></span>`;
   if(d.custom) h+=`<button class="linkbtn" type="button" data-rmel="${id}" style="color:var(--bad)">${t.remove}</button>`;
@@ -488,6 +563,9 @@ function render(){
   document.getElementById("t-sub").textContent=t.sub;
   document.getElementById("lang-en").setAttribute("aria-pressed",S.lang==="en");
   document.getElementById("lang-sk").setAttribute("aria-pressed",S.lang==="sk");
+  document.getElementById("th-light").textContent=t.light;
+  document.getElementById("th-dark").textContent=t.dark;
+  applyTheme();
   renderSummary();renderPicker();
   const list=allCourses();
   let h="";
@@ -505,6 +583,23 @@ function render(){
   }
   document.getElementById("sems").innerHTML=h;
   document.getElementById("foot").innerHTML=`<p style="margin:0">${t.foot[0]}</p><h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div>`;
+}
+
+// Light / Dark choice is kept per device; with no choice the page follows the system
+function applyTheme(){
+  let m=null;try{m=localStorage.getItem("fit-theme")}catch(e){}
+  if(m)document.documentElement.setAttribute("data-mode",m);
+  const dark=m?m==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  document.getElementById("th-light").setAttribute("aria-pressed",!dark);
+  document.getElementById("th-dark").setAttribute("aria-pressed",dark);
+}
+
+// IDM / ILG: a second test with 0 points means no course credit, so the course is failed automatically
+function autoFail(code){
+  const d=COURSES.find(x=>x.c===code);if(!d||d.zeroMax==null)return;
+  const r=cs(code),k=calc(d);
+  if(k.zeros>d.zeroMax&&r.status!=="failed"){r.status="failed";r.autoFail=1}
+  else if(k.zeros<=d.zeroMax&&r.autoFail){r.status="enrolled";delete r.autoFail}
 }
 
 /* ---------- Events ---------- */
@@ -526,6 +621,7 @@ document.addEventListener("input",e=>{
   else if(f==="credit")r.credit=num(el.value);
   else return;
   if(f==="pt"){const x=r.extra.find(x=>x.id===el.dataset.k);if(x)x.val=el.value}
+  autoFail(c);
   rerender();changed();
 });
 document.addEventListener("change",e=>{
@@ -544,7 +640,10 @@ document.addEventListener("toggle",e=>{
 document.addEventListener("click",e=>{
   const b=e.target.closest("button");if(!b)return;
   if(b.id==="lang-en"||b.id==="lang-sk"){S.lang=b.id.slice(5);rerender();changed();return}
+  if(b.id==="th-light"||b.id==="th-dark"){try{localStorage.setItem("fit-theme",b.id.slice(3))}catch(e){}applyTheme();return}
+  if(b.dataset.view){S.view=b.dataset.view;render();changed();return}
   if(b.dataset.year||b.dataset.half){const c=cur();S.current=(b.dataset.year||c[0])+(b.dataset.half||c[1]);render();changed();return}
+  if(b.dataset.apply){cs(b.dataset.apply).status="passed";rerender();changed();return}
   if(b.dataset.retake){const r=cs(b.dataset.retake);r.taken=SLOTS[SLOTS.indexOf(r.taken)+2];r.enroll=2;r.status="planned";r.exam=["","",""];r.pts={};r.extra=[];rerender();changed();return}
   if(b.dataset.add){const c=b.dataset.add,n=document.getElementById("an-"+c).value.trim(),m=num(document.getElementById("am-"+c).value);if(!n)return document.getElementById("an-"+c).focus();
     cs(c).extra.push({id:"x"+Date.now().toString(36),n,max:m==null?"":m,val:""});rerender();changed();return}
@@ -564,6 +663,13 @@ document.addEventListener("click",e=>{
   const serverHasData=server&&server.courses&&Object.keys(server.courses).length;
   load(serverHasData?server:(local&&local.s)||server||null);
   if(!S.courses.ISM)cs("ISM");
+  // IDM changed from one 20-point row to 5 tests: drop the old total, move self-added "Test N" rows into the new slots
+  if(!S.idm5&&S.courses.IDM){const r=S.courses.IDM;
+    if(num(r.pts.p0)>4)delete r.pts.p0;
+    r.extra=r.extra.filter(x=>{const m=/^(test|písomka)\s*([1-5])$/i.exec(x.n.trim());if(!m)return true;r.pts["p"+(m[2]-1)]=x.val;delete r.pts[x.id];return false});
+  }
+  S.idm5=1;
+  COURSES.filter(d=>d.zeroMax!=null).forEach(d=>autoFail(d.c));
   render();
   setChip("saved",L().local);
   try{
