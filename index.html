@@ -1,0 +1,578 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>[hidden]{display:none!important}</style></head><body><title>FIT Study Index</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a student's "index" — summary band with the 180-credit bar, then one ledger section per semester */
+:root{
+  --paper:#f4f6f8; --card:#ffffff; --ink:#14202e; --muted:#5b6878; --line:#d8dee6;
+  --accent:#d0102b; --accent-soft:#fbe5e8; --blue:#1f4f8f; --blue-soft:#e3ecf7;
+  --ok:#1d7a4a; --ok-soft:#e1f2e8; --warn:#9a6200; --warn-soft:#fbf0d9; --bad:#b4232c; --bad-soft:#fbe3e4;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0f151d; --card:#17202b; --ink:#e6ebf1; --muted:#97a3b2; --line:#2a3644;
+  --accent:#ff4d64; --accent-soft:#3a1820; --blue:#7fb0ef; --blue-soft:#1b2a3d;
+  --ok:#5fd394; --ok-soft:#163023; --warn:#f0b956; --warn-soft:#33270f; --bad:#ff7a82; --bad-soft:#3a1a1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f151d; --card:#17202b; --ink:#e6ebf1; --muted:#97a3b2; --line:#2a3644;
+  --accent:#ff4d64; --accent-soft:#3a1820; --blue:#7fb0ef; --blue-soft:#1b2a3d;
+  --ok:#5fd394; --ok-soft:#163023; --warn:#f0b956; --warn-soft:#33270f; --bad:#ff7a82; --bad-soft:#3a1a1d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1080px;margin:0 auto;padding-block:20px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:14px;align-items:center}
+.stamp{width:46px;height:46px;border-radius:50%;border:2px solid var(--accent);color:var(--accent);display:grid;place-items:center;font-family:var(--f-mono);font-size:11px;font-weight:500;line-height:1.05;text-align:center;transform:rotate(-8deg)}
+.brand h1{font-size:28px}
+.brand p{margin:0;color:var(--muted);font-size:13px}
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
+.seg button{border:0;background:none;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 10px;border-radius:99px;background:var(--card);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip .dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.chip.saved .dot{background:var(--ok)} .chip.pending .dot{background:var(--warn)} .chip.err .dot{background:var(--bad)}
+
+/* summary */
+.summary{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;display:grid;gap:18px}
+.big{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
+.big .pct{font-family:var(--f-display);font-size:56px;font-weight:700;line-height:1;color:var(--ink)}
+.big .of{color:var(--muted)}
+.bar{position:relative;height:22px;border-radius:6px;background:var(--paper);border:1px solid var(--line);overflow:hidden}
+.bar .done{position:absolute;inset:0 auto 0 0;background:var(--accent)}
+.bar .prog{position:absolute;inset:0 auto 0 0;background:repeating-linear-gradient(135deg,var(--accent-soft) 0 6px,transparent 6px 12px);border-right:1px dashed var(--accent)}
+.bar .tick{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+.scale{position:relative;height:16px;font-size:11px;color:var(--muted)}
+.scale span{position:absolute;transform:translateX(-50%)}
+.scale span:first-child{transform:none}.scale span:last-child{transform:translateX(-100%)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+.reqs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.req{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:2px;min-width:0}
+.req .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.req .v{font-family:var(--f-mono);font-size:18px;font-weight:500}
+.req .s{font-size:12px;color:var(--muted)}
+.req.ok{border-color:color-mix(in srgb,var(--ok) 40%,var(--line));background:var(--ok-soft)}
+.req.warn{border-color:color-mix(in srgb,var(--warn) 40%,var(--line));background:var(--warn-soft)}
+.req.bad{border-color:color-mix(in srgb,var(--bad) 40%,var(--line));background:var(--bad-soft)}
+
+/* semester strip */
+.strip{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.strip button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;text-align:left;cursor:pointer;display:grid;gap:4px;min-width:0}
+.strip button.cur{border-color:var(--accent)}
+.strip .lbl{font-size:12px;font-weight:600}
+.strip .mini{height:5px;border-radius:3px;background:var(--paper);overflow:hidden}
+.strip .mini b{display:block;height:100%;background:var(--accent)}
+.strip .n{font-size:11px;color:var(--muted)}
+@media (max-width:640px){.strip{grid-template-columns:repeat(3,1fr)}}
+
+/* semester sections */
+.sem{display:grid;gap:12px}
+.sem-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px;border-bottom:2px solid var(--ink);padding-bottom:6px}
+.sem-head h2{font-size:22px}
+.sem-head .meta{color:var(--muted);font-size:13px}
+.tag-now{font-family:var(--f-body);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-left:8px;vertical-align:3px}
+.courses{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:12px;align-items:start}
+details.course{background:var(--card);border:1px solid var(--line);border-radius:12px;min-width:0}
+details.course[data-st="passed"]{border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
+details.course[data-st="failed"]{border-color:color-mix(in srgb,var(--bad) 45%,var(--line))}
+.course summary{list-style:none;cursor:pointer;padding:12px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:center}
+.course summary::-webkit-details-marker{display:none}
+.code{font-family:var(--f-mono);font-weight:500;font-size:14px;background:var(--blue-soft);color:var(--blue);border-radius:6px;padding:2px 7px}
+.cname{font-weight:600;font-size:14px;line-height:1.3;min-width:0}
+.cmeta{grid-column:2/4;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px}
+.pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;background:var(--paper);color:var(--muted);border:1px solid var(--line)}
+.pill.enrolled{background:var(--blue-soft);color:var(--blue);border-color:transparent}
+.pill.credit{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.pill.passed{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.pill.failed{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.cbody{padding:0 14px 14px;display:grid;gap:12px;border-top:1px solid var(--line);padding-top:12px}
+.row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.row label{font-size:12px;color:var(--muted);display:grid;gap:3px}
+.wrap>*,main>*,.sem>*{min-width:0}
+select{max-width:100%}
+.strip .lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+select,input[type=text]{background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:5px 8px;font-size:13px;min-width:0}
+table.pts{width:100%;border-collapse:collapse;font-size:13px}
+table.pts td{padding:4px 0;border-bottom:1px dashed var(--line);vertical-align:middle}
+table.pts td:first-child{width:100%;padding-right:8px}
+table.pts td.n{white-space:nowrap;text-align:right;color:var(--muted)}
+table.pts input{width:56px;text-align:right;font-family:var(--f-mono);padding:3px 6px}
+table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
+.minnote{font-size:11px;color:var(--warn)}
+.x{border:0;background:none;color:var(--muted);cursor:pointer;padding:0 4px;font-size:14px}
+.linkbtn{border:0;background:none;color:var(--blue);cursor:pointer;padding:0;font-size:12px;font-weight:500;text-align:left}
+.addrow{display:flex;gap:6px;flex-wrap:wrap}
+.addrow input{flex:1 1 120px}
+.addrow input.sm{flex:0 0 64px}
+.verdict{border-radius:8px;padding:8px 10px;font-size:13px}
+.verdict span{display:block}
+.verdict.ok{background:var(--ok-soft);color:var(--ok)}
+.verdict.warn{background:var(--warn-soft);color:var(--warn)}
+.verdict.bad{background:var(--bad-soft);color:var(--bad)}
+.verdict.info{background:var(--blue-soft);color:var(--blue)}
+.verdict b{font-weight:600}
+.attempts{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.attempts label{font-size:11px;color:var(--muted);display:grid;gap:2px}
+.attempts input{width:100%;text-align:right;font-family:var(--f-mono)}
+.grade{font-family:var(--f-display);font-size:26px;font-weight:700;line-height:1}
+.totline{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.src{font-size:11px;color:var(--muted)}
+.src a{color:var(--blue)}
+.addel{border:1px dashed var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:8px;background:transparent}
+.addel h3{font-family:var(--f-body);font-size:13px;font-weight:600}
+.addel .addrow select{flex:0 0 auto}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:7px;padding:5px 12px;font-size:13px;font-weight:500;cursor:pointer}
+.foot{font-size:12px;color:var(--muted);display:grid;gap:6px;max-width:72ch}
+.foot h3{font-family:var(--f-body);font-size:13px;color:var(--ink)}
+.grades{display:flex;flex-wrap:wrap;gap:6px}
+.grades span{font-family:var(--f-mono);font-size:11px;border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+@media (prefers-reduced-motion:no-preference){.bar .done,.bar .prog,.strip .mini b{transition:width .4s ease}}
+</style>
+
+<div class="wrap" id="app">
+  <header class="top">
+    <div class="brand">
+      <div class="stamp" aria-hidden="true">FIT<br>VUT</div>
+      <div>
+        <h1 id="t-title">FIT Study Index</h1>
+        <p id="t-sub">Bachelor · Information Technology (BIT) · Faculty of Information Technology, BUT Brno</p>
+      </div>
+    </div>
+    <div class="tools">
+      <span class="chip" id="savechip"><span class="dot"></span><span id="savetxt">Saved on this device</span></span>
+      <div class="seg" role="group" aria-label="Language">
+        <button id="lang-en" type="button" aria-pressed="true">EN</button>
+        <button id="lang-sk" type="button" aria-pressed="false">SK</button>
+      </div>
+    </div>
+  </header>
+  <section class="summary" id="summary"></section>
+  <nav class="strip" id="strip" aria-label="Semesters"></nav>
+  <main id="sems" style="display:grid;gap:32px"></main>
+  <footer class="foot" id="foot"></footer>
+</div>
+
+<script>
+/* ---------- Curriculum: BIT 2019-2029, plan for ac. y. 2026/27 (fit.vut.cz/study/program/9865) ---------- */
+const SLOTS=["1W","1S","2W","2S","3W","3S","4W","4S"];
+const P=(en,sk,max,min)=>({en,sk,max,min});
+const EX=(max,min)=>({max,min});
+const COURSES=[
+ // 1st year, winter
+ {c:"IDM",id:302514,en:"Discrete Mathematics",sk:"Diskrétna matematika",cr:4,t:"Cr+Ex",k:"C",s:"1W",parts:[P("Written tests at exercises","Písomky na cvičeniach",20)],exam:EX(80)},
+ {c:"IEL",id:302517,en:"Electronics for Information Technology",sk:"Elektronika pre informačné technológie",cr:6,t:"Cr+Ex",k:"C",s:"1W",parts:[P("Labs (6 × 3 pts)","Laboratóriá (6 × 3 b)",18,9),P("Semester project","Semestrálny projekt",12,3),P("Mid-term test","Polsemestrálna písomka",15)],exam:EX(55,27)},
+ {c:"ILG",id:302528,en:"Linear Algebra",sk:"Lineárna algebra",cr:5,t:"Cr+Ex",k:"C",s:"1W",parts:[1,2,3,4,5].map(i=>P("Test "+i,"Písomka "+i,4)),exam:EX(80)},
+ {c:"IUS",id:302578,en:"Introduction to Software Engineering",sk:"Úvod do softvérového inžinierstva",cr:5,t:"Cr+Ex",k:"C",s:"1W",credit:18,parts:[P("Exercises (4 × 3 pts)","Cvičenia (4 × 3 b)",12),P("Homework (ER diagram)","Domáca úloha (ER diagram)",12),P("Team project + defence","Tímový projekt + obhajoba",16)],exam:EX(60)},
+ {c:"IZP",id:302589,en:"Introduction to Programming Systems",sk:"Základy programovania",cr:7,t:"Cr+Ex",k:"C",s:"1W",credit:25,parts:[P("Computer labs","Počítačové cvičenia",20,12),P("Project 1","Projekt 1",7.5,1),P("Project 2","Projekt 2",7.5,1),P("Mid-term test","Polsemestrálna písomka",12)],exam:EX(53)},
+ {c:"ISM",id:302562,en:"Seminar of Mathematics",sk:"Seminár matematiky",cr:2,t:"Cr",k:"E",s:"1W",creditUnknown:true,parts:[P("Test 1","Písomka 1",10),P("Test 2","Písomka 2",10),P("Examples at the board (bonus)","Príklady pri tabuli (bonus)",3)]},
+ // 1st year, summer
+ {c:"IMA1",id:302530,en:"Mathematical Analysis 1",sk:"Matematická analýza 1",cr:4,t:"Cr+Ex",k:"C",s:"1S",parts:[P("Written tests","Písomky",20)],exam:EX(80)},
+ {c:"INC",id:302539,en:"Digital Systems Design",sk:"Návrh číslicových systémov",cr:5,t:"Cr+Ex",k:"C",s:"1S",parts:[P("Mid-term test","Polsemestrálna písomka",25),P("Homework + lab evaluation","Domáce úlohy + laboratóriá",20)],exam:EX(55)},
+ {c:"IOS",id:302543,en:"Operating Systems",sk:"Operačné systémy",cr:5,t:"Cr+Ex",k:"C",s:"1S",parts:[P("Project 1","Projekt 1",15),P("Project 2","Projekt 2",15),P("Mid-term test","Polsemestrálna písomka",10)],exam:EX(60)},
+ {c:"ISU",id:302567,en:"Machine Level Programming",sk:"Programovanie na strojovej úrovni",cr:6,t:"Cr+Ex",k:"C",s:"1S",credit:20,parts:[P("Tests in computer labs","Testy na počítačových cvičeniach",24),P("Mid-term test","Polsemestrálna písomka",16)],exam:EX(60,25)},
+ {c:"IZLO",id:302588,en:"Introduction to Logic for Computer Science",sk:"Úvod do logiky pre informatikov",cr:2,t:"Ex",k:"C",s:"1S",parts:[P("Projects","Projekty",20)],exam:EX(80,40)},
+ // 2nd year, winter
+ {c:"IAL",id:302503,en:"Algorithms",sk:"Algoritmy",cr:5,t:"Cr+Ex",k:"C",s:"2W",credit:15,parts:[P("Mid-term test","Polsemestrálna písomka",20),P("Project + defence","Projekt + obhajoba",15,6)],exam:EX(65)},
+ {c:"IFJ",id:302519,en:"Formal Languages and Compilers",sk:"Formálne jazyky a prekladače",cr:5,t:"Cr+Ex",k:"C",s:"2W",credit:20,parts:[P("Mid-term test","Polsemestrálna písomka",17),P("Team project (compiler)","Tímový projekt (prekladač)",28,12)],exam:EX(55)},
+ {c:"IMA2",id:302531,en:"Mathematical Analysis 2",sk:"Matematická analýza 2",cr:4,t:"Cr+Ex",k:"C",s:"2W",credit:11,parts:[P("Control tests","Kontrolné písomky",20)],exam:EX(80)},
+ {c:"INP",id:302542,en:"Design of Computer Systems",sk:"Návrh počítačových systémov",cr:6,t:"Cr+Ex",k:"C",s:"2W",credit:20,parts:[P("Mid-term test","Polsemestrálna písomka",15),P("Projects","Projekty",33)],exam:EX(52)},
+ {c:"IPT",id:302549,en:"Probability and Statistics",sk:"Pravdepodobnosť a štatistika",cr:5,t:"Cr+Ex",k:"C",s:"2W",parts:[P("Credit test","Zápočtová písomka",20,10)],exam:EX(80)},
+ {c:"ISS",id:302564,en:"Signals and Systems",sk:"Signály a systémy",cr:5,t:"Ex",k:"C",s:"2W",parts:[P("Tests at exercises (6 × 2)","Písomky na cvičeniach (6 × 2)",12),P("Mid-term test","Polsemestrálna písomka",19),P("Project","Projekt",18)],exam:EX(51)},
+ // 2nd year, summer
+ {c:"IDS",id:302515,en:"Database Systems",sk:"Databázové systémy",cr:5,t:"Cr+Ex",k:"C",s:"2S",credit:24,parts:[P("Project (4 parts)","Projekt (4 časti)",34),P("Mid-term test","Polsemestrálna písomka",15)],exam:EX(51,20)},
+ {c:"IPK",id:302545,en:"Computer Communications and Networks",sk:"Počítačové komunikácie a siete",cr:4,t:"Cr+Ex",k:"C",s:"2S",parts:[P("Project 1","Projekt 1",20),P("Project 2","Projekt 2",20)],exam:EX(60)},
+ {c:"IPP",id:302546,en:"Principles of Programming Languages",sk:"Princípy programovacích jazykov",cr:5,t:"Cr+Ex",k:"C",s:"2S",parts:[P("Mid-term test","Polsemestrálna písomka",20),P("Project","Projekt",20)],exam:EX(60)},
+ {c:"IZG",id:302587,en:"Computer Graphics Principles",sk:"Základy počítačovej grafiky",cr:6,t:"Cr+Ex",k:"C",s:"2S",parts:[P("Labs","Laboratóriá",18),P("Mid-term test","Polsemestrálna písomka",10),P("Projects","Projekty",20)],exam:EX(52,20)},
+ {c:"IZU",id:302590,en:"Fundamentals of Artificial Intelligence",sk:"Základy umelej inteligencie",cr:4,t:"Cr+Ex",k:"C",s:"2S",parts:[P("Mid-term test","Polsemestrálna písomka",20),P("Projects","Projekty",20)],exam:EX(60,25)},
+ // 3rd year
+ {c:"IIS",id:302522,en:"Information Systems",sk:"Informačné systémy",cr:4,t:"Cr+Ex",k:"C",s:"3W",credit:25,parts:[P("Mid-term test","Polsemestrálna písomka",19),P("Project","Projekt",30)],exam:EX(51,20)},
+ {c:"IMP",id:302535,en:"Microprocessors and Embedded Systems",sk:"Mikroprocesory a vstavané systémy",cr:6,t:"Cr+Ex",k:"C",s:"3W",parts:[P("Labs","Laboratóriá",16),P("Mid-term test","Polsemestrálna písomka",19),P("Project","Projekt",14,5)],exam:EX(51)},
+ {c:"IMS",id:302537,en:"Modelling and Simulation",sk:"Modelovanie a simulácie",cr:5,t:"Cr+Ex",k:"C",s:"3W",credit:10,parts:[P("Mid-term test","Polsemestrálna písomka",10),P("Project","Projekt",20)],exam:EX(70)},
+ {c:"ISA",id:302558,en:"Network Applications and Network Administration",sk:"Sieťové aplikácie a správa sietí",cr:5,t:"Cr+Ex",k:"C",s:"3W",credit:15,parts:[P("Labs","Laboratóriá",20),P("Project","Projekt",20)],exam:EX(60,20)},
+ {c:"ITT",id:302571,en:"Term Thesis",sk:"Semestrálny projekt",cr:5,t:"Cr",k:"C",s:"3W",parts:[]},
+ {c:"ITU",id:302573,en:"User Interface Programming",sk:"Tvorba užívateľských rozhraní",cr:5,t:"ClCr",k:"C",s:"3W",parts:[P("Final test","Záverečný test",20),P("Computer labs","Počítačové cvičenia",25),P("Projects","Projekty",55)]},
+ {c:"IBT",id:302508,en:"Bachelor's Thesis",sk:"Bakalárska práca",cr:13,t:"Cr",k:"C",s:"3S",parts:[]},
+];
+// Compulsory-elective groups: PVA (English, B1 or higher) and PVT (technical)
+const PVA=[
+ {c:"GEN",id:302490,en:"General English Exam B1",sk:"Všeobecná skúška z angličtiny B1",cr:1,t:"Ex",s:"1W"},
+ {c:"ZAN4",id:302705,en:"B1 level (CEFR) English exam",sk:"Skúška z angličtiny na úrovni B1",cr:1,t:"Ex",s:"1W"},
+ {c:"BAN4",id:302444,en:"English for Bachelors – Intermediate 2",sk:"Angličtina pre bakalárov – stredne pokročilí 2",cr:3,t:"Cr+Ex",s:"1S"},
+ {c:"AIT",id:302431,en:"English for IT",sk:"Angličtina pre IT",cr:3,t:"Cr+Ex",s:"1S"},
+ {c:"0A8",id:300427,en:"English B2-2",sk:"Angličtina B2-2",cr:3,t:"Cr+Ex",s:"2S"},
+];
+const PVT=[
+ {c:"IVH",id:302580,en:"VHDL Seminar",sk:"Seminár VHDL",cr:4,t:"ClCr",s:"1S"},
+ {c:"ICP",id:302512,en:"The C++ Programming Language",sk:"Programovanie v C++",cr:4,t:"ClCr",s:"2S"},
+ {c:"ICS",id:302513,en:"The C# Programming Language",sk:"Programovanie v C#",cr:4,t:"ClCr",s:"2S"},
+ {c:"IJA",id:302524,en:"Java Programming Language",sk:"Programovanie v jazyku Java",cr:4,t:"ClCr",s:"2S"},
+];
+
+/* ---------- Strings ---------- */
+const T={
+ en:{title:"FIT Study Index",sub:"Bachelor · Information Technology (BIT) · Faculty of Information Technology, BUT Brno",
+  done:"done",of:"of 180 credits",earned:"credits earned",inprog:"in progress this term",
+  lgPassed:"Passed",lgProg:"Enrolled now",lgLeft:"Still ahead",
+  rComp:"Compulsory courses",rCompS:"146 credits must all be passed",rEng:"English (PVA)",rTech:"Technical elective (PVT)",rTechS:"one of IVH, ICP, ICS, IJA",
+  rElec:"Elective credits",rElecS:"fill up to 180 in total",rFirst:"1st semester rule",rFirstS:"at least 15 credits to continue",
+  rYear:"Year {y} rule",rYearS:"at least 30 credits this year",rState:"State final exam",rStateS:"thesis defence + oral part, after 180 credits",
+  passedW:"passed",notChosen:"not chosen yet",locked:"after all credits",
+  sem:{W:"winter",S:"summer"},yearN:y=>`Year ${y}`,semTitle:(y,s)=>`Year ${y} · ${s} semester`,now:"current",
+  cr:"cr",credits:"credits",
+  st:{planned:"Planned",enrolled:"In progress",credit:"Zápočet ✓",passed:"Passed",failed:"Failed"},
+  status:"Status",taken:"Taken in",enroll:"Enrolment",e1:"1st time",e2:"Repeated (2nd)",
+  partsH:"Points during the semester",sem_total:"Semester total",addItem:"Add a test or item",itemName:"Name, e.g. Test 3",max:"max",add:"Add",
+  min:"min",exam:"Exam",examAttempts:"Exam attempts",regular:"Regular",resit1:"1st resit",resit2:"2nd resit",
+  needCredit:(n,t)=>`<b>${n} more points</b> needed for zápočet (${t} required).`,
+  creditOk:t=>`<b>Zápočet reached</b> (${t} required). You can sign up for the exam.`,
+  creditUnknown:"The course page does not list a zápočet threshold. Set the one your teacher announced:",
+  creditSet:"Zápočet threshold",
+  partMin:(name,m)=>`${name}: at least ${m} pts needed`,
+  needExam:(n,m)=>`You need <b>${n} pts</b> from the exam to reach 50.${m?` Exam minimum is ${m}.`:""}`,
+  examBelowMin:m=>`Exam score is below the minimum of ${m} pts, so the exam counts as failed.`,
+  totalLbl:"Total",gradeLbl:"Grade",
+  passedMsg:g=>`Passed with ${g}.`,failedMsg:"Not passed yet (under 50 points).",
+  lastTry:"This is your last exam attempt in this enrolment.",
+  noTriesLeft1:"All 3 exam attempts used. Re-enrol the course next year (2nd and last enrolment).",
+  noTriesLeft2:"All attempts in the repeated enrolment are used. Contact the study office right away: a compulsory course cannot be enrolled a third time.",
+  repeatWarn:"Repeated enrolment: this is the last chance to pass the course.",
+  crOnly:"This course ends with zápočet only. Mark it as Passed once you get it.",
+  noPts:"No points are tracked for this course. Change the status when it is done.",
+  ccNote:"Classified credit: the total from 100 points sets your grade.",
+  src:"Rules from",fitPage:"the course page",remove:"Remove course",
+  addElective:"Add an elective course",elCode:"Code",elName:"Name",elCr:"Cr",elType:"Ends with",
+  pvaPick:"English course (PVA)",pvtPick:"Technical course (PVT)",choose:"Choose…",
+  saved:"Saved",saving:"Saving…",unsaved:"Unsaved changes",local:"Saved on this device",readonly:"View only · saved on this device",saveErr:"Could not save · kept on this device",
+  footH:"How the tracker counts",
+  foot:["Credits count when a course is marked <b>Passed</b>. Courses that are <b>In progress</b> show as the striped part of the bar.","Grades follow the BUT scale. Every exam has a regular term and two resit terms. A course you fail can be enrolled one more time, and that repeated enrolment is your last.","Point splits and thresholds come from each course page on fit.vut.cz for 2026/27. Teachers sometimes change details in the first lecture, so you can edit any maximum or add your own items."],
+  gradesH:"Grade scale"},
+ sk:{title:"FIT študijný index",sub:"Bakalár · Informačné technológie (BIT) · Fakulta informačných technológií VUT v Brne",
+  done:"hotovo",of:"zo 180 kreditov",earned:"získaných kreditov",inprog:"prebieha tento semester",
+  lgPassed:"Absolvované",lgProg:"Zapísané teraz",lgLeft:"Ešte pred tebou",
+  rComp:"Povinné predmety",rCompS:"všetkých 146 kreditov treba splniť",rEng:"Angličtina (PVA)",rTech:"Technický PV predmet (PVT)",rTechS:"jeden z IVH, ICP, ICS, IJA",
+  rElec:"Voliteľné kredity",rElecS:"doplnok do 180 kreditov",rFirst:"Pravidlo 1. semestra",rFirstS:"aspoň 15 kreditov na pokračovanie",
+  rYear:"Pravidlo {y}. ročníka",rYearS:"aspoň 30 kreditov za rok",rState:"Štátna záverečná skúška",rStateS:"obhajoba + ústna časť, po 180 kreditoch",
+  passedW:"splnené",notChosen:"ešte nevybrané",locked:"po získaní kreditov",
+  sem:{W:"zimný",S:"letný"},yearN:y=>`${y}. ročník`,semTitle:(y,s)=>`${y}. ročník · ${s} semester`,now:"aktuálny",
+  cr:"kr",credits:"kreditov",
+  st:{planned:"Plánované",enrolled:"Prebieha",credit:"Zápočet ✓",passed:"Absolvované",failed:"Neúspešné"},
+  status:"Stav",taken:"Zapísané v",enroll:"Zápis",e1:"1. zápis",e2:"Opakovaný (2.)",
+  partsH:"Body počas semestra",sem_total:"Spolu za semester",addItem:"Pridať písomku alebo položku",itemName:"Názov, napr. Písomka 3",max:"max",add:"Pridať",
+  min:"min",exam:"Skúška",examAttempts:"Termíny skúšky",regular:"Riadny",resit1:"1. opravný",resit2:"2. opravný",
+  needCredit:(n,t)=>`Na zápočet ti chýba <b>${n} bodov</b> (treba ${t}).`,
+  creditOk:t=>`<b>Zápočet máš</b> (treba ${t}). Môžeš sa prihlásiť na skúšku.`,
+  creditUnknown:"Stránka predmetu neuvádza hranicu na zápočet. Nastav si tú, ktorú oznámil vyučujúci:",
+  creditSet:"Hranica na zápočet",
+  partMin:(name,m)=>`${name}: treba aspoň ${m} b`,
+  needExam:(n,m)=>`Zo skúšky potrebuješ <b>${n} b</b>, aby si mal 50.${m?` Minimum zo skúšky je ${m}.`:""}`,
+  examBelowMin:m=>`Skúška je pod minimom ${m} b, takže sa počíta ako neúspešná.`,
+  totalLbl:"Spolu",gradeLbl:"Známka",
+  passedMsg:g=>`Absolvované so známkou ${g}.`,failedMsg:"Zatiaľ nesplnené (menej ako 50 bodov).",
+  lastTry:"Toto je tvoj posledný termín v tomto zápise.",
+  noTriesLeft1:"Všetky 3 termíny sú vyčerpané. Predmet si zapíš znova budúci rok (2. a posledný zápis).",
+  noTriesLeft2:"Vyčerpal si termíny aj v opakovanom zápise. Hneď kontaktuj študijné oddelenie: povinný predmet sa nedá zapísať tretíkrát.",
+  repeatWarn:"Opakovaný zápis: je to posledná šanca predmet splniť.",
+  crOnly:"Predmet končí len zápočtom. Keď ho dostaneš, označ ho ako Absolvované.",
+  noPts:"Pri tomto predmete sa body nesledujú. Po splnení zmeň stav.",
+  ccNote:"Klasifikovaný zápočet: známku určuje súčet zo 100 bodov.",
+  src:"Pravidlá zo",fitPage:"stránky predmetu",remove:"Odstrániť predmet",
+  addElective:"Pridať voliteľný predmet",elCode:"Skratka",elName:"Názov",elCr:"Kr",elType:"Ukončenie",
+  pvaPick:"Kurz angličtiny (PVA)",pvtPick:"Technický predmet (PVT)",choose:"Vyber…",
+  saved:"Uložené",saving:"Ukladám…",unsaved:"Neuložené zmeny",local:"Uložené v tomto zariadení",readonly:"Len na čítanie · uložené v zariadení",saveErr:"Nepodarilo sa uložiť · ostáva v zariadení",
+  footH:"Ako tracker počíta",
+  foot:["Kredity sa započítajú, keď predmet označíš ako <b>Absolvované</b>. Predmety, ktoré <b>Prebiehajú</b>, sú na lište šrafované.","Známky podľa stupnice VUT. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz a tento opakovaný zápis je posledný.","Rozdelenie bodov a hranice sú zo stránok predmetov na fit.vut.cz pre 2026/27. Vyučujúci ich niekedy upresnia na prvej prednáške, preto môžeš každé maximum upraviť alebo pridať vlastné položky."],
+  gradesH:"Stupnica hodnotenia"}
+};
+const TYPE={en:{"Cr+Ex":"Zápočet + exam","Ex":"Exam","Cr":"Zápočet","ClCr":"Classified credit"},sk:{"Cr+Ex":"Zápočet + skúška","Ex":"Skúška","Cr":"Zápočet","ClCr":"Klasifikovaný zápočet"}};
+
+/* ---------- State ---------- */
+const LS="fit-index-state-v1";
+let S=null, artifact=null, canPublish=true, dirty=false, timer=null;
+const cur=()=>S.current||"1W";
+function defaults(){
+  return {v:1,lang:"en",current:"1W",pva:"",pvt:"",courses:{},electives:[]};
+}
+function cs(code){ // per-course record
+  if(!S.courses[code]){
+    const def=allCourses().find(x=>x.c===code);
+    S.courses[code]={status:def&&def.s===cur()?"enrolled":"planned",pts:{},extra:[],maxOv:{},exam:["","",""],enroll:1,taken:def?def.s:"1W",credit:null};
+  }
+  return S.courses[code];
+}
+function allCourses(){
+  const list=[...COURSES];
+  const a=PVA.find(x=>x.c===S.pva); if(a) list.push({...a,k:"A",parts:a.t==="Ex"?[]:[],exam:a.t==="Ex"||a.t==="Cr+Ex"?EX(100):null,free:true});
+  const b=PVT.find(x=>x.c===S.pvt); if(b) list.push({...b,k:"T",parts:[],free:true});
+  for(const e of S.electives) list.push({c:e.c,en:e.n,sk:e.n,cr:e.cr,t:e.t,k:"E",s:e.s,parts:[],exam:e.t==="Cr+Ex"||e.t==="Ex"?EX(100):null,custom:true,free:true});
+  return list;
+}
+function load(json){
+  S=Object.assign(defaults(),json||{});
+}
+function localSave(){try{localStorage.setItem(LS,JSON.stringify({at:Date.now(),s:S}))}catch(e){}}
+function localLoad(){try{const r=JSON.parse(localStorage.getItem(LS)||"null");return r}catch(e){return null}}
+
+/* ---------- Saving: publish data/state.json through the artifact capability, plus a device copy ---------- */
+function setChip(kind,txt){const c=document.getElementById("savechip");c.className="chip "+kind;document.getElementById("savetxt").textContent=txt}
+function changed(){
+  localSave();
+  if(!artifact||!canPublish){setChip("saved",L()[canPublish?"local":"readonly"]);return}
+  dirty=true;setChip("pending",L().unsaved);
+  clearTimeout(timer);timer=setTimeout(publishNow,3000);
+}
+async function publishNow(){
+  if(!dirty||!artifact)return;dirty=false;setChip("pending",L().saving);
+  try{await artifact.publish({"data/state.json":JSON.stringify(S)});setChip("saved",L().saved)}
+  catch(e){
+    const code=e&&e.code;
+    if(["not_writer","not_granted","capability_disabled","consent_required","not_declared","capability_removed"].includes(code)){canPublish=false;setChip("saved",L().readonly)}
+    else if(code==="conflict"){setChip("pending",L().saving)}
+    else setChip("err",L().saveErr);
+  }
+}
+
+/* ---------- Calculations ---------- */
+const num=v=>{const n=parseFloat(String(v).replace(",","."));return isFinite(n)?n:null};
+const fmt=n=>Math.round(n*10)/10;
+const L=()=>T[S.lang];
+const nm=o=>o[S.lang]||o.en;
+function grade(p){return p>=90?"A":p>=80?"B":p>=70?"C":p>=60?"D":p>=50?"E":"F"}
+function partsOf(d){
+  const r=cs(d.c);
+  const base=(d.parts||[]).map((p,i)=>({key:"p"+i,n:nm(p),max:r.maxOv["p"+i]!=null?r.maxOv["p"+i]:p.max,min:p.min,val:r.pts["p"+i]}));
+  const extra=r.extra.map(x=>({key:x.id,n:x.n,max:x.max,val:x.val,custom:true}));
+  return [...base,...extra];
+}
+function calc(d){
+  const r=cs(d.c), parts=partsOf(d);
+  const semPts=parts.reduce((a,p)=>a+(num(p.val)||0),0);
+  const anyPts=parts.some(p=>num(p.val)!=null);
+  const threshold=d.credit!=null?d.credit:(r.credit!=null?r.credit:null);
+  const partFails=parts.filter(p=>p.min&& (num(p.val)||0)<p.min);
+  const hasCreditStep=d.t==="Cr+Ex"||d.t==="Cr";
+  const creditOk=hasCreditStep && (threshold==null?partFails.length===0&&!d.creditUnknown:semPts>=threshold&&partFails.length===0);
+  const tries=r.exam.map(num);
+  const used=tries.filter(x=>x!=null).length;
+  const lastExam=[...tries].reverse().find(x=>x!=null);
+  const exMin=d.exam&&d.exam.min||0;
+  const examOk=lastExam!=null&&lastExam>=exMin;
+  const total=semPts+(d.exam&&examOk?lastExam:0);
+  return {r,parts,semPts,anyPts,threshold,partFails,creditOk,tries,used,lastExam,exMin,examOk,total};
+}
+function stats(){
+  const list=allCourses();let passed=0,prog=0,comp=0,elec=0;
+  const byYear={},bySlot={};
+  for(const d of list){
+    const r=cs(d.c);
+    if(r.status==="passed"){passed+=d.cr;if(d.k==="C")comp+=d.cr;if(d.k==="E")elec+=d.cr;
+      byYear[r.taken[0]]=(byYear[r.taken[0]]||0)+d.cr;bySlot[r.taken]=(bySlot[r.taken]||0)+d.cr}
+    else if(r.status==="enrolled"||r.status==="credit")prog+=d.cr;
+  }
+  return {passed,prog,comp,elec,byYear,bySlot,list};
+}
+
+/* ---------- Rendering ---------- */
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function slotName(s){return L().semTitle(s[0],L().sem[s[1]])}
+function renderSummary(){
+  const t=L(),st=stats();
+  const pct=Math.min(100,st.passed/180*100), pp=Math.min(100-pct,st.prog/180*100);
+  const engD=PVA.find(x=>x.c===S.pva), engR=S.pva?cs(S.pva):null;
+  const tecD=PVT.find(x=>x.c===S.pvt), tecR=S.pvt?cs(S.pvt):null;
+  const y=+cur()[0];
+  const first=st.bySlot["1W"]||0, yr=st.byYear[String(y)]||0;
+  const req=(cls,k,v,s)=>`<div class="req ${cls}"><span class="k">${k}</span><span class="v">${v}</span><span class="s">${s}</span></div>`;
+  let h=`<div class="big"><span class="pct mono">${fmt(pct)}%</span><span class="of">${t.done} · <b class="mono">${st.passed}</b> ${t.of}</span><span class="of">· <b class="mono">${st.prog}</b> ${t.credits} ${t.inprog}</span></div>
+  <div><div class="bar" role="img" aria-label="${st.passed} / 180"><div class="prog" style="width:${pct+pp}%"></div><div class="done" style="width:${pct}%"></div>${[60,120].map(x=>`<div class="tick" style="left:${x/180*100}%"></div>`).join("")}</div>
+  <div class="scale mono"><span style="left:0">0</span><span style="left:33.33%">60 · ${t.yearN(1)}</span><span style="left:66.67%">120 · ${t.yearN(2)}</span><span style="left:100%">180</span></div></div>
+  <div class="legend"><span><i style="background:var(--accent)"></i>${t.lgPassed}</span><span><i style="background:repeating-linear-gradient(135deg,var(--accent-soft) 0 3px,var(--card) 3px 6px);border:1px dashed var(--accent)"></i>${t.lgProg}</span><span><i style="background:var(--paper);border:1px solid var(--line)"></i>${t.lgLeft}</span></div>
+  <div class="reqs">`;
+  h+=req(st.comp>=146?"ok":"",t.rComp,`${st.comp} / 146`,t.rCompS);
+  h+=req(engR&&engR.status==="passed"?"ok":S.pva?"":"warn",t.rEng,engD?`${engD.c} · ${engR.status==="passed"?t.passedW:t.st[engR.status]}`:t.notChosen,"B1+");
+  h+=req(tecR&&tecR.status==="passed"?"ok":S.pvt?"":"warn",t.rTech,tecD?`${tecD.c} · ${tecR.status==="passed"?t.passedW:t.st[tecR.status]}`:t.notChosen,t.rTechS);
+  h+=req("",t.rElec,`${st.elec} ${t.cr}`,t.rElecS);
+  if(y===1&&cur()==="1W") h+=req(first>=15?"ok":"warn",t.rFirst,`${first} / 15`,t.rFirstS);
+  else h+=req(yr>=30?"ok":"warn",t.rYear.replace("{y}",y),`${yr} / 30`,t.rYearS);
+  h+=req(st.passed>=180?"ok":"",t.rState,st.passed>=180?"✓":t.locked,t.rStateS);
+  h+=`</div>`;
+  document.getElementById("summary").innerHTML=h;
+}
+function renderStrip(){
+  const st=stats(),t=L();
+  document.getElementById("strip").innerHTML=SLOTS.slice(0,6).map(s=>{
+    const inSlot=st.list.filter(d=>cs(d.c).taken===s);
+    const tot=inSlot.reduce((a,d)=>a+d.cr,0), got=inSlot.filter(d=>cs(d.c).status==="passed").reduce((a,d)=>a+d.cr,0);
+    return `<button type="button" data-goto="${s}" class="${s===cur()?"cur":""}"><span class="lbl">${s[0]}${S.lang==="sk"?". roč.":"y"} · ${t.sem[s[1]]}</span><span class="mini"><b style="width:${tot?got/tot*100:0}%"></b></span><span class="n mono">${got} / ${tot} ${t.cr}</span></button>`}).join("");
+}
+function courseCard(d){
+  const t=L(),k=calc(d),r=k.r,id=d.c;
+  const crOnly=d.t==="Cr"; const cc=d.t==="ClCr";
+  const stOpts=(crOnly||cc?["planned","enrolled","passed","failed"]:d.t==="Ex"?["planned","enrolled","passed","failed"]:["planned","enrolled","credit","passed","failed"]);
+  const kindLbl={C:"",E:S.lang==="sk"?"voliteľný":"elective",A:"PVA",T:"PVT"}[d.k||"C"];
+  let h=`<details class="course" data-st="${r.status}" id="c-${id}" ${S.open&&S.open[id]?"open":""}><summary>
+   <span class="code">${esc(d.c)}</span><span class="cname">${esc(nm(d))}</span><span class="pill ${r.status}">${t.st[r.status]}</span>
+   <span class="cmeta"><span class="mono">${d.cr} ${t.cr}</span><span>${TYPE[S.lang][d.t]||d.t}</span>${kindLbl?`<span>${kindLbl}</span>`:""}${r.enroll===2?`<span style="color:var(--warn)">${t.e2}</span>`:""}${k.anyPts?`<span class="mono">${fmt(k.semPts)}${d.exam?"":" / "+fmt(k.parts.reduce((a,p)=>a+(num(p.max)||0),0))} b</span>`:""}</span>
+  </summary><div class="cbody">
+  <div class="row">
+   <label>${t.status}<select id="st-${id}" data-f="status" data-c="${id}">${stOpts.map(o=>`<option value="${o}" ${o===r.status?"selected":""}>${t.st[o]}</option>`).join("")}</select></label>
+   <label>${t.taken}<select id="tk-${id}" data-f="taken" data-c="${id}">${SLOTS.map(s=>`<option value="${s}" ${s===r.taken?"selected":""}>${s[0]}${S.lang==="sk"?". roč. ":"y "}${t.sem[s[1]]}</option>`).join("")}</select></label>
+   <label>${t.enroll}<select id="en-${id}" data-f="enroll" data-c="${id}"><option value="1" ${r.enroll===1?"selected":""}>${t.e1}</option><option value="2" ${r.enroll===2?"selected":""}>${t.e2}</option></select></label>
+  </div>`;
+  if(r.enroll===2&&r.status!=="passed") h+=`<div class="verdict warn">${t.repeatWarn}</div>`;
+  const hasPts=k.parts.length>0||!crOnly||d.creditUnknown;
+  if(k.parts.length||!d.free){
+    h+=`<div><table class="pts"><tbody>`;
+    for(const p of k.parts){
+      h+=`<tr><td>${esc(p.n)}${p.min?` <span class="minnote">${t.min} ${p.min}</span>`:""}</td><td class="n"><input type="text" inputmode="decimal" id="v-${id}-${p.key}" data-f="pt" data-c="${id}" data-k="${p.key}" value="${esc(p.val)}" aria-label="${esc(p.n)}"> / <input type="text" inputmode="decimal" id="m-${id}-${p.key}" data-f="max" data-c="${id}" data-k="${p.key}" value="${esc(p.max)}" aria-label="${t.max}" style="width:44px;background:transparent;border-color:transparent"></td><td>${p.custom?`<button class="x" type="button" data-del="${id}" data-k="${p.key}" aria-label="×">×</button>`:""}</td></tr>`;
+    }
+    if(k.parts.length) h+=`<tr class="sum"><td>${t.sem_total}</td><td class="n mono" style="color:var(--ink)">${fmt(k.semPts)} / ${fmt(k.parts.reduce((a,p)=>a+(num(p.max)||0),0))}</td><td></td></tr>`;
+    h+=`</tbody></table></div>`;
+  }
+  h+=`<div class="addrow"><input type="text" id="an-${id}" placeholder="${t.itemName}" aria-label="${t.itemName}"><input type="text" class="sm" inputmode="decimal" id="am-${id}" placeholder="${t.max}" aria-label="${t.max}"><button class="btn" type="button" data-add="${id}">${t.add}</button></div>`;
+  // zápočet
+  if(d.t==="Cr+Ex"||(crOnly&&k.parts.length)){
+    const thr=k.threshold;
+    if(thr==null&&d.creditUnknown){
+      h+=`<div class="verdict info">${t.creditUnknown}<label class="row" style="color:inherit">${t.creditSet} <input type="text" inputmode="decimal" id="cr-${id}" data-f="credit" data-c="${id}" value="${esc(r.credit==null?"":r.credit)}" style="width:60px"></label></div>`;
+    }
+    if(thr!=null){
+      const miss=Math.max(0,thr-k.semPts);
+      h+= k.creditOk?`<div class="verdict ok">${t.creditOk(thr)}</div>`:`<div class="verdict warn">${miss>0?t.needCredit(fmt(miss),thr):""}${k.partFails.map(p=>`<span>${t.partMin(esc(p.n),p.min)}</span>`).join("")}</div>`;
+    } else if(k.partFails.length){
+      h+=`<div class="verdict warn">${k.partFails.map(p=>`<span>${t.partMin(esc(p.n),p.min)}</span>`).join("")}</div>`;
+    }
+  }
+  if(crOnly&&!k.parts.length) h+=`<div class="src">${t.crOnly}</div>`;
+  if(cc) h+=`<div class="src">${t.ccNote}</div>`;
+  // exam
+  if(d.exam){
+    const lbls=[t.regular,t.resit1,t.resit2];
+    h+=`<div><div class="row" style="justify-content:space-between"><b style="font-size:13px">${t.exam} <span class="mono" style="color:var(--muted);font-weight:400">/ ${d.exam.max}${d.exam.min?` · ${t.min} ${d.exam.min}`:""}</span></b><span style="font-size:12px;color:var(--muted)">${t.examAttempts}: <span class="mono">${k.used} / 3</span></span></div>
+    <div class="attempts">${lbls.map((l,i)=>`<label>${l}<input type="text" inputmode="decimal" id="ex-${id}-${i}" data-f="exam" data-c="${id}" data-k="${i}" value="${esc(r.exam[i])}"></label>`).join("")}</div></div>`;
+    const need=Math.max(k.exMin,50-k.semPts);
+    if(k.lastExam==null){ if(!d.free||k.anyPts) h+=`<div class="verdict info">${t.needExam(fmt(Math.min(need,d.exam.max)),k.exMin)}</div>`; }
+    else{
+      const g=grade(k.total);
+      const okAll=k.examOk&&k.total>=50;
+      if(!k.examOk) h+=`<div class="verdict bad">${t.examBelowMin(k.exMin)}</div>`;
+      h+=`<div class="totline"><span>${t.totalLbl}: <b class="mono">${fmt(k.total)}</b> / 100</span><span>${t.gradeLbl} <span class="grade" style="color:var(${okAll?"--ok":"--bad"})">${okAll?g:"F"}</span></span></div>`;
+      h+= okAll?`<div class="verdict ok">${t.passedMsg(g)}</div>`:(k.used>=3?`<div class="verdict bad">${r.enroll===2?t.noTriesLeft2:t.noTriesLeft1}</div>`:k.used===2?`<div class="verdict warn">${t.failedMsg} ${t.lastTry}</div>`:`<div class="verdict warn">${t.failedMsg} ${t.needExam(fmt(Math.min(need,d.exam.max)),k.exMin)}</div>`);
+    }
+  } else if(cc && k.anyPts){
+    const g=grade(k.semPts);
+    h+=`<div class="totline"><span>${t.totalLbl}: <b class="mono">${fmt(k.semPts)}</b> / 100</span><span>${t.gradeLbl} <span class="grade" style="color:var(${k.semPts>=50?"--ok":"--bad"})">${g}</span></span></div>`;
+  }
+  h+=`<div class="row" style="justify-content:space-between">`;
+  if(d.id) h+=`<span class="src">${t.src} <a href="https://www.fit.vut.cz/study/course/${d.id}/${S.lang==="sk"?"":".en"}" target="_blank" rel="noopener">${t.fitPage}</a></span>`;
+  if(d.custom) h+=`<button class="linkbtn" type="button" data-rmel="${id}" style="color:var(--bad)">${t.remove}</button>`;
+  h+=`</div></div></details>`;
+  return h;
+}
+function render(){
+  const t=L();
+  document.documentElement.lang=S.lang;
+  document.getElementById("t-title").textContent=t.title;
+  document.getElementById("t-sub").textContent=t.sub;
+  document.getElementById("lang-en").setAttribute("aria-pressed",S.lang==="en");
+  document.getElementById("lang-sk").setAttribute("aria-pressed",S.lang==="sk");
+  renderSummary();renderStrip();
+  const list=allCourses();
+  const used=new Set(list.map(d=>cs(d.c).taken));
+  const slots=SLOTS.filter(s=>SLOTS.indexOf(s)<6||used.has(s));
+  let h="";
+  for(const s of slots){
+    const inSlot=list.filter(d=>cs(d.c).taken===s);
+    const tot=inSlot.reduce((a,d)=>a+d.cr,0);
+    h+=`<section class="sem" id="sem-${s}"><div class="sem-head"><h2>${slotName(s)}${s===cur()?`<span class="tag-now">${t.now}</span>`:""}</h2><span class="meta mono">${tot} ${t.credits}</span></div><div class="courses">`;
+    h+=inSlot.map(courseCard).join("");
+    if(s==="1W"||s===cur()){
+      h+=`<div class="addel"><h3>${t.pvaPick} · ${t.pvtPick}</h3><div class="addrow">
+        <select id="pva-pick" data-f="pva" aria-label="${t.pvaPick}"><option value="">${t.pvaPick}…</option>${PVA.map(x=>`<option value="${x.c}" ${S.pva===x.c?"selected":""}>${x.c} · ${nm(x)} (${x.cr})</option>`).join("")}</select>
+        <select id="pvt-pick" data-f="pvt" aria-label="${t.pvtPick}"><option value="">${t.pvtPick}…</option>${PVT.map(x=>`<option value="${x.c}" ${S.pvt===x.c?"selected":""}>${x.c} · ${nm(x)} (${x.cr})</option>`).join("")}</select></div></div>`;
+    }
+    if(s===cur()||s==="1W"){
+      h+=`<div class="addel"><h3>${t.addElective}</h3><div class="addrow"><input type="text" id="el-c-${s}" placeholder="${t.elCode}" class="sm" style="flex-basis:76px" aria-label="${t.elCode}"><input type="text" id="el-n-${s}" placeholder="${t.elName}" aria-label="${t.elName}"><input type="text" inputmode="numeric" id="el-cr-${s}" placeholder="${t.elCr}" class="sm" style="flex-basis:48px" aria-label="${t.elCr}"><select id="el-t-${s}" aria-label="${t.elType}">${Object.keys(TYPE.en).map(k=>`<option value="${k}">${TYPE[S.lang][k]}</option>`).join("")}</select><button class="btn" type="button" data-addel="${s}">${t.add}</button></div></div>`;
+    }
+    h+=`</div></section>`;
+  }
+  document.getElementById("sems").innerHTML=h;
+  document.getElementById("foot").innerHTML=`<h3>${t.footH}</h3>${t.foot.map(p=>`<p style="margin:0">${p}</p>`).join("")}<h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div>`;
+}
+
+/* ---------- Events ---------- */
+let focusId=null,caret=null;
+function rerender(){
+  const a=document.activeElement;focusId=a&&a.id;caret=a&&a.selectionStart;
+  S.open=S.open||{};document.querySelectorAll("details.course[open]").forEach(d=>S.open[d.id.slice(2)]=1);
+  render();
+  if(focusId){const el=document.getElementById(focusId);if(el){el.focus();try{if(caret!=null)el.setSelectionRange(caret,caret)}catch(e){}}}
+}
+document.addEventListener("input",e=>{
+  const el=e.target,f=el.dataset.f,c=el.dataset.c;if(!f)return;
+  const r=c?cs(c):null;
+  if(f==="pt")r.pts[el.dataset.k]=el.value;
+  else if(f==="max"){if(el.dataset.k.startsWith("p"))r.maxOv[el.dataset.k]=num(el.value);else{const x=r.extra.find(x=>x.id===el.dataset.k);if(x)x.max=num(el.value)}}
+  else if(f==="exam")r.exam[+el.dataset.k]=el.value;
+  else if(f==="credit")r.credit=num(el.value);
+  else return;
+  if(f==="pt"){const x=r.extra.find(x=>x.id===el.dataset.k);if(x)x.val=el.value}
+  rerender();changed();
+});
+document.addEventListener("change",e=>{
+  const el=e.target,f=el.dataset.f,c=el.dataset.c;if(!f)return;
+  if(f==="status")cs(c).status=el.value;
+  else if(f==="taken")cs(c).taken=el.value;
+  else if(f==="enroll")cs(c).enroll=+el.value;
+  else if(f==="pva"){S.pva=el.value;if(el.value){const r=cs(el.value);}}
+  else if(f==="pvt"){S.pvt=el.value;if(el.value)cs(el.value);}
+  else return;
+  rerender();changed();
+});
+document.addEventListener("toggle",e=>{
+  const d=e.target;if(!d.classList||!d.classList.contains("course"))return;
+  S.open=S.open||{};const k=d.id.slice(2);if(d.open)S.open[k]=1;else delete S.open[k];localSave();
+},true);
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.id==="lang-en"||b.id==="lang-sk"){S.lang=b.id.slice(5);rerender();changed();return}
+  if(b.dataset.goto){S.current=b.dataset.goto;render();changed();document.getElementById("sem-"+b.dataset.goto).scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});return}
+  if(b.dataset.add){const c=b.dataset.add,n=document.getElementById("an-"+c).value.trim(),m=num(document.getElementById("am-"+c).value);if(!n)return document.getElementById("an-"+c).focus();
+    cs(c).extra.push({id:"x"+Date.now().toString(36),n,max:m==null?"":m,val:""});rerender();changed();return}
+  if(b.dataset.del){const r=cs(b.dataset.del);r.extra=r.extra.filter(x=>x.id!==b.dataset.k);rerender();changed();return}
+  if(b.dataset.addel){const s=b.dataset.addel,g=id=>document.getElementById(id);
+    const c=g("el-c-"+s).value.trim().toUpperCase(),n=g("el-n-"+s).value.trim(),cr=parseInt(g("el-cr-"+s).value,10),t=g("el-t-"+s).value;
+    if(!c||allCourses().some(x=>x.c===c))return g("el-c-"+s).focus(); if(!(cr>0))return g("el-cr-"+s).focus();
+    S.electives.push({c,n:n||c,cr,t,s});const r=cs(c);r.taken=s;r.status=s===cur()?"enrolled":"planned";S.open=S.open||{};S.open[c]=1;rerender();changed();return}
+  if(b.dataset.rmel){const c=b.dataset.rmel;S.electives=S.electives.filter(x=>x.c!==c);delete S.courses[c];rerender();changed();return}
+});
+
+/* ---------- Boot ---------- */
+(async function boot(){
+  let server=null;
+  try{const r=await fetch("data/state.json",{cache:"no-store"});if(r.ok)server=await r.json()}catch(e){}
+  const local=localLoad();
+  const serverHasData=server&&server.courses&&Object.keys(server.courses).length;
+  load(serverHasData?server:(local&&local.s)||server||null);
+  if(!S.courses.ISM)cs("ISM");
+  render();
+  setChip("saved",L().local);
+  try{
+    if(window.claude&&window.claude.use){
+      artifact=await window.claude.use("artifact");
+      if(artifact){setChip("saved",L().saved)}
+    }
+  }catch(e){artifact=null}
+})();
+</script>
+
+</body></html>
