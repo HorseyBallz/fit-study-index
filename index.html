@@ -65,15 +65,15 @@ button,select,input{font:inherit;color:inherit}
 .req.warn{border-color:color-mix(in srgb,var(--warn) 40%,var(--line));background:var(--warn-soft)}
 .req.bad{border-color:color-mix(in srgb,var(--bad) 40%,var(--line));background:var(--bad-soft)}
 
-/* semester strip */
-.strip{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-.strip button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;text-align:left;cursor:pointer;display:grid;gap:4px;min-width:0}
-.strip button.cur{border-color:var(--accent)}
-.strip .lbl{font-size:12px;font-weight:600}
-.strip .mini{height:5px;border-radius:3px;background:var(--paper);overflow:hidden}
-.strip .mini b{display:block;height:100%;background:var(--accent)}
-.strip .n{font-size:11px;color:var(--muted)}
-@media (max-width:640px){.strip{grid-template-columns:repeat(3,1fr)}}
+/* semester picker bar */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.picker{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--ink);color:var(--paper);border-radius:12px;padding:10px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.picker .lab{font-size:11px;text-transform:uppercase;letter-spacing:.08em;opacity:.7}
+.picker .grp{display:flex;align-items:center;gap:8px}
+.picker .seg{background:transparent;border-color:color-mix(in srgb,var(--paper) 30%,transparent)}
+.picker .seg button{color:var(--paper);opacity:.75;padding:6px 14px}
+.picker .seg button[aria-pressed="true"]{background:var(--paper);color:var(--ink);opacity:1}
+.picker .pmeta{margin-left:auto;font-size:13px;opacity:.85}
 
 /* semester sections */
 .sem{display:grid;gap:12px}
@@ -129,6 +129,8 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
 .src{font-size:11px;color:var(--muted)}
 .src a{color:var(--blue)}
 .addel{border:1px dashed var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:8px;background:transparent}
+.addel>summary,.addt>summary{cursor:pointer;list-style:none}
+.addel>summary::-webkit-details-marker,.addt>summary::-webkit-details-marker{display:none}
 .addel h3{font-family:var(--f-body);font-size:13px;font-weight:600}
 .addel .addrow select{flex:0 0 auto}
 .btn{border:1px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:7px;padding:5px 12px;font-size:13px;font-weight:500;cursor:pointer}
@@ -157,7 +159,7 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
     </div>
   </header>
   <section class="summary" id="summary"></section>
-  <nav class="strip" id="strip" aria-label="Semesters"></nav>
+  <nav class="picker" id="picker" aria-label="Semester"></nav>
   <main id="sems" style="display:grid;gap:32px"></main>
   <footer class="foot" id="foot"></footer>
 </div>
@@ -254,8 +256,9 @@ const T={
   pvaPick:"English course (PVA)",pvtPick:"Technical course (PVT)",choose:"Choose…",
   saved:"Saved",saving:"Saving…",unsaved:"Unsaved changes",local:"Saved on this device",readonly:"View only · saved on this device",saveErr:"Could not save · kept on this device",
   footH:"How the tracker counts",
-  foot:["Credits count when a course is marked <b>Passed</b>. Courses that are <b>In progress</b> show as the striped part of the bar.","Grades follow the BUT scale. Every exam has a regular term and two resit terms. A course you fail can be enrolled one more time, and that repeated enrolment is your last.","Point splits and thresholds come from each course page on fit.vut.cz for 2026/27. Teachers sometimes change details in the first lecture, so you can edit any maximum or add your own items."],
-  gradesH:"Grade scale"},
+  foot:["Credits count when you mark a course <b>Passed</b>. Every exam has a regular term and two resits. A failed course can be taken once more, the next year.","Grades follow the BUT scale. Every exam has a regular term and two resit terms. A course you fail can be enrolled one more time, and that repeated enrolment is your last.","Point splits and thresholds come from each course page on fit.vut.cz for 2026/27. Teachers sometimes change details in the first lecture, so you can edit any maximum or add your own items."],
+  gradesH:"Grade scale",yearLbl:"Year",semLbl:"Semester",semCap:{W:"Winter",S:"Summer"},moreCourses:"English, technical course or elective",
+  retake:"Retake next year"},
  sk:{title:"FIT študijný index",sub:"Bakalár · Informačné technológie (BIT) · Fakulta informačných technológií VUT v Brne",
   done:"hotovo",of:"zo 180 kreditov",earned:"získaných kreditov",inprog:"prebieha tento semester",
   lgPassed:"Absolvované",lgProg:"Zapísané teraz",lgLeft:"Ešte pred tebou",
@@ -290,8 +293,9 @@ const T={
   pvaPick:"Kurz angličtiny (PVA)",pvtPick:"Technický predmet (PVT)",choose:"Vyber…",
   saved:"Uložené",saving:"Ukladám…",unsaved:"Neuložené zmeny",local:"Uložené v tomto zariadení",readonly:"Len na čítanie · uložené v zariadení",saveErr:"Nepodarilo sa uložiť · ostáva v zariadení",
   footH:"Ako tracker počíta",
-  foot:["Kredity sa započítajú, keď predmet označíš ako <b>Absolvované</b>. Predmety, ktoré <b>Prebiehajú</b>, sú na lište šrafované.","Známky podľa stupnice VUT. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz a tento opakovaný zápis je posledný.","Rozdelenie bodov a hranice sú zo stránok predmetov na fit.vut.cz pre 2026/27. Vyučujúci ich niekedy upresnia na prvej prednáške, preto môžeš každé maximum upraviť alebo pridať vlastné položky."],
-  gradesH:"Stupnica hodnotenia"}
+  foot:["Kredity sa započítajú, keď predmet označíš ako <b>Absolvované</b>. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz, budúci rok.","Známky podľa stupnice VUT. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz a tento opakovaný zápis je posledný.","Rozdelenie bodov a hranice sú zo stránok predmetov na fit.vut.cz pre 2026/27. Vyučujúci ich niekedy upresnia na prvej prednáške, preto môžeš každé maximum upraviť alebo pridať vlastné položky."],
+  gradesH:"Stupnica hodnotenia",yearLbl:"Ročník",semLbl:"Semester",semCap:{W:"Zimný",S:"Letný"},moreCourses:"Angličtina, technický predmet alebo voliteľný predmet",
+  retake:"Opakovať budúci rok"}
 };
 const TYPE={en:{"Cr+Ex":"Zápočet + exam","Ex":"Exam","Cr":"Zápočet","ClCr":"Classified credit"},sk:{"Cr+Ex":"Zápočet + skúška","Ex":"Skúška","Cr":"Zápočet","ClCr":"Klasifikovaný zápočet"}};
 
@@ -395,24 +399,24 @@ function renderSummary(){
   let h=`<div class="big"><span class="pct mono">${fmt(pct)}%</span><span class="of">${t.done} · <b class="mono">${st.passed}</b> ${t.of}</span><span class="of">· <b class="mono">${st.prog}</b> ${t.credits} ${t.inprog}</span></div>
   <div><div class="bar" role="img" aria-label="${st.passed} / 180"><div class="prog" style="width:${pct+pp}%"></div><div class="done" style="width:${pct}%"></div>${[60,120].map(x=>`<div class="tick" style="left:${x/180*100}%"></div>`).join("")}</div>
   <div class="scale mono"><span style="left:0">0</span><span style="left:33.33%">60 · ${t.yearN(1)}</span><span style="left:66.67%">120 · ${t.yearN(2)}</span><span style="left:100%">180</span></div></div>
-  <div class="legend"><span><i style="background:var(--accent)"></i>${t.lgPassed}</span><span><i style="background:repeating-linear-gradient(135deg,var(--accent-soft) 0 3px,var(--card) 3px 6px);border:1px dashed var(--accent)"></i>${t.lgProg}</span><span><i style="background:var(--paper);border:1px solid var(--line)"></i>${t.lgLeft}</span></div>
   <div class="reqs">`;
-  h+=req(st.comp>=146?"ok":"",t.rComp,`${st.comp} / 146`,t.rCompS);
-  h+=req(engR&&engR.status==="passed"?"ok":S.pva?"":"warn",t.rEng,engD?`${engD.c} · ${engR.status==="passed"?t.passedW:t.st[engR.status]}`:t.notChosen,"B1+");
-  h+=req(tecR&&tecR.status==="passed"?"ok":S.pvt?"":"warn",t.rTech,tecD?`${tecD.c} · ${tecR.status==="passed"?t.passedW:t.st[tecR.status]}`:t.notChosen,t.rTechS);
-  h+=req("",t.rElec,`${st.elec} ${t.cr}`,t.rElecS);
   if(y===1&&cur()==="1W") h+=req(first>=15?"ok":"warn",t.rFirst,`${first} / 15`,t.rFirstS);
   else h+=req(yr>=30?"ok":"warn",t.rYear.replace("{y}",y),`${yr} / 30`,t.rYearS);
-  h+=req(st.passed>=180?"ok":"",t.rState,st.passed>=180?"✓":t.locked,t.rStateS);
+  h+=req(st.comp>=146?"ok":"",t.rComp,`${st.comp} / 146`,t.rCompS);
+  h+=req(engR&&engR.status==="passed"?"ok":"",t.rEng,engD?`${engD.c} · ${engR.status==="passed"?t.passedW:t.st[engR.status]}`:t.notChosen,"B1+");
+  h+=req(tecR&&tecR.status==="passed"?"ok":"",t.rTech,tecD?`${tecD.c} · ${tecR.status==="passed"?t.passedW:t.st[tecR.status]}`:t.notChosen,t.rTechS);
   h+=`</div>`;
   document.getElementById("summary").innerHTML=h;
 }
-function renderStrip(){
-  const st=stats(),t=L();
-  document.getElementById("strip").innerHTML=SLOTS.slice(0,6).map(s=>{
-    const inSlot=st.list.filter(d=>cs(d.c).taken===s);
-    const tot=inSlot.reduce((a,d)=>a+d.cr,0), got=inSlot.filter(d=>cs(d.c).status==="passed").reduce((a,d)=>a+d.cr,0);
-    return `<button type="button" data-goto="${s}" class="${s===cur()?"cur":""}"><span class="lbl">${s[0]}${S.lang==="sk"?". roč.":"y"} · ${t.sem[s[1]]}</span><span class="mini"><b style="width:${tot?got/tot*100:0}%"></b></span><span class="n mono">${got} / ${tot} ${t.cr}</span></button>`}).join("");
+function renderPicker(){
+  const st=stats(),t=L(),c=cur();
+  const years=["1","2","3"]; if(st.list.some(d=>cs(d.c).taken[0]==="4")||c[0]==="4") years.push("4");
+  const inSlot=st.list.filter(d=>cs(d.c).taken===c);
+  const tot=inSlot.reduce((a,d)=>a+d.cr,0), got=inSlot.filter(d=>cs(d.c).status==="passed").reduce((a,d)=>a+d.cr,0);
+  document.getElementById("picker").innerHTML=
+   `<div class="grp"><span class="lab">${t.yearLbl}</span><div class="seg" role="group" aria-label="${t.yearLbl}">${years.map(y=>`<button type="button" data-year="${y}" aria-pressed="${c[0]===y}">${y}.</button>`).join("")}</div></div>
+    <div class="grp"><span class="lab">${t.semLbl}</span><div class="seg" role="group" aria-label="${t.semLbl}">${["W","S"].map(s=>`<button type="button" data-half="${s}" aria-pressed="${c[1]===s}">${t.semCap[s]}</button>`).join("")}</div></div>
+    <span class="pmeta mono">${got} / ${tot} ${t.cr} ${t.passedW}</span>`;
 }
 function courseCard(d){
   const t=L(),k=calc(d),r=k.r,id=d.c;
@@ -425,8 +429,7 @@ function courseCard(d){
   </summary><div class="cbody">
   <div class="row">
    <label>${t.status}<select id="st-${id}" data-f="status" data-c="${id}">${stOpts.map(o=>`<option value="${o}" ${o===r.status?"selected":""}>${t.st[o]}</option>`).join("")}</select></label>
-   <label>${t.taken}<select id="tk-${id}" data-f="taken" data-c="${id}">${SLOTS.map(s=>`<option value="${s}" ${s===r.taken?"selected":""}>${s[0]}${S.lang==="sk"?". roč. ":"y "}${t.sem[s[1]]}</option>`).join("")}</select></label>
-   <label>${t.enroll}<select id="en-${id}" data-f="enroll" data-c="${id}"><option value="1" ${r.enroll===1?"selected":""}>${t.e1}</option><option value="2" ${r.enroll===2?"selected":""}>${t.e2}</option></select></label>
+   ${r.status==="failed"&&r.enroll===1&&SLOTS.indexOf(r.taken)+2<SLOTS.length?`<button class="btn" type="button" data-retake="${id}" style="align-self:end">${t.retake}</button>`:""}
   </div>`;
   if(r.enroll===2&&r.status!=="passed") h+=`<div class="verdict warn">${t.repeatWarn}</div>`;
   const hasPts=k.parts.length>0||!crOnly||d.creditUnknown;
@@ -438,7 +441,7 @@ function courseCard(d){
     if(k.parts.length) h+=`<tr class="sum"><td>${t.sem_total}</td><td class="n mono" style="color:var(--ink)">${fmt(k.semPts)} / ${fmt(k.parts.reduce((a,p)=>a+(num(p.max)||0),0))}</td><td></td></tr>`;
     h+=`</tbody></table></div>`;
   }
-  h+=`<div class="addrow"><input type="text" id="an-${id}" placeholder="${t.itemName}" aria-label="${t.itemName}"><input type="text" class="sm" inputmode="decimal" id="am-${id}" placeholder="${t.max}" aria-label="${t.max}"><button class="btn" type="button" data-add="${id}">${t.add}</button></div>`;
+  h+=`<details class="addt" id="ad-${id}" ${S.addOpen===id?"open":""}><summary class="linkbtn">+ ${t.addItem}</summary><div class="addrow" style="margin-top:6px"><input type="text" id="an-${id}" placeholder="${t.itemName}" aria-label="${t.itemName}"><input type="text" class="sm" inputmode="decimal" id="am-${id}" placeholder="${t.max}" aria-label="${t.max}"><button class="btn" type="button" data-add="${id}">${t.add}</button></div></details>`;
   // zápočet
   if(d.t==="Cr+Ex"||(crOnly&&k.parts.length)){
     const thr=k.threshold;
@@ -485,28 +488,23 @@ function render(){
   document.getElementById("t-sub").textContent=t.sub;
   document.getElementById("lang-en").setAttribute("aria-pressed",S.lang==="en");
   document.getElementById("lang-sk").setAttribute("aria-pressed",S.lang==="sk");
-  renderSummary();renderStrip();
+  renderSummary();renderPicker();
   const list=allCourses();
-  const used=new Set(list.map(d=>cs(d.c).taken));
-  const slots=SLOTS.filter(s=>SLOTS.indexOf(s)<6||used.has(s));
   let h="";
-  for(const s of slots){
+  for(const s of [cur()]){
     const inSlot=list.filter(d=>cs(d.c).taken===s);
     const tot=inSlot.reduce((a,d)=>a+d.cr,0);
-    h+=`<section class="sem" id="sem-${s}"><div class="sem-head"><h2>${slotName(s)}${s===cur()?`<span class="tag-now">${t.now}</span>`:""}</h2><span class="meta mono">${tot} ${t.credits}</span></div><div class="courses">`;
+    h+=`<section class="sem" id="sem-${s}"><div class="sem-head"><h2>${slotName(s)}</h2><span class="meta mono">${tot} ${t.credits}</span></div><div class="courses">`;
     h+=inSlot.map(courseCard).join("");
-    if(s==="1W"||s===cur()){
-      h+=`<div class="addel"><h3>${t.pvaPick} · ${t.pvtPick}</h3><div class="addrow">
+    h+=`</div><details class="addel" id="more-${s}"><summary class="linkbtn">+ ${t.moreCourses}</summary><div style="display:grid;gap:10px;margin-top:10px">
+      <div class="addrow">
         <select id="pva-pick" data-f="pva" aria-label="${t.pvaPick}"><option value="">${t.pvaPick}…</option>${PVA.map(x=>`<option value="${x.c}" ${S.pva===x.c?"selected":""}>${x.c} · ${nm(x)} (${x.cr})</option>`).join("")}</select>
-        <select id="pvt-pick" data-f="pvt" aria-label="${t.pvtPick}"><option value="">${t.pvtPick}…</option>${PVT.map(x=>`<option value="${x.c}" ${S.pvt===x.c?"selected":""}>${x.c} · ${nm(x)} (${x.cr})</option>`).join("")}</select></div></div>`;
-    }
-    if(s===cur()||s==="1W"){
-      h+=`<div class="addel"><h3>${t.addElective}</h3><div class="addrow"><input type="text" id="el-c-${s}" placeholder="${t.elCode}" class="sm" style="flex-basis:76px" aria-label="${t.elCode}"><input type="text" id="el-n-${s}" placeholder="${t.elName}" aria-label="${t.elName}"><input type="text" inputmode="numeric" id="el-cr-${s}" placeholder="${t.elCr}" class="sm" style="flex-basis:48px" aria-label="${t.elCr}"><select id="el-t-${s}" aria-label="${t.elType}">${Object.keys(TYPE.en).map(k=>`<option value="${k}">${TYPE[S.lang][k]}</option>`).join("")}</select><button class="btn" type="button" data-addel="${s}">${t.add}</button></div></div>`;
-    }
-    h+=`</div></section>`;
+        <select id="pvt-pick" data-f="pvt" aria-label="${t.pvtPick}"><option value="">${t.pvtPick}…</option>${PVT.map(x=>`<option value="${x.c}" ${S.pvt===x.c?"selected":""}>${x.c} · ${nm(x)} (${x.cr})</option>`).join("")}</select></div>
+      <h3>${t.addElective}</h3><div class="addrow"><input type="text" id="el-c-${s}" placeholder="${t.elCode}" class="sm" style="flex-basis:76px" aria-label="${t.elCode}"><input type="text" id="el-n-${s}" placeholder="${t.elName}" aria-label="${t.elName}"><input type="text" inputmode="numeric" id="el-cr-${s}" placeholder="${t.elCr}" class="sm" style="flex-basis:48px" aria-label="${t.elCr}"><select id="el-t-${s}" aria-label="${t.elType}">${Object.keys(TYPE.en).map(k=>`<option value="${k}">${TYPE[S.lang][k]}</option>`).join("")}</select><button class="btn" type="button" data-addel="${s}">${t.add}</button></div></div></details>`;
+    h+=`</section>`;
   }
   document.getElementById("sems").innerHTML=h;
-  document.getElementById("foot").innerHTML=`<h3>${t.footH}</h3>${t.foot.map(p=>`<p style="margin:0">${p}</p>`).join("")}<h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div>`;
+  document.getElementById("foot").innerHTML=`<p style="margin:0">${t.foot[0]}</p><h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div>`;
 }
 
 /* ---------- Events ---------- */
@@ -514,7 +512,9 @@ let focusId=null,caret=null;
 function rerender(){
   const a=document.activeElement;focusId=a&&a.id;caret=a&&a.selectionStart;
   S.open=S.open||{};document.querySelectorAll("details.course[open]").forEach(d=>S.open[d.id.slice(2)]=1);
+  const openX=[...document.querySelectorAll("details.addel[open],details.addt[open]")].map(d=>d.id);
   render();
+  openX.forEach(i=>{const d=document.getElementById(i);if(d)d.open=true});
   if(focusId){const el=document.getElementById(focusId);if(el){el.focus();try{if(caret!=null)el.setSelectionRange(caret,caret)}catch(e){}}}
 }
 document.addEventListener("input",e=>{
@@ -533,8 +533,7 @@ document.addEventListener("change",e=>{
   if(f==="status")cs(c).status=el.value;
   else if(f==="taken")cs(c).taken=el.value;
   else if(f==="enroll")cs(c).enroll=+el.value;
-  else if(f==="pva"){S.pva=el.value;if(el.value){const r=cs(el.value);}}
-  else if(f==="pvt"){S.pvt=el.value;if(el.value)cs(el.value);}
+  else if(f==="pva"||f==="pvt"){S[f]=el.value;if(el.value){const r=cs(el.value);r.taken=cur();if(r.status==="planned")r.status="enrolled"}}
   else return;
   rerender();changed();
 });
@@ -545,7 +544,8 @@ document.addEventListener("toggle",e=>{
 document.addEventListener("click",e=>{
   const b=e.target.closest("button");if(!b)return;
   if(b.id==="lang-en"||b.id==="lang-sk"){S.lang=b.id.slice(5);rerender();changed();return}
-  if(b.dataset.goto){S.current=b.dataset.goto;render();changed();document.getElementById("sem-"+b.dataset.goto).scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});return}
+  if(b.dataset.year||b.dataset.half){const c=cur();S.current=(b.dataset.year||c[0])+(b.dataset.half||c[1]);render();changed();return}
+  if(b.dataset.retake){const r=cs(b.dataset.retake);r.taken=SLOTS[SLOTS.indexOf(r.taken)+2];r.enroll=2;r.status="planned";r.exam=["","",""];r.pts={};r.extra=[];rerender();changed();return}
   if(b.dataset.add){const c=b.dataset.add,n=document.getElementById("an-"+c).value.trim(),m=num(document.getElementById("am-"+c).value);if(!n)return document.getElementById("an-"+c).focus();
     cs(c).extra.push({id:"x"+Date.now().toString(36),n,max:m==null?"":m,val:""});rerender();changed();return}
   if(b.dataset.del){const r=cs(b.dataset.del);r.extra=r.extra.filter(x=>x.id!==b.dataset.k);rerender();changed();return}
