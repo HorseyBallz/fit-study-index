@@ -30,6 +30,7 @@
   --accent:#ff4d64; --accent-soft:#3a1820; --blue:#7fb0ef; --blue-soft:#1b2a3d;
   --ok:#5fd394; --ok-soft:#163023; --warn:#f0b956; --warn-soft:#33270f; --bad:#ff7a82; --bad-soft:#3a1a1d; --bar:#000000; --bar-fg:#e6ebf1; color-scheme:dark}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 .sumhead{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
 .sumhead .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .note{margin:0;font-size:13px;color:var(--muted);max-width:70ch}
@@ -45,6 +46,22 @@ button,select,input{font:inherit;color:inherit}
 .brand{display:flex;gap:14px;align-items:center}
 .stamp{width:46px;height:46px;border-radius:50%;border:2px solid var(--accent);color:var(--accent);display:grid;place-items:center;font-family:var(--f-mono);font-size:11px;font-weight:500;line-height:1.05;text-align:center;transform:rotate(-8deg)}
 .brand h1{font-size:28px}
+.logorow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;min-width:0}
+.logo{height:52px;width:auto;max-width:100%;object-fit:contain;object-position:left;align-self:start}
+.madeby{margin:8px 0 0;font-size:13px;color:var(--muted);text-align:center}
+.gate{gap:16px}
+.foot .madeby{text-align:left}
+.unoff{margin:0;font-size:12px;color:var(--warn)}
+/* entry notice: shown until the viewer types the accept word */
+.gate{min-height:100%;display:grid;place-items:center;padding-block:32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.gate-card{max-width:560px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;display:grid;gap:14px}
+.gate-card h2{font-size:24px}
+.gate-card p{margin:0;color:var(--ink);max-width:65ch}
+.gate-card .warn{background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:10px 12px;font-size:14px}
+.gate-card label{display:grid;gap:6px;font-size:13px;color:var(--muted)}
+.gate-card input{font-size:16px;padding:8px 10px}
+.gate-card .btn{justify-self:start;padding:8px 16px;font-size:14px}
+.gate-card .btn:disabled{opacity:.4;cursor:not-allowed}
 .brand p{margin:0;color:var(--muted);font-size:13px}
 .tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
@@ -162,13 +179,27 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
 @media (prefers-reduced-motion:no-preference){.bar .done,.bar .prog,.strip .mini b{transition:width .4s ease}}
 </style>
 
-<div class="wrap" id="app">
+<div class="gate" id="gate" hidden>
+  <form class="gate-card" id="gate-form" novalidate>
+    <div class="row" style="justify-content:space-between"><h2 id="g-title">Before you continue</h2>
+      <div class="seg" role="group" aria-label="Language"><button id="g-en" type="button" aria-pressed="true">EN</button><button id="g-sk" type="button" aria-pressed="false">SK</button></div></div>
+    <p class="warn" id="g-warn"></p>
+    <p id="g-body"></p>
+    <label><span id="g-lbl"></span><input type="text" id="g-input" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
+    <button class="btn" type="submit" id="g-btn" disabled>Continue</button>
+  </form>
+  <p class="madeby">Made by Filipko ❤️</p>
+</div>
+<div class="wrap" id="app" hidden>
   <header class="top">
     <div class="brand">
-      <div class="stamp" aria-hidden="true">FIT<br>VUT</div>
-      <div>
-        <h1 id="t-title">FIT Study Index</h1>
+      <div style="display:grid;gap:10px;min-width:0">
+        <div class="logorow">
+          <img id="logo" class="logo" src="logo-en.webp" alt="Brno University of Technology, Faculty of Information Technology">
+          <h1 id="t-title">FIT Study Index</h1>
+        </div>
         <p id="t-sub">Bachelor · Information Technology (BIT) · Faculty of Information Technology, BUT Brno</p>
+        <p class="unoff" id="t-unoff">Unofficial student tool, not run by VUT or FIT.</p>
       </div>
     </div>
     <div class="tools">
@@ -283,7 +314,11 @@ const T={
   footH:"How the tracker counts",
   foot:["Credits count when you mark a course <b>Passed</b>. Every exam has a regular term and two resits. A failed course can be taken once more, the next year.","Grades follow the BUT scale. Every exam has a regular term and two resit terms. A course you fail can be enrolled one more time, and that repeated enrolment is your last.","Point splits and thresholds come from each course page on fit.vut.cz for 2026/27. Teachers sometimes change details in the first lecture, so you can edit any maximum or add your own items."],
   gradesH:"Grade scale",yearLbl:"Year",semLbl:"Semester",semCap:{W:"Winter",S:"Summer"},moreCourses:"English, technical course or elective",
-  retake:"Retake next year",zeroLbl:"Tests with 0 points",failLbl:"Failed courses",failNote:"Each failed course adds one ✕.",fail3:"3 ✕: you cannot continue your studies.",markPassed:n=>`Mark as passed (+${n} credits)`,
+  retake:"Retake next year",unoff:"Unofficial student tool, not run by VUT or FIT.",logoAlt:"Brno University of Technology, Faculty of Information Technology",
+  gTitle:"Before you continue",gWarn:"This is not an official page of Brno University of Technology (VUT) or its Faculty of Information Technology (FIT).",
+  gBody:"It is a personal study tracker made by a student. The faculty does not run or check it, and the points and rules in it can be wrong or out of date. The logos belong to VUT. For official rules, points and deadlines, always check fit.vut.cz and StudIS.",
+  gLbl:"Type ACCEPT to continue",gBtn:"Continue",
+  zeroLbl:"Tests with 0 points",failLbl:"Failed courses",failNote:"Each failed course adds one ✕.",fail3:"3 ✕: you cannot continue your studies.",markPassed:n=>`Mark as passed (+${n} credits)`,
   apply:n=>`✓ Passed · add ${n} credits to my progress`,
   zeroBad:(z,m)=>`<b>${z} tests have 0 points.</b> Only ${m} is allowed, so the course credit is not met and the course is marked Failed.`,
   zeroInfo:(z,m,left)=>`Tests with 0 points: <b>${z} of ${m} allowed</b>. ${left} test${left>1?"s":""} still to write.`,
@@ -330,7 +365,11 @@ const T={
   footH:"Ako tracker počíta",
   foot:["Kredity sa započítajú, keď predmet označíš ako <b>Absolvované</b>. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz, budúci rok.","Známky podľa stupnice VUT. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz a tento opakovaný zápis je posledný.","Rozdelenie bodov a hranice sú zo stránok predmetov na fit.vut.cz pre 2026/27. Vyučujúci ich niekedy upresnia na prvej prednáške, preto môžeš každé maximum upraviť alebo pridať vlastné položky."],
   gradesH:"Stupnica hodnotenia",yearLbl:"Ročník",semLbl:"Semester",semCap:{W:"Zimný",S:"Letný"},moreCourses:"Angličtina, technický predmet alebo voliteľný predmet",
-  retake:"Opakovať budúci rok",zeroLbl:"Písomky za 0 bodov",failLbl:"Neúspešné predmety",failNote:"Každý neúspešný predmet pridá jeden ✕.",fail3:"3 ✕: v štúdiu nemôžeš pokračovať.",markPassed:n=>`Označiť ako splnené (+${n} kreditov)`,
+  retake:"Opakovať budúci rok",unoff:"Neoficiálny študentský nástroj, VUT ani FIT ho neprevádzkujú.",logoAlt:"Vysoké učení technické v Brně, Fakulta informačních technologií",
+  gTitle:"Skôr než budeš pokračovať",gWarn:"Toto nie je oficiálna stránka Vysokého učení technického v Brně (VUT) ani jeho Fakulty informačních technologií (FIT).",
+  gBody:"Je to osobný tracker štúdia, ktorý vytvoril študent. Fakulta ho neprevádzkuje ani nekontroluje a body a pravidlá v ňom môžu byť nesprávne alebo zastarané. Logá patria VUT. Oficiálne pravidlá, body a termíny si vždy over na fit.vut.cz a v StudIS.",
+  gLbl:"Napíš SÚHLASÍM a pokračuj",gBtn:"Pokračovať",
+  zeroLbl:"Písomky za 0 bodov",failLbl:"Neúspešné predmety",failNote:"Každý neúspešný predmet pridá jeden ✕.",fail3:"3 ✕: v štúdiu nemôžeš pokračovať.",markPassed:n=>`Označiť ako splnené (+${n} kreditov)`,
   apply:n=>`✓ Splnené · pridať ${n} kreditov do postupu`,
   zeroBad:(z,m)=>`<b>${z} písomky máš za 0 bodov.</b> Povolená je len ${m}, takže zápočet nie je splnený a predmet je označený ako neúspešný.`,
   zeroInfo:(z,m,left)=>`Písomky za 0 bodov: <b>${z} z ${m} povolenej</b>. Ešte ťa čaká ${left} ${left===1?"písomka":left<5?"písomky":"písomiek"}.`,
@@ -566,6 +605,8 @@ function render(){
   document.getElementById("th-light").textContent=t.light;
   document.getElementById("th-dark").textContent=t.dark;
   applyTheme();
+  const lg=document.getElementById("logo");lg.src=S.lang==="sk"?"logo-cz.webp":"logo-en.webp";lg.alt=t.logoAlt;
+  document.getElementById("t-unoff").textContent=t.unoff;
   renderSummary();renderPicker();
   const list=allCourses();
   let h="";
@@ -582,7 +623,7 @@ function render(){
     h+=`</section>`;
   }
   document.getElementById("sems").innerHTML=h;
-  document.getElementById("foot").innerHTML=`<p style="margin:0">${t.foot[0]}</p><h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div>`;
+  document.getElementById("foot").innerHTML=`<p style="margin:0">${t.foot[0]}</p><h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div><p class="madeby">Made by Filipko ❤️</p>`;
 }
 
 // Light / Dark choice is kept per device; with no choice the page follows the system
@@ -601,6 +642,28 @@ function autoFail(code){
   if(k.zeros>d.zeroMax&&r.status!=="failed"){r.status="failed";r.autoFail=1}
   else if(k.zeros<=d.zeroMax&&r.autoFail){r.status="enrolled";delete r.autoFail}
 }
+
+/* ---------- Entry notice ---------- */
+const GATE="fit-accepted-v1";
+const okWord=v=>["accept","suhlasim"].includes(v.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""));
+function renderGate(){
+  const t=L(),g=id=>document.getElementById(id);
+  g("g-title").textContent=t.gTitle;g("g-warn").textContent=t.gWarn;g("g-body").textContent=t.gBody;
+  g("g-lbl").textContent=t.gLbl;g("g-btn").textContent=t.gBtn;
+  g("g-en").setAttribute("aria-pressed",S.lang==="en");g("g-sk").setAttribute("aria-pressed",S.lang==="sk");
+  g("g-btn").disabled=!okWord(g("g-input").value);
+}
+function showGate(){
+  let ok=false;try{ok=localStorage.getItem(GATE)==="1"}catch(e){}
+  document.getElementById("gate").hidden=ok;document.getElementById("app").hidden=!ok;
+  if(!ok)renderGate();
+}
+document.getElementById("g-input").addEventListener("input",()=>renderGate());
+document.getElementById("gate-form").addEventListener("submit",e=>{
+  e.preventDefault();if(!okWord(document.getElementById("g-input").value))return;
+  try{localStorage.setItem(GATE,"1")}catch(e){}
+  document.getElementById("gate").hidden=true;document.getElementById("app").hidden=false;
+});
 
 /* ---------- Events ---------- */
 let focusId=null,caret=null;
@@ -639,6 +702,7 @@ document.addEventListener("toggle",e=>{
 },true);
 document.addEventListener("click",e=>{
   const b=e.target.closest("button");if(!b)return;
+  if(b.id==="g-en"||b.id==="g-sk"){S.lang=b.id.slice(2);render();renderGate();localSave();return}
   if(b.id==="lang-en"||b.id==="lang-sk"){S.lang=b.id.slice(5);rerender();changed();return}
   if(b.id==="th-light"||b.id==="th-dark"){try{localStorage.setItem("fit-theme",b.id.slice(3))}catch(e){}applyTheme();return}
   if(b.dataset.view){S.view=b.dataset.view;render();changed();return}
@@ -669,6 +733,7 @@ document.addEventListener("click",e=>{
     r.extra=r.extra.filter(x=>{const m=/^(test|písomka)\s*([1-5])$/i.exec(x.n.trim());if(!m)return true;r.pts["p"+(m[2]-1)]=x.val;delete r.pts[x.id];return false});
   }
   S.idm5=1;
+  showGate();
   COURSES.filter(d=>d.zeroMax!=null).forEach(d=>autoFail(d.c));
   render();
   setChip("saved",L().local);
