@@ -73,9 +73,36 @@ button,select,input{font:inherit;color:inherit}
 @media (prefers-reduced-motion:no-preference){
   details.course.anim .cbody{animation:roll .32s cubic-bezier(.2,.8,.2,1)}
   details.course.anim{animation:lift .32s ease}
+  details.course.closing .cbody{animation:roll .24s cubic-bezier(.4,0,.6,1) reverse forwards}
 }
 @keyframes roll{from{opacity:0;transform:translateY(-8px);clip-path:inset(0 0 100% 0)}to{opacity:1;transform:none;clip-path:inset(0 0 0 0)}}
 @keyframes lift{50%{box-shadow:0 6px 18px rgba(0,0,0,.12)}}
+/* reset: button + two warning pop-ups over a blurred page */
+.btn.danger-outline{background:transparent;color:var(--bad);border-color:var(--bad);margin-top:10px}
+.btn.danger-outline:hover{background:var(--bad-soft)}
+.modal{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:40px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));background:rgba(8,10,14,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.mbox{position:relative;max-width:420px;width:100%;background:var(--card);color:var(--ink);border:1px solid var(--bad);border-radius:16px;padding:46px 22px 20px;text-align:center;display:grid;gap:12px;box-shadow:0 0 0 1px color-mix(in srgb,var(--bad) 35%,transparent),0 0 36px color-mix(in srgb,var(--bad) 45%,transparent)}
+.mbox h2{font-size:22px}
+.mbox p{margin:0;color:var(--muted)}
+.mbox .tri{position:absolute;top:-32px;left:50%;width:64px;height:58px;transform:translateX(-50%);filter:drop-shadow(0 0 10px rgba(220,30,50,.6))}
+.mbox .acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:6px}
+.mbox .acts .btn{padding:8px 16px;font-size:14px}
+.btn.danger{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn.plain{background:transparent;color:var(--ink);border-color:var(--line)}
+/* second step: one deliberate dark-red look in both themes */
+.mbox.lvl2{background:#4a0a12;color:#fff;border-color:#ff4d64;box-shadow:0 0 0 2px rgba(255,77,100,.5),0 0 60px rgba(255,40,60,.65),0 0 120px rgba(255,40,60,.35)}
+.mbox.lvl2 p{color:#ffd5da}
+.mbox.lvl2 .btn.plain{color:#fff;border-color:rgba(255,255,255,.45)}
+.mbox.lvl2 .btn.danger{background:#ff2d45;border-color:#ff2d45}
+@media (prefers-reduced-motion:no-preference){
+  .modal{animation:fadein .2s ease}
+  .mbox{animation:pop .28s cubic-bezier(.2,.9,.3,1.25)}
+  .mbox.lvl2{animation:pop .28s cubic-bezier(.2,.9,.3,1.25),glow 1.6s ease-in-out .3s infinite}
+}
+@keyframes fadein{from{opacity:0}}
+@keyframes pop{from{opacity:0;transform:scale(.88)}}
+@keyframes glow{50%{box-shadow:0 0 0 2px rgba(255,77,100,.7),0 0 80px rgba(255,40,60,.85),0 0 160px rgba(255,40,60,.45)}}
+.shards{position:fixed;inset:0;z-index:61;pointer-events:none;overflow:hidden}
 .unoff{margin:0;font-size:12px;color:var(--warn)}
 /* entry notice: shown until the viewer types the accept word */
 .gate{min-height:100%;display:grid;place-items:center;padding-block:32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -203,7 +230,7 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
     <label><span id="g-lbl"></span><input type="text" id="g-input" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
     <button class="btn" type="submit" id="g-btn" disabled>Continue</button>
   </form>
-  <p class="madeby">Made by Filipko ❤️</p>
+  <p class="madeby">Made by Filipko &amp; Claude ❤️</p>
 </div>
 <div class="wrap" id="app" hidden>
   <header class="top">
@@ -329,7 +356,9 @@ const T={
   footH:"How the tracker counts",
   foot:["Credits count automatically as soon as your points pass a course, and disappear again if you lower the points. Every exam has a regular term and two resits. A failed course can be taken once more, the next year.","Grades follow the BUT scale. Every exam has a regular term and two resit terms. A course you fail can be enrolled one more time, and that repeated enrolment is your last.","Point splits and thresholds come from each course page on fit.vut.cz for 2026/27. Teachers sometimes change details in the first lecture, so you can edit any maximum or add your own items."],
   gradesH:"Grade scale",yearLbl:"Year",semLbl:"Semester",semCap:{W:"Winter",S:"Summer"},moreCourses:"English, technical course or elective",
-  retake:"Retake next year",minOkShort:"✓ Minimum reached. You can continue your studies.",minOkToast:"🎉 You reached the minimum credits!",unoff:"Unofficial student tool, not run by VUT or FIT.",logoAlt:"Brno University of Technology, Faculty of Information Technology",
+  retake:"Retake next year",resetBtn:"Reset all data",cancel:"Cancel",
+  r1Title:"Reset everything?",r1Body:"This deletes all your points, exam scores, course statuses, electives and failed-course marks.",r1Yes:"Yes, reset",
+  r2Title:"Are you absolutely sure?",r2Body:"All your data will be deleted for good. This cannot be undone.",r2Yes:"Delete everything",resetDone:"All data was reset.",minOkShort:"✓ Minimum reached. You can continue your studies.",minOkToast:"🎉 You reached the minimum credits!",unoff:"Unofficial student tool, not run by VUT or FIT.",logoAlt:"Brno University of Technology, Faculty of Information Technology",
   gTitle:"Before you continue",gWarn:"This is not an official page of Brno University of Technology (VUT) or its Faculty of Information Technology (FIT).",
   gBody:"It is a personal study tracker made by a student. The faculty does not run or check it, and the points and rules in it can be wrong or out of date. The logos belong to VUT. For official rules, points and deadlines, always check fit.vut.cz and StudIS.",
   gLbl:"Type ACCEPT to continue",gBtn:"Continue",
@@ -379,7 +408,9 @@ const T={
   footH:"Ako tracker počíta",
   foot:["Kredity sa započítajú automaticky, keď ti body na predmet stačia, a zmiznú, ak body znížiš. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz, budúci rok.","Známky podľa stupnice VUT. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz a tento opakovaný zápis je posledný.","Rozdelenie bodov a hranice sú zo stránok predmetov na fit.vut.cz pre 2026/27. Vyučujúci ich niekedy upresnia na prvej prednáške, preto môžeš každé maximum upraviť alebo pridať vlastné položky."],
   gradesH:"Stupnica hodnotenia",yearLbl:"Ročník",semLbl:"Semester",semCap:{W:"Zimný",S:"Letný"},moreCourses:"Angličtina, technický predmet alebo voliteľný predmet",
-  retake:"Opakovať budúci rok",minOkShort:"✓ Minimum splnené. Môžeš pokračovať v štúdiu.",minOkToast:"🎉 Máš minimum kreditov!",unoff:"Neoficiálny študentský nástroj, VUT ani FIT ho neprevádzkujú.",logoAlt:"Vysoké učení technické v Brně, Fakulta informačních technologií",
+  retake:"Opakovať budúci rok",resetBtn:"Vymazať všetky údaje",cancel:"Zrušiť",
+  r1Title:"Vymazať všetko?",r1Body:"Vymažú sa všetky tvoje body, výsledky skúšok, stavy predmetov, voliteľné predmety aj značky neúspešných predmetov.",r1Yes:"Áno, vymazať",
+  r2Title:"Naozaj to chceš urobiť?",r2Body:"Všetky údaje sa natrvalo vymažú. Nedá sa to vrátiť späť.",r2Yes:"Vymazať všetko",resetDone:"Všetky údaje boli vymazané.",minOkShort:"✓ Minimum splnené. Môžeš pokračovať v štúdiu.",minOkToast:"🎉 Máš minimum kreditov!",unoff:"Neoficiálny študentský nástroj, VUT ani FIT ho neprevádzkujú.",logoAlt:"Vysoké učení technické v Brně, Fakulta informačních technologií",
   gTitle:"Skôr než budeš pokračovať",gWarn:"Toto nie je oficiálna stránka Vysokého učení technického v Brně (VUT) ani jeho Fakulty informačních technologií (FIT).",
   gBody:"Je to osobný tracker štúdia, ktorý vytvoril študent. Fakulta ho neprevádzkuje ani nekontroluje a body a pravidlá v ňom môžu byť nesprávne alebo zastarané. Logá patria VUT. Oficiálne pravidlá, body a termíny si vždy over na fit.vut.cz a v StudIS.",
   gLbl:"Napíš SÚHLASÍM a pokračuj",gBtn:"Pokračovať",
@@ -670,7 +701,7 @@ function render(){
     h+=`</section>`;
   }
   document.getElementById("sems").innerHTML=h;
-  document.getElementById("foot").innerHTML=`<p style="margin:0">${t.foot[0]}</p><h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div><p class="madeby">Made by Filipko ❤️</p>`;
+  document.getElementById("foot").innerHTML=`<p style="margin:0">${t.foot[0]}</p><h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div><button class="btn danger-outline" type="button" id="reset-btn">${t.resetBtn}</button><p class="madeby">Made by Filipko &amp; Claude ❤️</p>`;
 }
 
 // Light / Dark choice is kept per device; with no choice the page follows the system
@@ -731,6 +762,57 @@ document.getElementById("gate-form").addEventListener("submit",e=>{
   document.getElementById("gate").hidden=true;document.getElementById("app").hidden=false;
 });
 
+/* ---------- Reset all data (two confirmations) ---------- */
+const TRI=`<svg class="tri" viewBox="0 0 64 58" aria-hidden="true"><path d="M32 4 L60 54 H4 Z" fill="#e0182f" stroke="#ff6b7d" stroke-width="3" stroke-linejoin="round"/><rect x="29" y="20" width="6" height="19" rx="3" fill="#fff"/><circle cx="32" cy="46" r="3.6" fill="#fff"/></svg>`;
+function closeModal(fall){
+  const m=document.getElementById("modal");document.removeEventListener("keydown",modalKey);if(!m)return;
+  if(!fall||matchMedia("(prefers-reduced-motion: reduce)").matches){m.remove();return}
+  if(m.dataset.closing)return;m.dataset.closing=1;m.id="";shatter(m);
+}
+// cancel: cut the pop-up into jagged shards that drop off the bottom of the screen
+function shatter(m){
+  const box=m.querySelector(".mbox"),r=box.getBoundingClientRect(),C=6,R=5,rnd=Math.random,pts=[];
+  for(let j=0;j<=R;j++){pts[j]=[];for(let i=0;i<=C;i++){const edge=i===0||i===C||j===0||j===R;
+    pts[j][i]=[i*r.width/C+(edge?0:(rnd()-.5)*r.width/C*.7),j*r.height/R+(edge?0:(rnd()-.5)*r.height/R*.7)]}}
+  const layer=document.createElement("div");layer.className="shards";layer.setAttribute("aria-hidden","true");document.body.append(layer);
+  let longest=0;
+  for(let j=0;j<R;j++)for(let i=0;i<C;i++){
+    const q=[pts[j][i],pts[j][i+1],pts[j+1][i+1],pts[j+1][i]],cx=q.reduce((a,p)=>a+p[0],0)/4,cy=q.reduce((a,p)=>a+p[1],0)/4;
+    const sh=box.cloneNode(true);sh.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));sh.removeAttribute("role");
+    Object.assign(sh.style,{position:"fixed",left:r.left+"px",top:r.top+"px",width:r.width+"px",height:r.height+"px",margin:"0",animation:"none",
+      clipPath:`polygon(${q.map(p=>p[0]+"px "+p[1]+"px").join(",")})`,transformOrigin:`${cx}px ${cy}px`});
+    layer.append(sh);
+    const dx=(cx-r.width/2)*.5+(rnd()-.5)*160,rot=(rnd()-.5)*140,fallY=innerHeight-r.top+r.height,dur=900+rnd()*600,delay=(R-j)*40+rnd()*120;
+    longest=Math.max(longest,dur+delay);
+    sh.animate([{transform:"none"},{transform:`translate(${dx*.15}px,${-12-rnd()*24}px) rotate(${rot*.08}deg)`,offset:.18},{transform:`translate(${dx}px,${fallY}px) rotate(${rot}deg)`}],
+      {duration:dur,delay,easing:"cubic-bezier(.5,0,.85,.55)",fill:"forwards"});
+  }
+  box.style.visibility="hidden";
+  m.animate([{opacity:1},{opacity:0}],{duration:500,delay:150,fill:"forwards"});
+  setTimeout(()=>{layer.remove();m.remove()},longest+50);
+}
+function modalKey(e){if(e.key==="Escape")closeModal(true)}
+function openReset(step){
+  closeModal();const t=L();
+  const m=document.createElement("div");m.className="modal";m.id="modal";
+  m.innerHTML=`<div class="mbox${step===2?" lvl2":""}" role="alertdialog" aria-modal="true" aria-labelledby="m-title" aria-describedby="m-body">${TRI}
+    <h2 id="m-title">${step===1?t.r1Title:t.r2Title}</h2><p id="m-body">${step===1?t.r1Body:t.r2Body}</p>
+    <div class="acts"><button class="btn plain" type="button" id="m-cancel">${t.cancel}</button><button class="btn danger" type="button" id="m-yes">${step===1?t.r1Yes:t.r2Yes}</button></div></div>`;
+  document.body.append(m);
+  m.addEventListener("click",e=>{if(e.target===m)closeModal(true)});
+  m.querySelector("#m-cancel").onclick=()=>closeModal(true);
+  m.querySelector("#m-yes").onclick=()=>step===1?openReset(2):resetAll();
+  document.addEventListener("keydown",modalKey);
+  m.querySelector("#m-cancel").focus();
+}
+function resetAll(){
+  const lang=S.lang;closeModal();
+  S=defaults();S.lang=lang;S.idm5=1;cs("ISM");
+  metPrev=null;
+  rerender();changed();
+  const toast=document.createElement("div");toast.className="toast";toast.style.background="var(--bad)";toast.textContent=L().resetDone;document.body.append(toast);setTimeout(()=>toast.remove(),2800);
+}
+
 /* ---------- Events ---------- */
 let focusId=null,caret=null;
 function rerender(){
@@ -768,10 +850,19 @@ document.addEventListener("toggle",e=>{
 },true);
 document.addEventListener("click",e=>{
   const sm=e.target.closest("details.course > summary");
-  if(sm){const d=sm.parentElement;if(!d.open){d.classList.add("anim");d.addEventListener("animationend",()=>d.classList.remove("anim"),{once:true})}}
+  if(sm){const d=sm.parentElement;
+    if(!d.open){d.classList.remove("closing");d.classList.add("anim");d.addEventListener("animationend",()=>d.classList.remove("anim"),{once:true})}
+    // closing: play the roll backwards first, then really close
+    else if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&!d.classList.contains("closing")){
+      e.preventDefault();d.classList.remove("anim");d.classList.add("closing");
+      const done=()=>{if(d.classList.contains("closing")){d.classList.remove("closing");d.open=false}};
+      d.querySelector(".cbody").addEventListener("animationend",done,{once:true});setTimeout(done,400);
+    }else if(d.classList.contains("closing"))e.preventDefault();
+  }
   const b=e.target.closest("button");if(!b)return;
   if(b.id==="g-en"||b.id==="g-sk"){S.lang=b.id.slice(2);render();renderGate();localSave();return}
   if(b.id==="lang-en"||b.id==="lang-sk"){S.lang=b.id.slice(5);rerender();changed();return}
+  if(b.id==="reset-btn"){openReset(1);return}
   if(b.id==="th-light"||b.id==="th-dark"){try{localStorage.setItem("fit-theme",b.id.slice(3))}catch(e){}applyTheme();return}
   if(b.dataset.view){S.view=b.dataset.view;render();changed();return}
   if(b.dataset.year||b.dataset.half){const c=cur();S.current=(b.dataset.year||c[0])+(b.dataset.half||c[1]);render();changed();return}
