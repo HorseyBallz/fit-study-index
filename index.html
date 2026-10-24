@@ -7,7 +7,7 @@
 :root{
   --paper:#f4f6f8; --card:#ffffff; --ink:#14202e; --muted:#5b6878; --line:#d8dee6;
   --accent:#d0102b; --accent-soft:#fbe5e8; --blue:#1f4f8f; --blue-soft:#e3ecf7;
-  --ok:#1d7a4a; --ok-soft:#e1f2e8; --warn:#9a6200; --warn-soft:#fbf0d9; --bad:#b4232c; --bad-soft:#fbe3e4;
+  --ok:#1d7a4a; --ok-soft:#e1f2e8; --warn:#9a6200; --warn-soft:#fbf0d9; --bad:#b4232c; --bad-soft:#fbe3e4; --save:#ef7d1a;
   --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
@@ -15,20 +15,20 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --paper:#0f151d; --card:#17202b; --ink:#e6ebf1; --muted:#97a3b2; --line:#2a3644;
   --accent:#ff4d64; --accent-soft:#3a1820; --blue:#7fb0ef; --blue-soft:#1b2a3d;
-  --ok:#5fd394; --ok-soft:#163023; --warn:#f0b956; --warn-soft:#33270f; --bad:#ff7a82; --bad-soft:#3a1a1d; color-scheme:dark}}
+  --ok:#5fd394; --ok-soft:#163023; --warn:#f0b956; --warn-soft:#33270f; --bad:#ff7a82; --bad-soft:#3a1a1d; --save:#ffa04d; color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#0f151d; --card:#17202b; --ink:#e6ebf1; --muted:#97a3b2; --line:#2a3644;
   --accent:#ff4d64; --accent-soft:#3a1820; --blue:#7fb0ef; --blue-soft:#1b2a3d;
-  --ok:#5fd394; --ok-soft:#163023; --warn:#f0b956; --warn-soft:#33270f; --bad:#ff7a82; --bad-soft:#3a1a1d; color-scheme:dark}
+  --ok:#5fd394; --ok-soft:#163023; --warn:#f0b956; --warn-soft:#33270f; --bad:#ff7a82; --bad-soft:#3a1a1d; --save:#ffa04d; color-scheme:dark}
 /* the page's own Light / Dark switch wins over the system and viewer theme */
 :root[data-mode="light"]{
   --paper:#f4f6f8; --card:#ffffff; --ink:#14202e; --muted:#5b6878; --line:#d8dee6;
   --accent:#d0102b; --accent-soft:#fbe5e8; --blue:#1f4f8f; --blue-soft:#e3ecf7;
-  --ok:#1d7a4a; --ok-soft:#e1f2e8; --warn:#9a6200; --warn-soft:#fbf0d9; --bad:#b4232c; --bad-soft:#fbe3e4; color-scheme:light}
+  --ok:#1d7a4a; --ok-soft:#e1f2e8; --warn:#9a6200; --warn-soft:#fbf0d9; --bad:#b4232c; --bad-soft:#fbe3e4; --save:#ef7d1a; color-scheme:light}
 :root[data-mode="dark"]{
   --paper:#0f151d; --card:#17202b; --ink:#e6ebf1; --muted:#97a3b2; --line:#2a3644;
   --accent:#ff4d64; --accent-soft:#3a1820; --blue:#7fb0ef; --blue-soft:#1b2a3d;
-  --ok:#5fd394; --ok-soft:#163023; --warn:#f0b956; --warn-soft:#33270f; --bad:#ff7a82; --bad-soft:#3a1a1d; color-scheme:dark}
+  --ok:#5fd394; --ok-soft:#163023; --warn:#f0b956; --warn-soft:#33270f; --bad:#ff7a82; --bad-soft:#3a1a1d; --save:#ffa04d; color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 .sumhead{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
@@ -49,7 +49,6 @@ button,select,input{font:inherit;color:inherit}
 .logorow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;min-width:0}
 .logo{height:52px;width:auto;max-width:100%;object-fit:contain;object-position:left;align-self:start}
 .madeby{margin:8px 0 0;font-size:13px;color:var(--muted);text-align:center}
-.gate{gap:16px}
 .bar.met .done{background:var(--ok)}
 .bar.met .prog{border-right-color:var(--ok)}
 .big.met .pct{color:var(--ok)}
@@ -73,12 +72,15 @@ button,select,input{font:inherit;color:inherit}
 @media (prefers-reduced-motion:no-preference){
   details.course.anim .cbody{animation:roll .32s cubic-bezier(.2,.8,.2,1)}
   details.course.anim{animation:lift .32s ease}
-  details.course.closing .cbody{animation:roll .24s cubic-bezier(.4,0,.6,1) reverse forwards}
+  details.course.closing .cbody{animation:roll .3s cubic-bezier(.4,0,.6,1) reverse forwards}
 }
 @keyframes roll{from{opacity:0;transform:translateY(-8px);clip-path:inset(0 0 100% 0)}to{opacity:1;transform:none;clip-path:inset(0 0 0 0)}}
 @keyframes lift{50%{box-shadow:0 6px 18px rgba(0,0,0,.12)}}
 /* reset: button + two warning pop-ups over a blurred page */
-.btn.danger-outline{background:transparent;color:var(--bad);border-color:var(--bad);margin-top:10px}
+.footacts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:10px}
+.btn.danger-outline{background:transparent;color:var(--bad);border-color:var(--bad)}
+.footacts .btn{padding:7px 14px;transition:background-color .2s,transform .15s}
+#exit-btn:hover{background:var(--line)}
 .btn.danger-outline:hover{background:var(--bad-soft)}
 .modal{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:40px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));background:rgba(8,10,14,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .mbox{position:relative;max-width:420px;width:100%;background:var(--card);color:var(--ink);border:1px solid var(--bad);border-radius:16px;padding:46px 22px 20px;text-align:center;display:grid;gap:12px;box-shadow:0 0 0 1px color-mix(in srgb,var(--bad) 35%,transparent),0 0 36px color-mix(in srgb,var(--bad) 45%,transparent)}
@@ -105,15 +107,27 @@ button,select,input{font:inherit;color:inherit}
 .shards{position:fixed;inset:0;z-index:61;pointer-events:none;overflow:hidden}
 .unoff{margin:0;font-size:12px;color:var(--warn)}
 /* entry notice: shown until the viewer types the accept word */
-.gate{min-height:100%;display:grid;place-items:center;padding-block:32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.gate-card{max-width:560px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;display:grid;gap:14px}
-.gate-card h2{font-size:24px}
-.gate-card p{margin:0;color:var(--ink);max-width:65ch}
-.gate-card .warn{background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:10px 12px;font-size:14px}
-.gate-card label{display:grid;gap:6px;font-size:13px;color:var(--muted)}
-.gate-card input{font-size:16px;padding:8px 10px}
-.gate-card .btn{justify-self:start;padding:8px 16px;font-size:14px}
-.gate-card .btn:disabled{opacity:.4;cursor:not-allowed}
+.gate{min-height:100vh;min-height:100dvh;display:grid;place-items:center;align-content:center;gap:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.gate form{width:min(320px,100%)}
+.gnote{margin:0;font-size:13px;color:var(--warn);text-align:center;max-width:320px}
+.gate>*:not(.bigx){position:relative;z-index:1}
+/* wrong word: a huge red X flashes behind the box for about 2.5 s */
+.bigx{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:0;color:var(--bad);transition:color .35s ease,opacity .35s ease}
+.bigx.ok{color:var(--ok)}
+.bigx.out{opacity:0}
+.bigx svg{width:min(75vw,75vh);height:auto;opacity:.24;filter:drop-shadow(0 0 30px currentColor);overflow:visible}
+.bigx line{stroke:currentColor;stroke-width:14;stroke-linecap:round}
+@media (prefers-reduced-motion:no-preference){
+  .bigx.pop svg{animation:markin .4s cubic-bezier(.2,.9,.3,1.3)}
+  .bigx.morph svg{animation:markbump .4s ease}
+}
+@keyframes markin{from{opacity:0;transform:scale(.6) rotate(-12deg)}}
+@keyframes markbump{50%{transform:scale(1.08)}}
+.secret{width:100%;font-size:18px;text-align:center;padding:12px 16px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--ink);transition:border-color .2s,box-shadow .2s}
+.secret:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px var(--blue-soft)}
+.secret.nope{border-color:var(--bad);box-shadow:0 0 0 4px var(--bad-soft)}
+@media (prefers-reduced-motion:no-preference){.secret.nope{animation:shake .4s}}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 .brand p{margin:0;color:var(--muted);font-size:13px}
 .tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
@@ -121,7 +135,21 @@ button,select,input{font:inherit;color:inherit}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 10px;border-radius:99px;background:var(--card);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
 .chip .dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
-.chip.saved .dot{background:var(--ok)} .chip.pending .dot{background:var(--warn)} .chip.err .dot{background:var(--bad)}
+.chip .dot{width:10px;height:10px;flex:none}
+.chip.saved .dot{background:var(--ok)} .chip.err .dot{background:var(--bad)}
+/* saving: orange spinning ring; saved: the ring closes into a green dot */
+.chip.pending .dot{background:transparent;border:2px solid var(--save);border-right-color:transparent}
+.chip.pending{color:var(--save)}
+@media (prefers-reduced-motion:no-preference){
+  .chip.pending .dot{animation:spin .7s linear infinite}
+  .chip.saved .dot{animation:morph .55s cubic-bezier(.3,1.4,.5,1)}
+  .chip.saved #savetxt{animation:fadein .3s ease}
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes morph{0%{background:transparent;border:2px solid var(--save);border-right-color:transparent;transform:rotate(0) scale(1)}
+  45%{background:transparent;border:2px solid var(--ok);border-right-color:var(--ok);transform:rotate(300deg) scale(1.15)}
+  70%{background:var(--ok);border:0 solid var(--ok);transform:rotate(360deg) scale(1.45)}
+  100%{background:var(--ok);border:0 solid var(--ok);transform:rotate(360deg) scale(1)}}
 
 /* summary */
 .summary{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;display:grid;gap:18px}
@@ -222,14 +250,12 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
 </style>
 
 <div class="gate" id="gate" hidden>
-  <form class="gate-card" id="gate-form" novalidate>
-    <div class="row" style="justify-content:space-between"><h2 id="g-title">Before you continue</h2>
-      <div class="seg slide" data-key="glang" role="group" aria-label="Language"><span class="thumb" aria-hidden="true"></span><button id="g-en" type="button" aria-pressed="true">EN</button><button id="g-sk" type="button" aria-pressed="false">SK</button></div></div>
-    <p class="warn" id="g-warn"></p>
-    <p id="g-body"></p>
-    <label><span id="g-lbl"></span><input type="text" id="g-input" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
-    <button class="btn" type="submit" id="g-btn" disabled>Continue</button>
+  <div class="bigx" id="bigx" hidden aria-hidden="true"><svg viewBox="0 0 100 100"><line x1="18" y1="18" x2="82" y2="82"/><line x1="82" y1="18" x2="18" y2="82"/></svg></div>
+  <div class="seg slide" data-key="glang" role="group" aria-label="Language"><button id="g-en" type="button" aria-pressed="true">EN</button><button id="g-sk" type="button" aria-pressed="false">SK</button></div>
+  <form id="gate-form" novalidate>
+    <input type="password" id="g-input" class="secret" placeholder="Type the secret word" aria-label="Type the secret word" autocomplete="off" autocapitalize="off" spellcheck="false">
   </form>
+  <p class="gnote" id="g-note" hidden></p>
   <p class="madeby">Made by Filipko &amp; Claude ❤️</p>
 </div>
 <div class="wrap" id="app" hidden>
@@ -356,12 +382,9 @@ const T={
   footH:"How the tracker counts",
   foot:["Credits count automatically as soon as your points pass a course, and disappear again if you lower the points. Every exam has a regular term and two resits. A failed course can be taken once more, the next year.","Grades follow the BUT scale. Every exam has a regular term and two resit terms. A course you fail can be enrolled one more time, and that repeated enrolment is your last.","Point splits and thresholds come from each course page on fit.vut.cz for 2026/27. Teachers sometimes change details in the first lecture, so you can edit any maximum or add your own items."],
   gradesH:"Grade scale",yearLbl:"Year",semLbl:"Semester",semCap:{W:"Winter",S:"Summer"},moreCourses:"English, technical course or elective",
-  retake:"Retake next year",resetBtn:"Reset all data",cancel:"Cancel",
+  retake:"Retake next year",idleNote:"Locked after 15 minutes without activity.",exTitle:"Exit the tracker?",exBody:"You will need the secret word to get back in. Your data stays saved.",exYes:"Yes, exit",exitBtn:"Exit",secretPh:"Type the secret word",resetBtn:"Reset all data",cancel:"Cancel",
   r1Title:"Reset everything?",r1Body:"This deletes all your points, exam scores, course statuses, electives and failed-course marks.",r1Yes:"Yes, reset",
   r2Title:"Are you absolutely sure?",r2Body:"All your data will be deleted for good. This cannot be undone.",r2Yes:"Delete everything",resetDone:"All data was reset.",minOkShort:"✓ Minimum reached. You can continue your studies.",minOkToast:"🎉 You reached the minimum credits!",unoff:"Unofficial student tool, not run by VUT or FIT.",logoAlt:"Brno University of Technology, Faculty of Information Technology",
-  gTitle:"Before you continue",gWarn:"This is not an official page of Brno University of Technology (VUT) or its Faculty of Information Technology (FIT).",
-  gBody:"It is a personal study tracker made by a student. The faculty does not run or check it, and the points and rules in it can be wrong or out of date. The logos belong to VUT. For official rules, points and deadlines, always check fit.vut.cz and StudIS.",
-  gLbl:"Type ACCEPT to continue",gBtn:"Continue",
   zeroLbl:"Tests with 0 points",failLbl:"Failed courses",fail3:"3 ✕: you cannot continue your studies.",
   zeroBad:(z,m)=>`<b>${z} tests have 0 points.</b> Only ${m} is allowed, so the course credit is not met and the course is marked Failed.`,
   zeroInfo:(z,m,left)=>`Tests with 0 points: <b>${z} of ${m} allowed</b>. ${left} test${left>1?"s":""} still to write.`,
@@ -408,12 +431,9 @@ const T={
   footH:"Ako tracker počíta",
   foot:["Kredity sa započítajú automaticky, keď ti body na predmet stačia, a zmiznú, ak body znížiš. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz, budúci rok.","Známky podľa stupnice VUT. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz a tento opakovaný zápis je posledný.","Rozdelenie bodov a hranice sú zo stránok predmetov na fit.vut.cz pre 2026/27. Vyučujúci ich niekedy upresnia na prvej prednáške, preto môžeš každé maximum upraviť alebo pridať vlastné položky."],
   gradesH:"Stupnica hodnotenia",yearLbl:"Ročník",semLbl:"Semester",semCap:{W:"Zimný",S:"Letný"},moreCourses:"Angličtina, technický predmet alebo voliteľný predmet",
-  retake:"Opakovať budúci rok",resetBtn:"Vymazať všetky údaje",cancel:"Zrušiť",
+  retake:"Opakovať budúci rok",idleNote:"Uzamknuté po 15 minútach nečinnosti.",exTitle:"Odísť z trackera?",exBody:"Na návrat budeš potrebovať tajné slovo. Tvoje údaje ostanú uložené.",exYes:"Áno, odísť",exitBtn:"Odísť",secretPh:"Zadaj tajné slovo",resetBtn:"Vymazať všetky údaje",cancel:"Zrušiť",
   r1Title:"Vymazať všetko?",r1Body:"Vymažú sa všetky tvoje body, výsledky skúšok, stavy predmetov, voliteľné predmety aj značky neúspešných predmetov.",r1Yes:"Áno, vymazať",
   r2Title:"Naozaj to chceš urobiť?",r2Body:"Všetky údaje sa natrvalo vymažú. Nedá sa to vrátiť späť.",r2Yes:"Vymazať všetko",resetDone:"Všetky údaje boli vymazané.",minOkShort:"✓ Minimum splnené. Môžeš pokračovať v štúdiu.",minOkToast:"🎉 Máš minimum kreditov!",unoff:"Neoficiálny študentský nástroj, VUT ani FIT ho neprevádzkujú.",logoAlt:"Vysoké učení technické v Brně, Fakulta informačních technologií",
-  gTitle:"Skôr než budeš pokračovať",gWarn:"Toto nie je oficiálna stránka Vysokého učení technického v Brně (VUT) ani jeho Fakulty informačních technologií (FIT).",
-  gBody:"Je to osobný tracker štúdia, ktorý vytvoril študent. Fakulta ho neprevádzkuje ani nekontroluje a body a pravidlá v ňom môžu byť nesprávne alebo zastarané. Logá patria VUT. Oficiálne pravidlá, body a termíny si vždy over na fit.vut.cz a v StudIS.",
-  gLbl:"Napíš SÚHLASÍM a pokračuj",gBtn:"Pokračovať",
   zeroLbl:"Písomky za 0 bodov",failLbl:"Neúspešné predmety",fail3:"3 ✕: v štúdiu nemôžeš pokračovať.",
   zeroBad:(z,m)=>`<b>${z} písomky máš za 0 bodov.</b> Povolená je len ${m}, takže zápočet nie je splnený a predmet je označený ako neúspešný.`,
   zeroInfo:(z,m,left)=>`Písomky za 0 bodov: <b>${z} z ${m} povolenej</b>. Ešte ťa čaká ${left} ${left===1?"písomka":left<5?"písomky":"písomiek"}.`,
@@ -455,7 +475,8 @@ function localSave(){try{localStorage.setItem(LS,JSON.stringify({at:Date.now(),s
 function localLoad(){try{const r=JSON.parse(localStorage.getItem(LS)||"null");return r}catch(e){return null}}
 
 /* ---------- Saving: publish data/state.json through the artifact capability, plus a device copy ---------- */
-function setChip(kind,txt){const c=document.getElementById("savechip");c.className="chip "+kind;document.getElementById("savetxt").textContent=txt}
+// restart the class each time so "saved" plays its ring-to-dot animation again even when it was already saved
+function setChip(kind,txt){const c=document.getElementById("savechip");c.className="chip";void c.offsetWidth;c.className="chip "+kind;document.getElementById("savetxt").textContent=txt}
 function changed(){
   localSave();
   if(!artifact||!canPublish){setChip("saved",L()[canPublish?"local":"readonly"]);return}
@@ -691,7 +712,7 @@ function render(){
   for(const s of [cur()]){
     const inSlot=list.filter(d=>cs(d.c).taken===s);
     const tot=inSlot.reduce((a,d)=>a+d.cr,0);
-    h+=`<section class="sem" id="sem-${s}"><div class="sem-head"><h2>${slotName(s)}</h2></div><div class="courses">`;
+    h+=`<section class="sem" id="sem-${s}"><div class="courses">`;
     h+=inSlot.map(courseCard).join("");
     h+=`</div><details class="addel" id="more-${s}"><summary class="linkbtn">+ ${t.moreCourses}</summary><div style="display:grid;gap:10px;margin-top:10px">
       <div class="addrow">
@@ -701,7 +722,7 @@ function render(){
     h+=`</section>`;
   }
   document.getElementById("sems").innerHTML=h;
-  document.getElementById("foot").innerHTML=`<p style="margin:0">${t.foot[0]}</p><h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div><button class="btn danger-outline" type="button" id="reset-btn">${t.resetBtn}</button><p class="madeby">Made by Filipko &amp; Claude ❤️</p>`;
+  document.getElementById("foot").innerHTML=`<p style="margin:0">${t.foot[0]}</p><h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div><div class="footacts"><button class="btn danger-outline" type="button" id="reset-btn">${t.resetBtn}</button><button class="btn plain" type="button" id="exit-btn">${t.exitBtn}</button></div><p class="madeby">Made by Filipko &amp; Claude ❤️</p>`;
 }
 
 // Light / Dark choice is kept per device; with no choice the page follows the system
@@ -740,26 +761,105 @@ function autoStatus(code){
   else if(r.auto){r.status="enrolled";delete r.auto}
 }
 
-/* ---------- Entry notice ---------- */
-const GATE="fit-accepted-v1";
-const okWord=v=>["accept","suhlasim"].includes(v.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""));
+/* ---------- Secret box ---------- */
+// a simple lock for casual visitors: the word sits in the page source, so it is not real protection
+const GATE="fit-unlocked-v1";
+const okWord=v=>v.trim().toLowerCase()==="hulo";
+// fade/zoom between the secret screen and the tracker
+function swap(from,to,after){
+  const a=document.getElementById(from),b=document.getElementById(to);
+  if(a.hidden||a.dataset.busy)return;
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches){a.hidden=true;b.hidden=false;after&&after();return}
+  a.dataset.busy=1;let done=false;
+  const out=a.animate([{opacity:1,transform:"none",filter:"blur(0)"},{opacity:0,transform:"scale(.97)",filter:"blur(6px)"}],{duration:260,easing:"ease-in",fill:"forwards"});
+  const finish=()=>{if(done)return;done=true;out.cancel();
+    delete a.dataset.busy;a.hidden=true;b.hidden=false;scrollTo(0,0);after&&after();
+    b.animate([{opacity:0,transform:"scale(1.03)",filter:"blur(6px)"},{opacity:1,transform:"none",filter:"blur(0)"}],{duration:360,easing:"cubic-bezier(.2,.8,.2,1)"});
+  };
+  out.onfinish=finish;setTimeout(finish,320);
+}
+function unlock(){
+  try{localStorage.setItem(GATE,"1")}catch(e){}
+  lastAct=Date.now();document.getElementById("g-note").hidden=true;
+  const i=document.getElementById("g-input");i.blur();
+  swap("gate","app");
+}
+function lockAgain(){
+  try{localStorage.removeItem(GATE)}catch(e){}
+  const i=document.getElementById("g-input");i.value="";i.classList.remove("nope");
+  document.getElementById("g-note").hidden=true;hideMark();renderGate();swap("app","gate",()=>i.focus());
+}
+/* ---------- Auto-exit after 15 minutes without activity ---------- */
+const IDLE=10*1000,LAST="fit-last-active"; // TEMPORARY test value; normal is 15*60*1000
+let lastAct=Date.now(),lastStored=0;
+function touchAct(){lastAct=Date.now();if(lastAct-lastStored>20000){lastStored=lastAct;try{localStorage.setItem(LAST,lastAct)}catch(e){}}}
+["pointerdown","pointermove","keydown","wheel","touchstart","scroll"].forEach(ev=>addEventListener(ev,touchAct,{passive:true}));
+function idleNote(){const n=document.getElementById("g-note");n.textContent=L().idleNote;n.hidden=false}
+function checkIdle(){
+  if(document.getElementById("app").hidden||Date.now()-lastAct<IDLE)return;
+  closeModal();try{localStorage.removeItem(GATE)}catch(e){}
+  const i=document.getElementById("g-input");i.value="";i.classList.remove("nope");
+  hideMark();renderGate();idleNote();morphToGate(()=>i.focus());
+}
+setInterval(checkIdle,Math.min(15000,IDLE/5));document.addEventListener("visibilitychange",checkIdle);
+// auto-exit: the whole tracker shrinks into the shape of the secret box, then the lock screen takes over
+function morphToGate(after){
+  const a=document.getElementById("app"),b=document.getElementById("gate");
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches){a.hidden=true;b.hidden=false;after&&after();return}
+  const W=a.offsetWidth,H=a.offsetHeight,vy=scrollY,vh=innerHeight,bw=Math.min(320,W-32),bh=52,top=vy+vh/2-bh/2,left=(W-bw)/2;
+  const from=`inset(${vy}px 0px ${Math.max(0,H-vy-vh)}px 0px round 0px)`,to=`inset(${top}px ${left}px ${Math.max(0,H-top-bh)}px ${left}px round 12px)`;
+  const anim=a.animate([{clipPath:from,filter:"blur(0)",opacity:1},{clipPath:to,filter:"blur(3px)",opacity:1,offset:.75},{clipPath:to,filter:"blur(3px)",opacity:0}],
+    {duration:800,easing:"cubic-bezier(.65,0,.3,1)",fill:"forwards"});
+  let done=false;const finish=()=>{if(done)return;done=true;anim.cancel();a.hidden=true;b.hidden=false;scrollTo(0,0);after&&after();
+    document.getElementById("g-input").animate([{transform:"scale(.94)",boxShadow:"0 0 0 10px var(--blue-soft)"},{transform:"none",boxShadow:"0 0 0 0 transparent"}],{duration:450,easing:"cubic-bezier(.2,.8,.2,1)"});
+  };
+  anim.onfinish=finish;setTimeout(finish,860);
+}
+
 function renderGate(){
-  const t=L(),g=id=>document.getElementById(id);
-  g("g-title").textContent=t.gTitle;g("g-warn").textContent=t.gWarn;g("g-body").textContent=t.gBody;
-  g("g-lbl").textContent=t.gLbl;g("g-btn").textContent=t.gBtn;
-  g("g-en").setAttribute("aria-pressed",S.lang==="en");g("g-sk").setAttribute("aria-pressed",S.lang==="sk");syncSegs();
-  g("g-btn").disabled=!okWord(g("g-input").value);
+  const t=L(),i=document.getElementById("g-input");
+  i.placeholder=t.secretPh;i.setAttribute("aria-label",t.secretPh);
+  document.getElementById("g-en").setAttribute("aria-pressed",S.lang==="en");document.getElementById("g-sk").setAttribute("aria-pressed",S.lang==="sk");
+  syncSegs();
+}
+// big background mark: red X for a wrong word, green check for the right one; X morphs into the check
+const MARK={x:[[18,18,82,82],[82,18,18,82]],ok:[[18,52,40,74],[40,74,84,28]]};
+let markTimer=null,markType=null,markRun=0;
+function setLines(c){document.querySelectorAll("#bigx line").forEach((l,i)=>["x1","y1","x2","y2"].forEach((k,j)=>l.setAttribute(k,c[i][j])))}
+function hideMark(){const el=document.getElementById("bigx");clearTimeout(markTimer);el.hidden=true;el.classList.remove("out","pop","morph");markType=null}
+function showMark(type,life){
+  const el=document.getElementById("bigx"),still=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  clearTimeout(markTimer);el.classList.remove("out");
+  const run=++markRun,to=MARK[type];
+  if(!el.hidden&&markType&&markType!==type&&!still){
+    const from=[...document.querySelectorAll("#bigx line")].map(l=>["x1","y1","x2","y2"].map(k=>+l.getAttribute(k)));
+    el.classList.remove("morph","pop");void el.offsetWidth;el.classList.add("morph");
+    const t0=performance.now(),D=380,ease=t=>1-Math.pow(1-t,3);
+    const step=now=>{if(run!==markRun)return;const t=Math.min(1,(now-t0)/D),e=ease(t);
+      setLines(from.map((r,i)=>r.map((v,j)=>v+(to[i][j]-v)*e)));if(t<1)requestAnimationFrame(step)};
+    requestAnimationFrame(step);setTimeout(()=>{if(run===markRun)setLines(to)},D+60);
+  }else{
+    setLines(to);el.hidden=false;el.classList.remove("pop","morph");void el.offsetWidth;el.classList.add("pop");
+  }
+  el.classList.toggle("ok",type==="ok");markType=type;
+  if(life)markTimer=setTimeout(()=>{el.classList.add("out");markTimer=setTimeout(hideMark,350)},life);
 }
 function showGate(){
-  let ok=false;try{ok=localStorage.getItem(GATE)==="1"}catch(e){}
+  let ok=false,last=0;try{ok=localStorage.getItem(GATE)==="1";last=+localStorage.getItem(LAST)||0}catch(e){}
+  // coming back after more than 15 idle minutes: start locked
+  if(ok&&last&&Date.now()-last>IDLE){ok=false;try{localStorage.removeItem(GATE)}catch(e){};idleNote()}
   document.getElementById("gate").hidden=ok;document.getElementById("app").hidden=!ok;
-  if(!ok)renderGate();
+  if(!ok){renderGate();document.getElementById("g-input").focus()}
 }
-document.getElementById("g-input").addEventListener("input",()=>renderGate());
+let unlocking=false;
+document.getElementById("g-input").addEventListener("input",e=>{
+  if(!okWord(e.target.value)||unlocking)return;
+  unlocking=true;showMark("ok");setTimeout(()=>{unlock();setTimeout(()=>{hideMark();unlocking=false},700)},650);
+});
 document.getElementById("gate-form").addEventListener("submit",e=>{
-  e.preventDefault();if(!okWord(document.getElementById("g-input").value))return;
-  try{localStorage.setItem(GATE,"1")}catch(e){}
-  document.getElementById("gate").hidden=true;document.getElementById("app").hidden=false;
+  e.preventDefault();const i=document.getElementById("g-input");
+  if(okWord(i.value))return unlock();
+  i.classList.remove("nope");void i.offsetWidth;i.classList.add("nope");i.select();showMark("x",900);
 });
 
 /* ---------- Reset all data (two confirmations) ---------- */
@@ -767,7 +867,16 @@ const TRI=`<svg class="tri" viewBox="0 0 64 58" aria-hidden="true"><path d="M32 
 function closeModal(fall){
   const m=document.getElementById("modal");document.removeEventListener("keydown",modalKey);if(!m)return;
   if(!fall||matchMedia("(prefers-reduced-motion: reduce)").matches){m.remove();return}
-  if(m.dataset.closing)return;m.dataset.closing=1;m.id="";shatter(m);
+  if(m.dataset.closing)return;m.dataset.closing=1;m.id="";
+  if(m.dataset.kind==="exit"){fadeOut(m);return}
+  shatter(m);
+}
+// exit pop-up: a plain fade instead of the shatter
+function fadeOut(m){
+  const box=m.querySelector(".mbox");
+  m.animate([{opacity:1},{opacity:0}],{duration:240,easing:"ease-out",fill:"forwards"});
+  box.animate([{transform:"none"},{transform:"scale(.95)"}],{duration:240,easing:"ease-out",fill:"forwards"});
+  setTimeout(()=>m.remove(),260);
 }
 // cancel: cut the pop-up into jagged shards that drop off the bottom of the screen
 function shatter(m){
@@ -794,14 +903,14 @@ function shatter(m){
 function modalKey(e){if(e.key==="Escape")closeModal(true)}
 function openReset(step){
   closeModal();const t=L();
-  const m=document.createElement("div");m.className="modal";m.id="modal";
+  const m=document.createElement("div");m.className="modal";m.id="modal";if(step==="exit")m.dataset.kind="exit";
   m.innerHTML=`<div class="mbox${step===2?" lvl2":""}" role="alertdialog" aria-modal="true" aria-labelledby="m-title" aria-describedby="m-body">${TRI}
-    <h2 id="m-title">${step===1?t.r1Title:t.r2Title}</h2><p id="m-body">${step===1?t.r1Body:t.r2Body}</p>
-    <div class="acts"><button class="btn plain" type="button" id="m-cancel">${t.cancel}</button><button class="btn danger" type="button" id="m-yes">${step===1?t.r1Yes:t.r2Yes}</button></div></div>`;
+    <h2 id="m-title">${step==="exit"?t.exTitle:step===1?t.r1Title:t.r2Title}</h2><p id="m-body">${step==="exit"?t.exBody:step===1?t.r1Body:t.r2Body}</p>
+    <div class="acts"><button class="btn plain" type="button" id="m-cancel">${t.cancel}</button><button class="btn danger" type="button" id="m-yes">${step==="exit"?t.exYes:step===1?t.r1Yes:t.r2Yes}</button></div></div>`;
   document.body.append(m);
   m.addEventListener("click",e=>{if(e.target===m)closeModal(true)});
   m.querySelector("#m-cancel").onclick=()=>closeModal(true);
-  m.querySelector("#m-yes").onclick=()=>step===1?openReset(2):resetAll();
+  m.querySelector("#m-yes").onclick=()=>step==="exit"?(closeModal(),lockAgain()):step===1?openReset(2):resetAll();
   document.addEventListener("keydown",modalKey);
   m.querySelector("#m-cancel").focus();
 }
@@ -855,14 +964,19 @@ document.addEventListener("click",e=>{
     // closing: play the roll backwards first, then really close
     else if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&!d.classList.contains("closing")){
       e.preventDefault();d.classList.remove("anim");d.classList.add("closing");
-      const done=()=>{if(d.classList.contains("closing")){d.classList.remove("closing");d.open=false}};
-      d.querySelector(".cbody").addEventListener("animationend",done,{once:true});setTimeout(done,400);
+      // shrink the card's height smoothly too, so the page gets shorter gradually instead of jumping
+      const full=d.offsetHeight,target=sm.offsetHeight+(d.offsetHeight-d.clientHeight);
+      d.style.overflow="hidden";
+      const ha=d.animate([{height:full+"px"},{height:target+"px"}],{duration:300,easing:"cubic-bezier(.4,0,.2,1)",fill:"forwards"});
+      const done=()=>{if(d.classList.contains("closing")){d.classList.remove("closing");d.open=false;ha.cancel();d.style.overflow=""}};
+      ha.onfinish=done;setTimeout(done,450);
     }else if(d.classList.contains("closing"))e.preventDefault();
   }
   const b=e.target.closest("button");if(!b)return;
   if(b.id==="g-en"||b.id==="g-sk"){S.lang=b.id.slice(2);render();renderGate();localSave();return}
   if(b.id==="lang-en"||b.id==="lang-sk"){S.lang=b.id.slice(5);rerender();changed();return}
   if(b.id==="reset-btn"){openReset(1);return}
+  if(b.id==="exit-btn"){openReset("exit");return}
   if(b.id==="th-light"||b.id==="th-dark"){try{localStorage.setItem("fit-theme",b.id.slice(3))}catch(e){}applyTheme();return}
   if(b.dataset.view){S.view=b.dataset.view;render();changed();return}
   if(b.dataset.year||b.dataset.half){const c=cur();S.current=(b.dataset.year||c[0])+(b.dataset.half||c[1]);render();changed();return}
