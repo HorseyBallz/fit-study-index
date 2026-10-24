@@ -105,11 +105,12 @@ button,select,input{font:inherit;color:inherit}
 @keyframes pop{from{opacity:0;transform:scale(.88)}}
 @keyframes glow{50%{box-shadow:0 0 0 2px rgba(255,77,100,.7),0 0 80px rgba(255,40,60,.85),0 0 160px rgba(255,40,60,.45)}}
 .shards{position:fixed;inset:0;z-index:61;pointer-events:none;overflow:hidden}
+.grouph{font-family:var(--f-body);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:6px 0 0}
+.emptyopt{margin:0;font-size:13px;color:var(--muted)}
 .unoff{margin:0;font-size:12px;color:var(--warn)}
 /* entry notice: shown until the viewer types the accept word */
 .gate{min-height:100vh;min-height:100dvh;display:grid;place-items:center;align-content:center;gap:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .gate form{width:min(320px,100%)}
-.gnote{margin:0;font-size:13px;color:var(--warn);text-align:center;max-width:320px}
 .gate>*:not(.bigx){position:relative;z-index:1}
 /* wrong word: a huge red X flashes behind the box for about 2.5 s */
 .bigx{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:0;color:var(--bad);transition:color .35s ease,opacity .35s ease}
@@ -255,7 +256,6 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
   <form id="gate-form" novalidate>
     <input type="password" id="g-input" class="secret" placeholder="Type the secret word" aria-label="Type the secret word" autocomplete="off" autocapitalize="off" spellcheck="false">
   </form>
-  <p class="gnote" id="g-note" hidden></p>
   <p class="madeby">Made by Filipko &amp; Claude ❤️</p>
 </div>
 <div class="wrap" id="app" hidden>
@@ -300,7 +300,6 @@ const COURSES=[
  {c:"ILG",id:302528,en:"Linear Algebra",sk:"Lineárna algebra",cr:5,t:"Cr+Ex",k:"C",s:"1W",zeroMax:1,parts:[1,2,3,4,5].map(i=>P("Test "+i,"Písomka "+i,4)),exam:EX(80)},
  {c:"IUS",id:302578,en:"Introduction to Software Engineering",sk:"Úvod do softvérového inžinierstva",cr:5,t:"Cr+Ex",k:"C",s:"1W",credit:18,parts:[P("Exercises (4 × 3 pts)","Cvičenia (4 × 3 b)",12),P("Homework (ER diagram)","Domáca úloha (ER diagram)",12),P("Team project + defence","Tímový projekt + obhajoba",16)],exam:EX(60)},
  {c:"IZP",id:302589,en:"Introduction to Programming Systems",sk:"Základy programovania",cr:7,t:"Cr+Ex",k:"C",s:"1W",credit:25,parts:[P("Computer labs","Počítačové cvičenia",20,12),P("Project 1","Projekt 1",7.5,1),P("Project 2","Projekt 2",7.5,1),P("Mid-term test","Polsemestrálna písomka",12)],exam:EX(53)},
- {c:"ISM",id:302562,en:"Seminar of Mathematics",sk:"Seminár matematiky",cr:2,t:"Cr",k:"E",s:"1W",creditUnknown:true,parts:[P("Test 1","Písomka 1",10),P("Test 2","Písomka 2",10),P("Examples at the board (bonus)","Príklady pri tabuli (bonus)",3)]},
  // 1st year, summer
  {c:"IMA1",id:302530,en:"Mathematical Analysis 1",sk:"Matematická analýza 1",cr:4,t:"Cr+Ex",k:"C",s:"1S",parts:[P("Written tests","Písomky",20)],exam:EX(80)},
  {c:"INC",id:302539,en:"Digital Systems Design",sk:"Návrh číslicových systémov",cr:5,t:"Cr+Ex",k:"C",s:"1S",parts:[P("Mid-term test","Polsemestrálna písomka",25),P("Homework + lab evaluation","Domáce úlohy + laboratóriá",20)],exam:EX(55)},
@@ -329,20 +328,20 @@ const COURSES=[
  {c:"ITU",id:302573,en:"User Interface Programming",sk:"Tvorba užívateľských rozhraní",cr:5,t:"ClCr",k:"C",s:"3W",parts:[P("Final test","Záverečný test",20),P("Computer labs","Počítačové cvičenia",25),P("Projects","Projekty",55)]},
  {c:"IBT",id:302508,en:"Bachelor's Thesis",sk:"Bakalárska práca",cr:13,t:"Cr",k:"C",s:"3S",parts:[]},
 ];
-// Compulsory-elective groups: PVA (English, B1 or higher) and PVT (technical)
-const PVA=[
- {c:"GEN",id:302490,en:"General English Exam B1",sk:"Všeobecná skúška z angličtiny B1",cr:1,t:"Ex",s:"1W"},
- {c:"ZAN4",id:302705,en:"B1 level (CEFR) English exam",sk:"Skúška z angličtiny na úrovni B1",cr:1,t:"Ex",s:"1W"},
- {c:"BAN4",id:302444,en:"English for Bachelors – Intermediate 2",sk:"Angličtina pre bakalárov – stredne pokročilí 2",cr:3,t:"Cr+Ex",s:"1S"},
- {c:"AIT",id:302431,en:"English for IT",sk:"Angličtina pre IT",cr:3,t:"Cr+Ex",s:"1S"},
- {c:"0A8",id:300427,en:"English B2-2",sk:"Angličtina B2-2",cr:3,t:"Cr+Ex",s:"2S"},
-];
-const PVT=[
- {c:"IVH",id:302580,en:"VHDL Seminar",sk:"Seminár VHDL",cr:4,t:"ClCr",s:"1S"},
- {c:"ICP",id:302512,en:"The C++ Programming Language",sk:"Programovanie v C++",cr:4,t:"ClCr",s:"2S"},
- {c:"ICS",id:302513,en:"The C# Programming Language",sk:"Programovanie v C#",cr:4,t:"ClCr",s:"2S"},
- {c:"IJA",id:302524,en:"Java Programming Language",sk:"Programovanie v jazyku Java",cr:4,t:"ClCr",s:"2S"},
-];
+// Optional courses per semester from the BIT study plan on fit.vut.cz (programme 10326, Czech and English pages):
+// [code, English name, Czech name, credits, ends with, group (A = English B1+, T = technical, E = elective), course id]
+const CAT={"1W":[["GEN","General English Exam B1","Zkouška z obecné angličtiny B1",1,"Ex","A",313957],["ZAN4","B1 level (CEFR) English exam","Zkouška z angličtiny na úrovni B1",1,"Ex","A",314668],["0MS","Mathematical Software","Matematický software",3,"Cr","E",312306],["1AHS-L","Applied game studies – research and design","Aplikovaná herní studia – výzkum a design",3,"Ex","E",312715],["1DS-Z","3D Printing and Digital Fabrication for Creative Industries 1","3D tisk a digitální výroba pro kreativní obory 1",2,"Cr","E",313145],["1HERDES-ZS","Game Design – Board Games","Herní design – Deskové hry",2,"Cr","E",312834],["1ODI-Z","3D Optical digitalization 1","3D optická digitalizace 1",2,"Cr","E",313143],["ACHE20","Architecture of the 20th century","Architektura 20. století",3,"Ex","E",312720],["ATGD","(Graphic) Design Topics of Today","Aktuální témata (grafického) designu",2,"Cr","E",312702],["BPC-DSY","Tax System of the Czech Republic","Daňový systém ČR",2,"ClCr","E",314873],["BPC-ELSA","Electrical Engineering Tutorial","Elektrotechnický seminář",2,"Cr","E",315131],["BPC-FY1B","Physics 1","Fyzika 1",6,"Cr+Ex","E",314776],["BPC-FYE","Physics in Electrical Engineering","Fyzika v elektrotechnice",5,"Cr+Ex","E",314800],["BRA012-A","GIS","GIS",2,"Cr","E",310340],["DKFI-Z","The History and Context of Photography 1","Dějiny a kontexty fotografie 1",3,"Ex","E",312780],["FIT","History and Philosophy of Technology","Dějiny a filozofie techniky",2,"ClCr","E",309439],["HKO","Communication and Presentation Skills","Manažerská komunikace a prezentace",3,"Cr","E",313969],["HVR","Leadership and Time Management","Manažerské vedení lidí a řízení času",3,"Cr","E",313982],["IFS","Seminar of Physics","Fyzikální seminář",2,"Cr","E",314027],["IKK","Circle Consultations","Kruhové konzultace",0,"Cr","E",314052],["ISC","PC Seminar","Počítačový seminář",2,"Cr","E",314186],["ISM","Seminar of Mathematics","Matematický seminář",2,"Cr","E",314198],["IVG","Information Education and Literacy","Informační výchova a gramotnost",1,"Cr","E",314259],["KPO-Z","Porn studies","Kurz pornostudií",3,"Ex","E",312863],["PRM","Fundamentals of Law","Právní minimum",2,"ClCr","E",309442],["RET","Rhetoric","Rétorika",2,"ClCr","E",309444],["VSDH1","Visual Digital Game Styles 1","Vizuální styly digitálních her 1",2,"Cr","E",313084],["XPC-POM","Management Minimum","Podnikatelské minimum",4,"Cr","E",315009]],"1S":[["0AX","English C1-2","Angličtina C1-2",3,"Cr+Ex","A",312268],["AIT","English for IT","Angličtina pro IT",3,"Cr+Ex","A",313897],["BAN1","English for bachelors - Pre-Intermediate 1","Angličtina 1: mírně pokročilí 1",3,"Cr+Ex","A",313905],["BAN2","English for bachelors - Pre-Intermediate 2","Angličtina 2: mírně pokročilí 2",3,"Cr+Ex","A",313907],["BAN3","English for bachelors - Intermediate 1","Angličtina 3: středně pokročilí 1",3,"Cr+Ex","A",313909],["BAN4","English for Bachelors - Intermediate 2","Angličtina 4: středně pokročilí 2",3,"Cr+Ex","A",313910],["GEN","General English Exam B1","Zkouška z obecné angličtiny B1",1,"Ex","A",313956],["XPC-FCE2","English for FCE 2","Angličtina pro FCE 2",3,"ClCr","A",314854],["IVH","VHDL Seminar","Seminář VHDL",4,"ClCr","T",314261],["0MV","Calculus with MAPLE","Matematické výpočty pomocí MAPLE",2,"Cr","E",312308],["1CNCO","CNC Machining – Robots in Artistic Practice","CNC obrábění – Roboti v umělecké praxi",2,"Cr","E",312769],["1DS-2","3D Printing and Digital Fabrication for Creative Industries 2","3D tisk a digitální výroba pro kreativní obory 2",2,"Cr","E",313146],["1HERDES","Game Design – Digital Games","Herní design – Digitální hry",2,"Cr","E",312835],["1HS-Z","Game Studies","Herní studia",3,"Ex","E",312836],["1KADH-L","Digital Games Critical Analyses","Kritická analýza digitálních her",3,"Ex","E",312860],["1ODI-L","3D Optical digitalization 2","3D optická digitalizace 2",2,"Cr","E",313144],["AUP-L","Copyright","Autorská práva",2,"Cr","E",312759],["DKFII-L","The History and Context of Photography 2","Dějiny a kontexty fotografie 2",3,"Ex","E",312781],["FIK","Philosophy and the Culture","Filozofie a kultura",2,"Cr","E",309438],["FIT","History and Philosophy of Technology","Dějiny a filozofie techniky",2,"ClCr","E",309440],["HKO","Communication and Presentation Skills","Manažerská komunikace a prezentace",3,"Cr","E",313971],["HLS-KE","Earthen Architecture","Hliněné stavitelství",3,"ClCr","E",315562],["HVR","Leadership and Time Management","Manažerské vedení lidí a řízení času",3,"Cr","E",313985],["IJC","The C Programming Language","Jazyk C",5,"Ex","E",314049],["IMK","Mechanics and Acoustics","Mechanika a akustika",6,"ClCr","E",314080],["IPZ","Peripheral Devices","Periferní zařízení",4,"Ex","E",314157],["ISJ","Scripting Languages","Skriptovací jazyky",5,"Ex","E",314195],["ITW","Web Design","Tvorba webových stránek",5,"ClCr","E",314241],["ITY","Typography and Publishing","Typografie a publikování",4,"ClCr","E",314249],["IVS","Practical Aspects of Software Design","Praktické aspekty vývoje software",5,"ClCr","E",314263],["N2","German 2","Němčina 2",3,"Cr+Ex","E",311674],["PRM","Fundamentals of Law","Právní minimum",2,"ClCr","E",309441],["RET","Rhetoric","Rétorika",2,"ClCr","E",309443],["SESP","Ergonomics of Sport and Physical Activities","Ergonomie sportu a pohybových aktivit",3,"Cr","E",308645],["SFR","Fundraising","Sport a nová média",3,"Cr","E",308650],["T1F","Computer Physics I","Počítačová fyzika I",3,"ClCr","E",312059],["VSDH2","Visual Digital Game Styles 2","Vizuální styly digitálních her 2",2,"Cr","E",313085],["XPC-BEN","Business English","Obchodní angličtina",3,"Cr+Ex","E",314857],["plaP","Business Laboratory","Podnikatelská laboratoř",5,"ClCr","E",313600]],"2W":[["0A7","English B2-1","Angličtina B2-1",2,"Cr","A",312272],["0A9","English C1-1","Angličtina C1-1",3,"Cr+Ex","A",312274],["AIT","English for IT","Angličtina pro IT",3,"Cr+Ex","A",313898],["BAN1","English for bachelors - Pre-Intermediate 1","Angličtina 1: mírně pokročilí 1",3,"Cr+Ex","A",313904],["BAN2","English for bachelors - Pre-Intermediate 2","Angličtina 2: mírně pokročilí 2",3,"Cr+Ex","A",313906],["BAN3","English for bachelors - Intermediate 1","Angličtina 3: středně pokročilí 1",3,"Cr+Ex","A",313908],["BAN4","English for Bachelors - Intermediate 2","Angličtina 4: středně pokročilí 2",3,"Cr+Ex","A",313911],["XPC-FCE1","English for FCE 1","Angličtina pro FCE 1",3,"ClCr","A",314855],["0SE1","English Skills for Workplace Communication I","English Skills for Workplace Communication I",3,"Cr+Ex","E",312338],["1ZHERV","Introduction to Game Development","Základy herního vývoje",4,"ClCr","E",313126],["AEU","English for Europe","Angličtina pro Evropu",3,"Cr+Ex","E",313893],["BPC-AE1","Analog Electronics 1","Analogová elektronika 1",7,"Cr+Ex","E",315074],["BPC-ANA","Analog Technology","Analogová technika",6,"Cr+Ex","E",315324],["BPC-ELA","Electroacoustics 1","Elektroakustika 1",6,"Cr+Ex","E",315281],["BPC-NRP","Design and Fabrication of Electronic Instruments","Návrh a realizace elektronických přístrojů",6,"Cr+Ex","E",314981],["BPC-RBM","Robotics and Robotic Manipulators","Robotika a manipulátory",4,"Cr+Ex","E",314210],["BPC-VPA","Selected parts from mathematics I.","Vybrané partie z matematiky I.",5,"Ex","E",314918],["BPC-ZSY","Security Systems","Zabezpečovací systémy",5,"Cr+Ex","E",315193],["DMSM","Digital Marketing and Social Media","Digital Marketing and Social Media",5,"ClCr","E",313311],["EC","E-commerce","E-commerce",6,"ClCr","E",313335],["EPO","Business Economics","Podniková ekonomika",5,"Cr+Ex","E",313602],["F1","French 1","Francouzština 1",2,"Cr","E",311450],["I1C","CCNA: Routing Basics and VLAN Technology","CCNA: základy směrování a technologie VLAN",4,"ClCr","E",314307],["ILI","Advanced Topics of Linux Administration","Pokročilá témata administrace operačního systému Linux",4,"ClCr","E",314059],["INI","IT Service Design and Implementation","Návrh a implementace IT služeb",4,"ClCr","E",314116],["IP1","Project Practice 1","Projektová praxe 1",5,"ClCr","E",314163],["IPS","Programming Seminar","Programovací seminář",2,"Cr","E",314150],["ISM2","Seminar of Mathematics 2","Matematický seminář 2",2,"Cr","E",314201],["IW1","Microsoft Windows Desktop Systems","Desktop systémy Microsoft Windows",5,"Cr+Ex","E",314270],["IW5","Programming .NET and C#","Programování v .NET a C#",5,"ClCr","E",314277],["JA3","Conversation through Hot Current Issues","Anglická konverzace na aktuální témata",3,"Cr+Ex","E",314319],["KdasP","Tax System","Daňová soustava",5,"Cr+Ex","E",313302],["N1","German 1","Němčina 1",2,"Cr","E",311673],["N3","German 3","Němčina 3",2,"Cr","E",311675],["N5","German 5","Němčina 5",2,"Cr","E",311677],["N7","German for Specific Purposes I","Deutsch für Studium und Beruf I",4,"Cr+Ex","E",311679],["NNA008","Geographic Information Systems","Geografické informační systémy",2,"Cr","E",310916],["NUA026","Smart Cities and Regions","Smart city, region",3,"Cr+Ex","E",311000],["PKA","Practical conversation, presenting and business communication in English","Praktická konverzace, prezentování a firemní komunikace v Angličtině",3,"Cr","E",314466],["R1","Russian 1","Ruština 1",2,"Cr","E",311878],["SORS","Personality Development and Self-knowledge","Osobností rozvoj a sebepoznání",3,"Cr","E",308662],["STD","Team Skills","Týmové dovednosti",3,"Cr","E",308678],["T2F","Computer Physics II","Počítačová fyzika II",3,"ClCr","E",312062],["VUC007","Additive technologies","Aditivní technologie",2,"Cr","E",311139],["XPC-ESP1","Spanish for Beginners 1","Španělština pro začátečníky 1",3,"ClCr","E",314875],["XPC-FR1","French for Beginners 1","Francouzština pro začátečníky 1",3,"ClCr","E",314811],["XPC-FR3","French for pre-intermediate","Francouzština pro mírně pokročilé",3,"ClCr","E",314812],["XPC-IPD","Engineering Pedagogy and Didactics","Inženýrská pedagogika a didaktika",5,"Ex","E",314882],["XPC-ITA1","Italian for Beginners 1","Italština pro začátečníky 1",3,"ClCr","E",314860],["XPC-KPT","Culture of Speech and the Generation of Texts","Kultura projevu a tvorba textů",5,"Cr","E",314871],["XPC-NE1","German for Beginners 1","Němčina pro začátečníky 1",3,"ClCr","E",314830],["XPC-NE3","German for Lower-Intermediate 1","Němčina pro mírně pokročilé 1",3,"ClCr","E",314829],["XPC-PEP","Pedagogical Psychology","Pedagogická psychologie",5,"Cr+Ex","E",314878],["ZPX","Professional Practice, Abroad","Zahraniční odborná praxe",5,"Cr","E",314691],["frpP","Financing Business Development","Financování rozvoje podniku",4,"ClCr","E",313376],["mak1P","Macroeconomics 1","Makroekonomie 1",6,"Cr+Ex","E",313457],["manP","Management","Management",6,"Cr+Ex","E",313465],["marP","Marketing","Marketing",5,"Cr+Ex","E",313506]],"2S":[["0A8","English B2-2","Angličtina B2-2",3,"Cr+Ex","A",312273],["ICP","The C++ Programming Language","Seminář C++",4,"ClCr","T",313995],["ICS","The C# Programming Language","Seminář C#",4,"ClCr","T",313996],["IJA","Java Programming Language","Seminář Java",4,"ClCr","T",314040],["IVH","VHDL Seminar","Seminář VHDL",4,"ClCr","T",314261],["0MR","Mobile Robots","Mobilní roboty",5,"Cr","E",312305],["0PZ","Writing Final Theses","Základy psaní závěrečných prací",3,"Cr+Ex","E",312336],["0SE2","English Skills for Workplace Communication II","English Skills for Workplace Communication II",3,"Cr+Ex","E",312339],["AEU","English for Europe","Angličtina pro Evropu",3,"Cr+Ex","E",313894],["BPC-AE2","Analog Electronics 2","Analogová elektronika 2",6,"Cr+Ex","E",315052],["BPC-AUD","Audio Electronics","Audio elektronika",5,"Cr+Ex","E",315089],["BPC-IOT","Communication Systems for IoT","Komunikační systémy pro IoT",5,"Cr+Ex","E",315338],["BPC-MA2","Mathematics 2","Matematika 2",6,"Cr+Ex","E",314895],["BPC-OZU","Selected Topics in Renewable Energy Sources and Energy Storage","Vybrané partie z obnovitelných zdrojů a ukládání energie",5,"Cr+Ex","E",314676],["BPC-PPK","Computer aided Design","Počítačová podpora konstruování",6,"ClCr","E",315417],["BPC-PRP","Robotics and Computer Vision","Robotika a zpracování obrazu",7,"Cr+Ex","E",314213],["BPC-PSM","Printed Circuits and Surface Mount Technology","Plošné spoje a povrchová montáž",5,"Cr+Ex","E",314646],["BPC-RR1","Control Theory 1","Řízení a regulace 1",7,"Cr+Ex","E",314174],["BPC-ZSL","Medical Imaging Systems","Zobrazovací systémy v lékařství",5,"Cr+Ex","E",314378],["BPC-ZSW","Audio Software","Zvukový software",2,"Cr","E",314083],["F2","French 2","Francouzština 2",3,"Cr+Ex","E",311451],["I2C","CCNA: LAN and WAN Technologies","CCNA: technologie sítí LAN a WAN",4,"ClCr","E",314311],["IAM","Advanced Mathematics","Pokročilá matematika",5,"ClCr","E",313988],["IAN","Binary Code Analysis","Analýza binárního kódu",4,"ClCr","E",313989],["IBS","Security and Computer Networks","Bezpečnost a počítačové sítě",4,"Cr+Ex","E",313990],["IIZ","IBM zSeries Servers","Správa serverů IBM zSeries",5,"ClCr","E",314035],["IMF","Mathematical Foundations of Fuzzy Logic","Matematické základy fuzzy logiky",5,"ClCr","E",314072],["IMHa","Science of happiness","Výpočetní metody v duševním zdraví",5,"ClCr","E",314076],["INAa","Introduction to Neural Models for AI","Introduction to Neural Models for AI",5,"Ex","E",314103],["IP2","Project Practice 2","Projektová praxe 2",5,"ClCr","E",314173],["IPA","Advanced Assembly Languages","Pokročilé asemblery",5,"Ex","E",314131],["ITP","Personal Computers","Technika personálních počítačů",4,"Ex","E",314221],["ITS","Testing and Dynamic Analysis","Testování a dynamická analýza",5,"Cr+Ex","E",314224],["IW2","Microsoft Windows Server Systems","Serverové systémy Microsoft Windows",5,"Cr+Ex","E",314273],["IZA","Programming Apple Devices","Programování zařízení Apple",5,"Ex","E",314281],["JA3","Conversation through Hot Current Issues","Anglická konverzace na aktuální témata",3,"Cr+Ex","E",314322],["N4","German 4","Němčina 4",3,"Cr+Ex","E",311676],["N6","German 6","Němčina 6",4,"Cr+Ex","E",311678],["N8","German for Specific Purposes II","Deutsch für Studium und Beruf II",4,"Cr+Ex","E",311680],["PKA","Practical conversation, presenting and business communication in English","Praktická konverzace, prezentování a firemní komunikace v Angličtině",3,"Cr","E",314464],["R2","Russian 2","Ruština 2",3,"Cr+Ex","E",311879],["XPC-EIC","Electrical Installations","Elektrické instalace",5,"ClCr","E",315143],["XPC-ELB","Safety in Electrical Engineering","Bezpečná elektrotechnika",2,"Ex","E",315144],["XPC-ESP2","Spanish for Beginners 2","Španělština pro začátečníky 2",3,"ClCr","E",314874],["XPC-FR2","French for Beginners 2","Francouzština pro začátečníky 2",3,"ClCr","E",314809],["XPC-FR4","French for pre-intermediate","Francouzština pro mírně pokročilé",3,"ClCr","E",314810],["XPC-IPD","Engineering Pedagogy and Didactics","Inženýrská pedagogika a didaktika",5,"Ex","E",314880],["XPC-ITA2","Italian for Beginners 2","Italština pro začátečníky 2",3,"ClCr","E",314859],["XPC-KPT","Culture of Speech and the Generation of Texts","Kultura projevu a tvorba textů",5,"Cr","E",314867],["XPC-NE2","German for Beginners 2","Němčina pro začátečníky 2",3,"ClCr","E",314894],["XPC-NE4","German for Lower-Intermediate 2","Němčina pro mírně pokročilé 2",3,"ClCr","E",314893],["XPC-PEP","Pedagogical Psychology","Pedagogická psychologie",5,"Cr+Ex","E",314876],["XPC-VPM","Selected parts from mathematics II.","Vybrané partie z matematiky II.",5,"Ex","E",314916],["ZFI","Basic Elements of Financing","Základy financování",6,"Cr+Ex","E",313792],["ZPX","Professional Practice, Abroad","Zahraniční odborná praxe",5,"Cr","E",314689],["faP","Financial Analysis","Finanční analýza",5,"Cr+Ex","E",313377],["ftP","Financial Markets","Finanční trhy",5,"Cr+Ex","E",313385],["mik1P","Microeconomics 1","Mikroekonomie 1",6,"Cr+Ex","E",313556],["uceP","Accounting","Účetnictví",6,"Cr+Ex","E",313771]],"3W":[["0PZ","Writing Final Theses","Základy psaní závěrečných prací",3,"Cr+Ex","E",312335],["BPC-RR2","Control Theory 2","Řízení a regulace 2",6,"Cr+Ex","E",314160],["IBbiP","Business Intelligence","Business Intelligence",5,"Cr+Ex","E",313268],["IP3","Project Practice 3","Projektová praxe 3",5,"ClCr","E",314178],["IZV","Data Analysis and Visualization in Python","Zpracování a vizualizace dat v prostředí Python",4,"ClCr","E",314304]],"3S":[["IMU","Multimedia Transmission over IP Networks","Multimédia v počítačových sítích",4,"ClCr","E",314100]]};
+// optional courses that have a known point layout
+const RICH={ISM:{creditUnknown:true,parts:[P("Test 1","Písomka 1",10),P("Test 2","Písomka 2",10),P("Examples at the board (bonus)","Príklady pri tabuli (bonus)",3)]}};
+function catFind(code,slot){
+  for(const s of [slot,...SLOTS]){const x=(CAT[s]||[]).find(r=>r[0]===code);if(x)return x}
+  return null;
+}
+function addOptional(code,slot){
+  const x=catFind(code,slot);if(!x||S.electives.some(e=>e.c===code))return false;
+  S.electives.push({c:x[0],en:x[1],sk:x[2],cr:x[3],t:x[4],g:x[5],id:x[6],s:slot});
+  const r=cs(code);r.taken=slot;return true;
+}
 
 /* ---------- Strings ---------- */
 const T={
@@ -377,12 +376,13 @@ const T={
   ccNote:"Graded course credit: the total from 100 points sets your grade.",
   src:"Rules from",fitPage:"the course page",remove:"Remove course",
   addElective:"Add an elective course",elCode:"Code",elName:"Name",elCr:"Cr",elType:"Ends with",
-  pvaPick:"English course (PVA)",pvtPick:"Technical course (PVT)",choose:"Choose…",
   saved:"Saved",saving:"Saving…",unsaved:"Unsaved changes",local:"Saved on this device",readonly:"View only · saved on this device",saveErr:"Could not save · kept on this device",
   footH:"How the tracker counts",
   foot:["Credits count automatically as soon as your points pass a course, and disappear again if you lower the points. Every exam has a regular term and two resits. A failed course can be taken once more, the next year.","Grades follow the BUT scale. Every exam has a regular term and two resit terms. A course you fail can be enrolled one more time, and that repeated enrolment is your last.","Point splits and thresholds come from each course page on fit.vut.cz for 2026/27. Teachers sometimes change details in the first lecture, so you can edit any maximum or add your own items."],
-  gradesH:"Grade scale",yearLbl:"Year",semLbl:"Semester",semCap:{W:"Winter",S:"Summer"},moreCourses:"English, technical course or elective",
-  retake:"Retake next year",idleNote:"Locked after 15 minutes without activity.",exTitle:"Exit the tracker?",exBody:"You will need the secret word to get back in. Your data stays saved.",exYes:"Yes, exit",exitBtn:"Exit",secretPh:"Type the secret word",resetBtn:"Reset all data",cancel:"Cancel",
+  gradesH:"Grade scale",yearLbl:"Year",semLbl:"Semester",semCap:{W:"Winter",S:"Summer"},
+  retake:"Retake next year",compH:"Compulsory courses",optH:"Optional courses",optEmpty:"No optional courses in this semester yet.",addOpt:"Add an optional course",
+  optPick:"Choose a course…",grpA:"English (one course, B1 or higher)",grpT:"Technical (one of these)",grpE:"Other electives",ownH:"Not on the list? Add your own",
+  kind:{E:"optional",A:"English",T:"technical"},exTitle:"Exit the tracker?",exBody:"You will need the secret word to get back in. Your data stays saved.",exYes:"Yes, exit",exitBtn:"Exit",secretPh:"Type the secret word",resetBtn:"Reset all data",cancel:"Cancel",
   r1Title:"Reset everything?",r1Body:"This deletes all your points, exam scores, course statuses, electives and failed-course marks.",r1Yes:"Yes, reset",
   r2Title:"Are you absolutely sure?",r2Body:"All your data will be deleted for good. This cannot be undone.",r2Yes:"Delete everything",resetDone:"All data was reset.",minOkShort:"✓ Minimum reached. You can continue your studies.",minOkToast:"🎉 You reached the minimum credits!",unoff:"Unofficial student tool, not run by VUT or FIT.",logoAlt:"Brno University of Technology, Faculty of Information Technology",
   zeroLbl:"Tests with 0 points",failLbl:"Failed courses",fail3:"3 ✕: you cannot continue your studies.",
@@ -426,12 +426,13 @@ const T={
   ccNote:"Klasifikovaný zápočet: známku určuje súčet zo 100 bodov.",
   src:"Pravidlá zo",fitPage:"stránky predmetu",remove:"Odstrániť predmet",
   addElective:"Pridať voliteľný predmet",elCode:"Skratka",elName:"Názov",elCr:"Kr",elType:"Ukončenie",
-  pvaPick:"Kurz angličtiny (PVA)",pvtPick:"Technický predmet (PVT)",choose:"Vyber…",
   saved:"Uložené",saving:"Ukladám…",unsaved:"Neuložené zmeny",local:"Uložené v tomto zariadení",readonly:"Len na čítanie · uložené v zariadení",saveErr:"Nepodarilo sa uložiť · ostáva v zariadení",
   footH:"Ako tracker počíta",
   foot:["Kredity sa započítajú automaticky, keď ti body na predmet stačia, a zmiznú, ak body znížiš. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz, budúci rok.","Známky podľa stupnice VUT. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz a tento opakovaný zápis je posledný.","Rozdelenie bodov a hranice sú zo stránok predmetov na fit.vut.cz pre 2026/27. Vyučujúci ich niekedy upresnia na prvej prednáške, preto môžeš každé maximum upraviť alebo pridať vlastné položky."],
-  gradesH:"Stupnica hodnotenia",yearLbl:"Ročník",semLbl:"Semester",semCap:{W:"Zimný",S:"Letný"},moreCourses:"Angličtina, technický predmet alebo voliteľný predmet",
-  retake:"Opakovať budúci rok",idleNote:"Uzamknuté po 15 minútach nečinnosti.",exTitle:"Odísť z trackera?",exBody:"Na návrat budeš potrebovať tajné slovo. Tvoje údaje ostanú uložené.",exYes:"Áno, odísť",exitBtn:"Odísť",secretPh:"Zadaj tajné slovo",resetBtn:"Vymazať všetky údaje",cancel:"Zrušiť",
+  gradesH:"Stupnica hodnotenia",yearLbl:"Ročník",semLbl:"Semester",semCap:{W:"Zimný",S:"Letný"},
+  retake:"Opakovať budúci rok",compH:"Povinné predmety",optH:"Voliteľné predmety",optEmpty:"V tomto semestri zatiaľ nemáš voliteľné predmety.",addOpt:"Pridať voliteľný predmet",
+  optPick:"Vyber predmet…",grpA:"Angličtina (jeden predmet, B1 alebo vyššie)",grpT:"Technický (jeden z nich)",grpE:"Ostatné voliteľné",ownH:"Nie je v zozname? Pridaj vlastný",
+  kind:{E:"voliteľný",A:"angličtina",T:"technický"},exTitle:"Odísť z trackera?",exBody:"Na návrat budeš potrebovať tajné slovo. Tvoje údaje ostanú uložené.",exYes:"Áno, odísť",exitBtn:"Odísť",secretPh:"Zadaj tajné slovo",resetBtn:"Vymazať všetky údaje",cancel:"Zrušiť",
   r1Title:"Vymazať všetko?",r1Body:"Vymažú sa všetky tvoje body, výsledky skúšok, stavy predmetov, voliteľné predmety aj značky neúspešných predmetov.",r1Yes:"Áno, vymazať",
   r2Title:"Naozaj to chceš urobiť?",r2Body:"Všetky údaje sa natrvalo vymažú. Nedá sa to vrátiť späť.",r2Yes:"Vymazať všetko",resetDone:"Všetky údaje boli vymazané.",minOkShort:"✓ Minimum splnené. Môžeš pokračovať v štúdiu.",minOkToast:"🎉 Máš minimum kreditov!",unoff:"Neoficiálny študentský nástroj, VUT ani FIT ho neprevádzkujú.",logoAlt:"Vysoké učení technické v Brně, Fakulta informačních technologií",
   zeroLbl:"Písomky za 0 bodov",failLbl:"Neúspešné predmety",fail3:"3 ✕: v štúdiu nemôžeš pokračovať.",
@@ -452,7 +453,7 @@ const LS="fit-index-state-v1";
 let S=null, artifact=null, canPublish=true, dirty=false, timer=null;
 const cur=()=>S.current||"1W";
 function defaults(){
-  return {v:1,lang:"en",current:"1W",pva:"",pvt:"",courses:{},electives:[]};
+  return {v:1,lang:"en",current:"1W",courses:{},electives:[]};
 }
 function cs(code){ // per-course record
   if(!S.courses[code]){
@@ -463,9 +464,9 @@ function cs(code){ // per-course record
 }
 function allCourses(){
   const list=[...COURSES];
-  const a=PVA.find(x=>x.c===S.pva); if(a) list.push({...a,k:"A",parts:a.t==="Ex"?[]:[],exam:a.t==="Ex"||a.t==="Cr+Ex"?EX(100):null,free:true});
-  const b=PVT.find(x=>x.c===S.pvt); if(b) list.push({...b,k:"T",parts:[],free:true});
-  for(const e of S.electives) list.push({c:e.c,en:e.n,sk:e.n,cr:e.cr,t:e.t,k:"E",s:e.s,parts:[],exam:e.t==="Cr+Ex"||e.t==="Ex"?EX(100):null,custom:true,free:true});
+  for(const e of S.electives){const rich=RICH[e.c]||{};
+    list.push({c:e.c,en:e.en||e.n,sk:e.sk||e.n,cr:e.cr,t:e.t,k:e.g||"E",s:e.s,id:e.id||null,parts:rich.parts||[],creditUnknown:rich.creditUnknown,
+      exam:e.t==="Cr+Ex"||e.t==="Ex"?EX(100):null,custom:!e.id,free:!rich.parts,opt:true})}
   return list;
 }
 function load(json){
@@ -579,8 +580,8 @@ function celebrate(msg){
 function renderSummary(){
   const t=L(),st=stats();
   const pct=Math.min(100,st.passed/180*100), pp=Math.min(100-pct,st.prog/180*100);
-  const engD=PVA.find(x=>x.c===S.pva), engR=S.pva?cs(S.pva):null;
-  const tecD=PVT.find(x=>x.c===S.pvt), tecR=S.pvt?cs(S.pvt):null;
+  const pick=g=>{const os=st.list.filter(d=>d.k===g);return os.find(d=>cs(d.c).status==="passed")||os[0]};
+  const engD=pick("A"),engR=engD?cs(engD.c):null,tecD=pick("T"),tecR=tecD?cs(tecD.c):null;
   const y=+cur()[0];
   const first=st.bySlot["1W"]||0, yr=st.byYear[String(y)]||0;
   const req=(cls,k,v,s)=>`<div class="req ${cls}"><span class="k">${k}</span><span class="v">${v}</span><span class="s">${s}</span></div>`;
@@ -628,7 +629,7 @@ function courseCard(d){
   const t=L(),k=calc(d),r=k.r,id=d.c;
   const crOnly=d.t==="Cr"; const cc=d.t==="ClCr";
   const stOpts=(crOnly||cc?["planned","enrolled","passed","failed"]:d.t==="Ex"?["planned","enrolled","passed","failed"]:["planned","enrolled","credit","passed","failed"]);
-  const kindLbl={C:"",E:S.lang==="sk"?"voliteľný":"elective",A:"PVA",T:"PVT"}[d.k||"C"];
+  const kindLbl=d.k&&d.k!=="C"?t.kind[d.k]:"";
   let h=`<details class="course" data-st="${r.status}" id="c-${id}" ${S.open&&S.open[id]?"open":""}><summary>
    <span class="code">${esc(d.c)}</span><span class="cname">${esc(nm(d))}</span><span class="pill ${r.status}">${t.st[r.status]}</span>
    <span class="cmeta"><span class="mono">${d.cr} ${t.cr}</span><span>${TYPE[S.lang][d.t]||d.t}</span>${kindLbl?`<span>${kindLbl}</span>`:""}${r.enroll===2?`<span style="color:var(--warn)">${t.e2}</span>`:""}${k.anyPts?`<span class="mono">${fmt(k.semPts)}${d.exam?"":" / "+fmt(k.parts.reduce((a,p)=>a+(num(p.max)||0),0))} b</span>`:""}</span>
@@ -690,7 +691,7 @@ function courseCard(d){
   }
   h+=`<div class="row" style="justify-content:space-between">`;
   if(d.id) h+=`<span class="src">${t.src} <a href="https://www.fit.vut.cz/study/course/${d.id}/${S.lang==="sk"?"":".en"}" target="_blank" rel="noopener">${t.fitPage}</a></span>`;
-  if(d.custom) h+=`<button class="linkbtn" type="button" data-rmel="${id}" style="color:var(--bad)">${t.remove}</button>`;
+  if(d.opt) h+=`<button class="linkbtn" type="button" data-rmel="${id}" style="color:var(--bad)">${t.remove}</button>`;
   h+=`</div></div></details>`;
   return h;
 }
@@ -712,13 +713,14 @@ function render(){
   for(const s of [cur()]){
     const inSlot=list.filter(d=>cs(d.c).taken===s);
     const tot=inSlot.reduce((a,d)=>a+d.cr,0);
-    h+=`<section class="sem" id="sem-${s}"><div class="courses">`;
-    h+=inSlot.map(courseCard).join("");
-    h+=`</div><details class="addel" id="more-${s}"><summary class="linkbtn">+ ${t.moreCourses}</summary><div style="display:grid;gap:10px;margin-top:10px">
-      <div class="addrow">
-        <select id="pva-pick" data-f="pva" aria-label="${t.pvaPick}"><option value="">${t.pvaPick}…</option>${PVA.map(x=>`<option value="${x.c}" ${S.pva===x.c?"selected":""}>${x.c} · ${nm(x)} (${x.cr})</option>`).join("")}</select>
-        <select id="pvt-pick" data-f="pvt" aria-label="${t.pvtPick}"><option value="">${t.pvtPick}…</option>${PVT.map(x=>`<option value="${x.c}" ${S.pvt===x.c?"selected":""}>${x.c} · ${nm(x)} (${x.cr})</option>`).join("")}</select></div>
-      <h3>${t.addElective}</h3><div class="addrow"><input type="text" id="el-c-${s}" placeholder="${t.elCode}" class="sm" style="flex-basis:76px" aria-label="${t.elCode}"><input type="text" id="el-n-${s}" placeholder="${t.elName}" aria-label="${t.elName}"><input type="text" inputmode="numeric" id="el-cr-${s}" placeholder="${t.elCr}" class="sm" style="flex-basis:48px" aria-label="${t.elCr}"><select id="el-t-${s}" aria-label="${t.elType}">${Object.keys(TYPE.en).map(k=>`<option value="${k}">${TYPE[S.lang][k]}</option>`).join("")}</select><button class="btn" type="button" data-addel="${s}">${t.add}</button></div></div></details>`;
+    const comp=inSlot.filter(d=>d.k==="C"),opt=inSlot.filter(d=>d.k!=="C");
+    const have=new Set(list.map(d=>d.c)),avail=(CAT[s]||[]).filter(x=>!have.has(x[0]));
+    const grp=(g,lbl)=>{const xs=avail.filter(x=>x[5]===g);return xs.length?`<optgroup label="${lbl}">${xs.map(x=>`<option value="${x[0]}">${x[0]} · ${esc(S.lang==="sk"?x[2]:x[1])} (${x[3]} ${t.cr})</option>`).join("")}</optgroup>`:""};
+    h+=`<section class="sem" id="sem-${s}"><h3 class="grouph">${t.compH}</h3><div class="courses">${comp.map(courseCard).join("")}</div>
+      <h3 class="grouph">${t.optH}</h3>${opt.length?`<div class="courses">${opt.map(courseCard).join("")}</div>`:`<p class="emptyopt">${t.optEmpty}</p>`}
+      <details class="addel" id="more-${s}"><summary class="linkbtn">+ ${t.addOpt}</summary><div style="display:grid;gap:10px;margin-top:10px">
+      ${avail.length?`<div class="addrow"><select id="opt-pick-${s}" aria-label="${t.addOpt}" style="flex:1 1 220px"><option value="">${t.optPick}</option>${grp("A",t.grpA)}${grp("T",t.grpT)}${grp("E",t.grpE)}</select><button class="btn" type="button" data-addopt="${s}">${t.add}</button></div>`:""}
+      <h3>${t.ownH}</h3><div class="addrow"><input type="text" id="el-c-${s}" placeholder="${t.elCode}" class="sm" style="flex-basis:76px" aria-label="${t.elCode}"><input type="text" id="el-n-${s}" placeholder="${t.elName}" aria-label="${t.elName}"><input type="text" inputmode="numeric" id="el-cr-${s}" placeholder="${t.elCr}" class="sm" style="flex-basis:48px" aria-label="${t.elCr}"><select id="el-t-${s}" aria-label="${t.elType}">${Object.keys(TYPE.en).map(k=>`<option value="${k}">${TYPE[S.lang][k]}</option>`).join("")}</select><button class="btn" type="button" data-addel="${s}">${t.add}</button></div></div></details>`;
     h+=`</section>`;
   }
   document.getElementById("sems").innerHTML=h;
@@ -780,26 +782,25 @@ function swap(from,to,after){
 }
 function unlock(){
   try{localStorage.setItem(GATE,"1")}catch(e){}
-  lastAct=Date.now();document.getElementById("g-note").hidden=true;
+  lastAct=Date.now();
   const i=document.getElementById("g-input");i.blur();
   swap("gate","app");
 }
 function lockAgain(){
   try{localStorage.removeItem(GATE)}catch(e){}
   const i=document.getElementById("g-input");i.value="";i.classList.remove("nope");
-  document.getElementById("g-note").hidden=true;hideMark();renderGate();swap("app","gate",()=>i.focus());
+  hideMark();renderGate();swap("app","gate",()=>i.focus());
 }
 /* ---------- Auto-exit after 15 minutes without activity ---------- */
-const IDLE=10*1000,LAST="fit-last-active"; // TEMPORARY test value; normal is 15*60*1000
+const IDLE=15*60*1000,LAST="fit-last-active";
 let lastAct=Date.now(),lastStored=0;
 function touchAct(){lastAct=Date.now();if(lastAct-lastStored>20000){lastStored=lastAct;try{localStorage.setItem(LAST,lastAct)}catch(e){}}}
 ["pointerdown","pointermove","keydown","wheel","touchstart","scroll"].forEach(ev=>addEventListener(ev,touchAct,{passive:true}));
-function idleNote(){const n=document.getElementById("g-note");n.textContent=L().idleNote;n.hidden=false}
 function checkIdle(){
   if(document.getElementById("app").hidden||Date.now()-lastAct<IDLE)return;
   closeModal();try{localStorage.removeItem(GATE)}catch(e){}
   const i=document.getElementById("g-input");i.value="";i.classList.remove("nope");
-  hideMark();renderGate();idleNote();morphToGate(()=>i.focus());
+  hideMark();renderGate();morphToGate(()=>i.focus());
 }
 setInterval(checkIdle,Math.min(15000,IDLE/5));document.addEventListener("visibilitychange",checkIdle);
 // auto-exit: the whole tracker shrinks into the shape of the secret box, then the lock screen takes over
@@ -847,7 +848,7 @@ function showMark(type,life){
 function showGate(){
   let ok=false,last=0;try{ok=localStorage.getItem(GATE)==="1";last=+localStorage.getItem(LAST)||0}catch(e){}
   // coming back after more than 15 idle minutes: start locked
-  if(ok&&last&&Date.now()-last>IDLE){ok=false;try{localStorage.removeItem(GATE)}catch(e){};idleNote()}
+  if(ok&&last&&Date.now()-last>IDLE){ok=false;try{localStorage.removeItem(GATE)}catch(e){};}
   document.getElementById("gate").hidden=ok;document.getElementById("app").hidden=!ok;
   if(!ok){renderGate();document.getElementById("g-input").focus()}
 }
@@ -916,7 +917,7 @@ function openReset(step){
 }
 function resetAll(){
   const lang=S.lang;closeModal();
-  S=defaults();S.lang=lang;S.idm5=1;cs("ISM");
+  S=defaults();S.lang=lang;S.idm5=1;S.optV2=1;addOptional("ISM","1W");cs("ISM").status="enrolled";
   metPrev=null;
   rerender();changed();
   const toast=document.createElement("div");toast.className="toast";toast.style.background="var(--bad)";toast.textContent=L().resetDone;document.body.append(toast);setTimeout(()=>toast.remove(),2800);
@@ -949,7 +950,6 @@ document.addEventListener("change",e=>{
   if(f==="status"){const r=cs(c);r.status=el.value;delete r.auto;delete r.autoFail}
   else if(f==="taken")cs(c).taken=el.value;
   else if(f==="enroll")cs(c).enroll=+el.value;
-  else if(f==="pva"||f==="pvt"){S[f]=el.value;if(el.value){const r=cs(el.value);r.taken=cur();if(r.status==="planned")r.status="enrolled"}}
   else return;
   rerender();changed();
 });
@@ -984,10 +984,12 @@ document.addEventListener("click",e=>{
   if(b.dataset.add){const c=b.dataset.add,n=document.getElementById("an-"+c).value.trim(),m=num(document.getElementById("am-"+c).value);if(!n)return document.getElementById("an-"+c).focus();
     cs(c).extra.push({id:"x"+Date.now().toString(36),n,max:m==null?"":m,val:""});rerender();changed();return}
   if(b.dataset.del){const r=cs(b.dataset.del);r.extra=r.extra.filter(x=>x.id!==b.dataset.k);rerender();changed();return}
+  if(b.dataset.addopt){const s=b.dataset.addopt,v=document.getElementById("opt-pick-"+s).value;if(!v)return document.getElementById("opt-pick-"+s).focus();
+    if(addOptional(v,s)){const r=cs(v);r.status=s===cur()?"enrolled":"planned";S.open=S.open||{};S.open[v]=1}rerender();changed();return}
   if(b.dataset.addel){const s=b.dataset.addel,g=id=>document.getElementById(id);
     const c=g("el-c-"+s).value.trim().toUpperCase(),n=g("el-n-"+s).value.trim(),cr=parseInt(g("el-cr-"+s).value,10),t=g("el-t-"+s).value;
     if(!c||allCourses().some(x=>x.c===c))return g("el-c-"+s).focus(); if(!(cr>0))return g("el-cr-"+s).focus();
-    S.electives.push({c,n:n||c,cr,t,s});const r=cs(c);r.taken=s;r.status=s===cur()?"enrolled":"planned";S.open=S.open||{};S.open[c]=1;rerender();changed();return}
+    S.electives.push({c,en:n||c,sk:n||c,cr,t,s,g:"E"});const r=cs(c);r.taken=s;r.status=s===cur()?"enrolled":"planned";S.open=S.open||{};S.open[c]=1;rerender();changed();return}
   if(b.dataset.rmel){const c=b.dataset.rmel;S.electives=S.electives.filter(x=>x.c!==c);delete S.courses[c];rerender();changed();return}
 });
 
@@ -998,7 +1000,14 @@ document.addEventListener("click",e=>{
   const local=localLoad();
   const serverHasData=server&&server.courses&&Object.keys(server.courses).length;
   load(serverHasData?server:(local&&local.s)||server||null);
-  if(!S.courses.ISM)cs("ISM");
+  // optional courses now live in S.electives: move ISM, the old English / technical picks and own electives there
+  if(!S.optV2){
+    if(!S.electives.some(e=>e.c==="ISM")){const had=S.courses.ISM;addOptional("ISM",had?had.taken:"1W");if(!had)cs("ISM").status="enrolled"}
+    for(const k of ["pva","pvt"])if(S[k]){const r=S.courses[S[k]];addOptional(S[k],r?r.taken:cur())}
+    S.pva=S.pvt="";
+    S.electives.forEach(e=>{if(!e.en){e.en=e.sk=e.n;e.g=e.g||"E"}});
+    S.optV2=1;
+  }
   // IDM changed from one 20-point row to 5 tests: drop the old total, move self-added "Test N" rows into the new slots
   if(!S.idm5&&S.courses.IDM){const r=S.courses.IDM;
     if(num(r.pts.p0)>4)delete r.pts.p0;
