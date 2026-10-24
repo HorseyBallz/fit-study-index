@@ -68,9 +68,9 @@ button,select,input{font:inherit;color:inherit}
 }
 /* course card rolls down when opened by a click (class added only then, so re-renders don't replay it) */
 @media (prefers-reduced-motion:no-preference){
-  details.course.anim .cbody{animation:roll .32s cubic-bezier(.2,.8,.2,1)}
+  details.course.anim .cbody,details.addel.anim .addbody{animation:roll .32s cubic-bezier(.2,.8,.2,1)}
   details.course.anim{animation:lift .32s ease}
-  details.course.closing .cbody{animation:roll .3s cubic-bezier(.4,0,.6,1) reverse forwards}
+  details.course.closing .cbody,details.addel.closing .addbody{animation:roll .3s cubic-bezier(.4,0,.6,1) reverse forwards}
 }
 @keyframes roll{from{opacity:0;transform:translateY(-8px);clip-path:inset(0 0 100% 0)}to{opacity:1;transform:none;clip-path:inset(0 0 0 0)}}
 @keyframes lift{50%{box-shadow:0 6px 18px rgba(0,0,0,.12)}}
@@ -171,10 +171,16 @@ details.course{position:relative}
 .failstamp{position:absolute;inset:0;display:grid;place-items:center;font-size:84px;font-weight:700;line-height:1;color:var(--bad);pointer-events:none;opacity:0;text-shadow:0 0 24px color-mix(in srgb,var(--bad) 60%,transparent)}
 @media (prefers-reduced-motion:no-preference){
   .sb.newx{animation:xin .55s cubic-bezier(.2,.9,.3,1.3)}
+  .sb.newok{animation:okin .55s cubic-bezier(.2,.9,.3,1.3)}
+  details.course.justpassed{animation:passpop .6s cubic-bezier(.2,.9,.3,1.3),passflash 1.2s ease}
   details.course.justfailed{animation:failshake .5s ease,failflash 1.2s ease}
   .failstamp{animation:stamp 1.2s cubic-bezier(.2,.9,.3,1) forwards}
 }
 @keyframes xin{0%{transform:scale(2.4) rotate(-30deg);opacity:0}55%{transform:scale(.85) rotate(6deg);opacity:1;box-shadow:0 0 0 6px color-mix(in srgb,var(--bad) 40%,transparent)}100%{transform:none}}
+@keyframes okin{0%{transform:scale(2.4) rotate(30deg);opacity:0}55%{transform:scale(.85) rotate(-6deg);opacity:1;box-shadow:0 0 0 6px color-mix(in srgb,var(--ok) 40%,transparent)}100%{transform:none}}
+@keyframes passpop{40%{transform:scale(1.035)}}
+@keyframes passflash{20%{box-shadow:0 0 0 3px var(--ok),0 0 30px color-mix(in srgb,var(--ok) 55%,transparent)}}
+.passstamp{color:var(--ok);text-shadow:0 0 24px color-mix(in srgb,var(--ok) 60%,transparent)}
 @keyframes failshake{15%,55%{transform:translateX(-7px)}35%,75%{transform:translateX(7px)}}
 @keyframes failflash{20%{box-shadow:0 0 0 3px var(--bad),0 0 30px color-mix(in srgb,var(--bad) 55%,transparent)}}
 @keyframes stamp{0%{opacity:0;transform:scale(2.6) rotate(-20deg)}25%{opacity:.9;transform:scale(1) rotate(-8deg)}70%{opacity:.75}100%{opacity:0;transform:scale(1.05) rotate(-8deg)}}
@@ -279,7 +285,12 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
 .totline{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .src{font-size:11px;color:var(--muted)}
 .src a{color:var(--blue)}
-.addel{border:1px dashed var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:8px;background:transparent}
+.addel{display:grid;gap:8px;background:transparent;margin-top:30px}
+/* centered pill that rolls the add-course panel down */
+.addel>summary.addbtn{justify-self:center;padding:8px 18px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--blue);font-size:13px;font-weight:600;transition:background-color .2s,border-color .2s,transform .15s}
+.addel>summary.addbtn:hover{border-color:var(--blue);background:var(--blue-soft)}
+.addel[open]>summary.addbtn{border-color:var(--blue);background:var(--blue-soft)}
+.addel .addbody{display:grid;gap:10px;padding:14px;margin-top:4px;border-radius:12px;background:var(--card);border:1px solid var(--line)}
 .strikes{display:inline-flex;gap:4px}
 .sb{width:22px;height:22px;border:1.5px solid var(--line);border-radius:5px;display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:700;line-height:1}
 .sb.x{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
@@ -839,21 +850,35 @@ function courseCard(d){
 let snapPrev=null;
 function animateChanges(){
   const snap={x:{},st:{}};
-  document.querySelectorAll("[data-x]").forEach(el=>snap.x[el.dataset.x]=[...el.querySelectorAll(".sb")].map(b=>b.classList.contains("x")));
+  document.querySelectorAll("[data-x]").forEach(el=>snap.x[el.dataset.x]=[...el.querySelectorAll(".sb")].map(b=>b.classList.contains("x")?"x":b.classList.contains("ok")?"ok":""));
   document.querySelectorAll("details.course").forEach(d=>snap.st[d.id]=d.dataset.st);
   const prev=snapPrev;snapPrev=snap;
   if(!prev||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
   for(const key in snap.x){const was=prev.x[key];if(!was)continue;
     const boxes=document.querySelectorAll(`[data-x="${key}"] .sb`);
-    snap.x[key].forEach((on,i)=>{if(on&&!was[i]){boxes[i].classList.add("newx");boxes[i].addEventListener("animationend",()=>boxes[i].classList.remove("newx"),{once:true})}});
+    snap.x[key].forEach((m,i)=>{if(m&&m!==was[i]){const c=m==="x"?"newx":"newok";boxes[i].classList.add(c);boxes[i].addEventListener("animationend",()=>boxes[i].classList.remove(c),{once:true})}});
   }
   for(const id in snap.st){
-    if(snap.st[id]!=="failed"||!prev.st[id]||prev.st[id]==="failed")continue;
-    const d=document.getElementById(id),sm=d.querySelector("summary");
-    const stamp=document.createElement("span");stamp.className="failstamp";stamp.setAttribute("aria-hidden","true");stamp.textContent="✕";
-    sm.append(stamp);d.classList.add("justfailed");
-    setTimeout(()=>{stamp.remove();d.classList.remove("justfailed")},1300);
+    const now=snap.st[id],was=prev.st[id];if(!was||now===was||(now!=="failed"&&now!=="passed"))continue;
+    const pass=now==="passed",d=document.getElementById(id),sm=d.querySelector("summary");
+    const stamp=document.createElement("span");stamp.className=pass?"failstamp passstamp":"failstamp";stamp.setAttribute("aria-hidden","true");stamp.textContent=pass?"✓":"✕";
+    sm.append(stamp);d.classList.add(pass?"justpassed":"justfailed");
+    if(pass)burst(d);
+    setTimeout(()=>{stamp.remove();d.classList.remove("justfailed","justpassed")},1300);
   }
+}
+// small confetti burst out of one course card when it is passed
+function burst(el){
+  const r=el.getBoundingClientRect(),cv=document.createElement("canvas");cv.className="confetti";document.body.append(cv);
+  const ctx=cv.getContext("2d"),dpr=devicePixelRatio||1,W=innerWidth,H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;ctx.scale(dpr,dpr);
+  const css=getComputedStyle(document.documentElement),cols=["--ok","--ok","--blue","--warn","--accent"].map(v=>css.getPropertyValue(v).trim());
+  const ox=r.left+r.width/2,oy=r.top+Math.min(r.height,80)/2;
+  const ps=Array.from({length:60},()=>{const a=Math.random()*Math.PI*2,v=3+Math.random()*7;return{x:ox,y:oy,vx:Math.cos(a)*v,vy:Math.sin(a)*v-4,r:Math.random()*3,vr:(Math.random()-.5)*.4,w:4+Math.random()*5,h:3+Math.random()*3,c:cols[Math.floor(Math.random()*cols.length)]}});
+  const t0=performance.now();let done=false;const end=()=>{if(!done){done=true;cv.remove()}};
+  (function frame(now){if(done)return;const el2=now-t0;ctx.clearRect(0,0,W,H);
+    for(const p of ps){p.vy+=.3;p.vx*=.98;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.globalAlpha=Math.max(0,1-el2/1400);ctx.fillStyle=p.c;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore()}
+    if(el2<1400)requestAnimationFrame(frame);else end()})(t0);
+  setTimeout(end,1600);
 }
 function render(){
   const t=L();
@@ -878,13 +903,13 @@ function render(){
     const grp=(g,lbl)=>{const xs=avail.filter(x=>x[5]===g);return xs.length?`<optgroup label="${lbl}">${xs.map(x=>`<option value="${x[0]}">${x[0]} · ${esc(S.lang==="sk"?x[2]:x[1])} (${x[3]} ${t.cr})</option>`).join("")}</optgroup>`:""};
     h+=`<section class="sem" id="sem-${s}"><h3 class="grouph">${t.compH}</h3><div class="courses">${comp.map(courseCard).join("")}</div>
       <h3 class="grouph">${t.optH}</h3>${opt.length?`<div class="courses">${opt.map(courseCard).join("")}</div>`:`<p class="emptyopt">${t.optEmpty}</p>`}
-      <details class="addel" id="more-${s}"><summary class="linkbtn">+ ${t.addOpt}</summary><div style="display:grid;gap:10px;margin-top:10px">
+      <details class="addel" id="more-${s}"><summary class="addbtn">+ ${t.addOpt}</summary><div class="cbody addbody">
       ${avail.length?`<div class="addrow"><select id="opt-pick-${s}" aria-label="${t.addOpt}" style="flex:1 1 220px"><option value="">${t.optPick}</option>${grp("A",t.grpA)}${grp("T",t.grpT)}${grp("E",t.grpE)}</select><button class="btn" type="button" data-addopt="${s}">${t.add}</button></div>`:""}
       <h3>${t.ownH}</h3><div class="addrow"><input type="text" id="el-c-${s}" placeholder="${t.elCode}" class="sm" style="flex-basis:76px" aria-label="${t.elCode}"><input type="text" id="el-n-${s}" placeholder="${t.elName}" aria-label="${t.elName}"><input type="text" inputmode="numeric" id="el-cr-${s}" placeholder="${t.elCr}" class="sm" style="flex-basis:48px" aria-label="${t.elCr}"><select id="el-t-${s}" aria-label="${t.elType}">${Object.keys(TYPE.en).map(k=>`<option value="${k}">${TYPE[S.lang][k]}</option>`).join("")}</select><button class="btn" type="button" data-addel="${s}">${t.add}</button></div></div></details>`;
     h+=`</section>`;
   }
   document.getElementById("sems").innerHTML=h;
-  document.getElementById("foot").innerHTML=`<p style="margin:0">${t.foot[0]}</p><h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div><div class="footacts"><button class="btn danger-outline" type="button" id="reset-btn">${t.resetBtn}</button><button class="btn plain" type="button" id="exit-btn">${t.exitBtn}</button></div><p class="madeby">Made by Filipko &amp; Claude ❤️</p>`;
+  document.getElementById("foot").innerHTML=`<h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div><div class="footacts"><button class="btn danger-outline" type="button" id="reset-btn">${t.resetBtn}</button><button class="btn plain" type="button" id="exit-btn">${t.exitBtn}</button></div><p class="madeby">Made by Filipko &amp; Claude ❤️</p>`;
   animateChanges();
 }
 
@@ -1119,7 +1144,7 @@ document.addEventListener("toggle",e=>{
   S.open=S.open||{};const k=d.id.slice(2);if(d.open)S.open[k]=1;else delete S.open[k];localSave();
 },true);
 document.addEventListener("click",e=>{
-  const sm=e.target.closest("details.course > summary");
+  const sm=e.target.closest("details.course > summary, details.addel > summary");
   if(sm){const d=sm.parentElement;
     if(!d.open){d.classList.remove("closing");d.classList.add("anim");d.addEventListener("animationend",()=>d.classList.remove("anim"),{once:true})}
     // closing: play the roll backwards first, then really close
