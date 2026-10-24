@@ -49,8 +49,6 @@ button,select,input{font:inherit;color:inherit}
 .logorow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;min-width:0}
 .logo{height:52px;width:auto;max-width:100%;object-fit:contain;object-position:left;align-self:start}
 .madeby{margin:8px 0 0;font-size:13px;color:var(--muted);text-align:center}
-.bar.met .done{background:var(--ok)}
-.bar.met .prog{border-right-color:var(--ok)}
 .big.met .pct{color:var(--ok)}
 .metmsg{margin:0;font-size:14px;font-weight:600;color:var(--ok)}
 .bar.pulse{animation:pulse .9s ease 2}
@@ -157,10 +155,47 @@ button,select,input{font:inherit;color:inherit}
 .big{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
 .big .pct{font-family:var(--f-display);font-size:56px;font-weight:700;line-height:1;color:var(--ink)}
 .big .of{color:var(--muted)}
-.bar{position:relative;height:22px;border-radius:6px;background:var(--paper);border:1px solid var(--line);overflow:hidden}
-.bar .done{position:absolute;inset:0 auto 0 0;background:var(--accent)}
-.bar .prog{position:absolute;inset:0 auto 0 0;background:repeating-linear-gradient(135deg,var(--accent-soft) 0 6px,transparent 6px 12px);border-right:1px dashed var(--accent)}
-.bar .tick{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+/* progress bar: a slim track, a fill that fades out at its leading edge, a little student riding that edge and the goal waiting at the end */
+.track{padding-top:30px}
+.bar{--fill:var(--accent);position:relative;height:14px;border-radius:99px;background:color-mix(in srgb,var(--ink) 9%,transparent)}
+.bar .done{position:absolute;inset:0 auto 0 0;border-radius:99px 0 0 99px;background:linear-gradient(90deg,var(--fill) 0,var(--fill) max(0px,calc(100% - 48px)),color-mix(in srgb,var(--fill) 0%,transparent) 100%)}
+.bar .prog{position:absolute;inset:0 auto 0 0;border-radius:99px 0 0 99px;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--fill) 22%,transparent) 0 5px,transparent 5px 10px)}
+.bar .tick{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;border-radius:1px;background:color-mix(in srgb,var(--ink) 25%,transparent)}
+.bar .rider{position:absolute;bottom:calc(100% + 3px);width:24px;height:24px;margin-left:-12px;color:var(--ink);z-index:2}
+.bar .goal{position:absolute;right:-6px;bottom:calc(100% + 3px);width:22px;height:22px;color:var(--muted)}
+.bar svg{display:block;width:100%;height:100%;overflow:visible}
+.bar .reaper{position:absolute;bottom:calc(100% + 1px);width:32px;height:32px;margin-left:-16px;color:var(--bad);z-index:1}
+.bar.caught .rider{color:var(--bad)}
+/* a new ✕ drops in; a course that just failed shakes, flashes red and gets a big ✕ stamp */
+details.course{position:relative}
+.failstamp{position:absolute;inset:0;display:grid;place-items:center;font-size:84px;font-weight:700;line-height:1;color:var(--bad);pointer-events:none;opacity:0;text-shadow:0 0 24px color-mix(in srgb,var(--bad) 60%,transparent)}
+@media (prefers-reduced-motion:no-preference){
+  .sb.newx{animation:xin .55s cubic-bezier(.2,.9,.3,1.3)}
+  details.course.justfailed{animation:failshake .5s ease,failflash 1.2s ease}
+  .failstamp{animation:stamp 1.2s cubic-bezier(.2,.9,.3,1) forwards}
+}
+@keyframes xin{0%{transform:scale(2.4) rotate(-30deg);opacity:0}55%{transform:scale(.85) rotate(6deg);opacity:1;box-shadow:0 0 0 6px color-mix(in srgb,var(--bad) 40%,transparent)}100%{transform:none}}
+@keyframes failshake{15%,55%{transform:translateX(-7px)}35%,75%{transform:translateX(7px)}}
+@keyframes failflash{20%{box-shadow:0 0 0 3px var(--bad),0 0 30px color-mix(in srgb,var(--bad) 55%,transparent)}}
+@keyframes stamp{0%{opacity:0;transform:scale(2.6) rotate(-20deg)}25%{opacity:.9;transform:scale(1) rotate(-8deg)}70%{opacity:.75}100%{opacity:0;transform:scale(1.05) rotate(-8deg)}}
+/* the reaper leads: a red outline and glow around the bar, stronger and faster the further ahead it is */
+.bar.danger::after{content:"";position:absolute;inset:-4px;border-radius:99px;pointer-events:none;border:1.5px solid color-mix(in srgb,var(--bad) 75%,transparent);box-shadow:0 0 18px 4px color-mix(in srgb,var(--bad) 55%,transparent),inset 0 0 8px color-mix(in srgb,var(--bad) 35%,transparent);opacity:var(--hi)}
+@media (prefers-reduced-motion:no-preference){.bar.danger::after{animation:aura var(--spd) ease-in-out infinite}}
+@keyframes aura{0%,100%{opacity:var(--hi)}50%{opacity:var(--lo)}}
+.dlcap{margin:8px 0 0;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.dlcap .dl{color:var(--ink)}.dlcap .dl b{font-weight:400;color:var(--bad)}
+.dlcap.caught{color:var(--bad)}
+@media (prefers-reduced-motion:no-preference){
+  .bar .reaper,.bar .rider{transition:left .9s cubic-bezier(.2,.8,.2,1)}
+  .bar .reaper svg{transform-origin:50% 100%;animation:sway 1.6s ease-in-out infinite alternate}
+}
+@keyframes sway{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
+.bar.met{--fill:var(--ok)}
+.bar.met .done{border-radius:99px;background:var(--fill)}
+.bar.met .goal{display:none}
+.bar.met .rider{color:var(--ok)}
+@media (prefers-reduced-motion:no-preference){.bar:not(.met) .rider svg{animation:jog .7s ease-in-out infinite alternate}}
+@keyframes jog{to{transform:translateY(-2px)}}
 .scale{position:relative;height:16px;font-size:11px;color:var(--muted)}
 .scale span{position:absolute;transform:translateX(-50%)}
 .scale span:first-child{transform:none}.scale span:last-child{transform:translateX(-100%)}
@@ -185,9 +220,22 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .sem-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px;border-bottom:2px solid var(--ink);padding-bottom:6px}
 .sem-head h2{font-size:22px}
 .courses{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:12px;align-items:start}
-details.course{background:var(--card);border:1px solid var(--line);border-radius:12px;min-width:0}
-details.course[data-st="passed"]{border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
-details.course[data-st="failed"]{border-color:color-mix(in srgb,var(--bad) 45%,var(--line))}
+/* each card takes one tone from its state: planned grey, in progress blue, at risk amber, credit / passed green, failed red */
+details.course{--tone:var(--muted);--tone-soft:var(--paper);background:color-mix(in srgb,var(--tone) 5%,var(--card));border:1px solid color-mix(in srgb,var(--tone) 35%,var(--line));border-radius:12px;min-width:0;transition:background-color .3s,border-color .3s}
+details.course[data-vs="planned"]{border-style:dashed;background:var(--card)}
+details.course[data-vs="enrolled"]{--tone:var(--blue);--tone-soft:var(--blue-soft)}
+details.course[data-vs="risk"]{--tone:var(--warn);--tone-soft:var(--warn-soft)}
+details.course[data-vs="credit"]{--tone:var(--ok);--tone-soft:var(--ok-soft)}
+details.course[data-vs="passed"]{--tone:var(--ok);--tone-soft:var(--ok-soft);background:color-mix(in srgb,var(--ok) 8%,var(--card))}
+details.course[data-vs="failed"]{--tone:var(--bad);--tone-soft:var(--bad-soft);background:color-mix(in srgb,var(--bad) 9%,var(--card))}
+.course .code{background:var(--tone-soft);color:var(--tone)}
+details.course[data-vs="planned"] .code{background:var(--blue-soft);color:var(--blue)}
+/* points bar under the course name: fill = points so far, ticks = credit threshold and the 50-point pass mark */
+.next{grid-column:1/-1;margin-top:4px;font-size:12.5px;font-weight:500;color:color-mix(in srgb,var(--tone) 75%,var(--ink))}
+details.course[open] .next{display:none}
+.cbar{grid-column:1/-1;position:relative;height:6px;border-radius:3px;margin-top:6px;background:color-mix(in srgb,var(--tone) 16%,var(--paper))}
+.cbar b{position:absolute;inset:0 auto 0 0;border-radius:3px;background:var(--tone)}
+.cbar i{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;border-radius:1px;background:var(--ink);opacity:.35}
 .course summary{list-style:none;cursor:pointer;padding:12px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:center}
 .course summary::-webkit-details-marker{display:none}
 .code{font-family:var(--f-mono);font-weight:500;font-size:14px;background:var(--blue-soft);color:var(--blue);border-radius:6px;padding:2px 7px}
@@ -195,9 +243,10 @@ details.course[data-st="failed"]{border-color:color-mix(in srgb,var(--bad) 45%,v
 .cmeta{grid-column:2/4;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px}
 .pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;background:var(--paper);color:var(--muted);border:1px solid var(--line)}
 .pill.enrolled{background:var(--blue-soft);color:var(--blue);border-color:transparent}
-.pill.credit{background:var(--warn-soft);color:var(--warn);border-color:transparent}
-.pill.passed{background:var(--ok-soft);color:var(--ok);border-color:transparent}
-.pill.failed{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.pill.risk{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.pill.credit{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.pill.passed{background:var(--ok);color:var(--card);border-color:transparent}
+.pill.failed{background:var(--bad);color:var(--card);border-color:transparent}
 .cbody{padding:0 14px 14px;display:grid;gap:12px;border-top:1px solid var(--line);padding-top:12px}
 .row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
 .row label{font-size:12px;color:var(--muted);display:grid;gap:3px}
@@ -354,7 +403,7 @@ const T={
   passedW:"passed",notChosen:"not chosen yet",locked:"after all credits",
   sem:{W:"winter",S:"summer"},yearN:y=>`Year ${y}`,semTitle:(y,s)=>`Year ${y} · ${s} semester`,now:"current",
   cr:"cr",credits:"credits",
-  st:{planned:"Planned",enrolled:"In progress",credit:"Credit ✓",passed:"Passed",failed:"Failed"},
+  st:{planned:"Planned",enrolled:"In progress",risk:"At risk",credit:"Credit ✓",passed:"Passed",failed:"Failed"},
   status:"Status",taken:"Taken in",enroll:"Enrolment",e1:"1st time",e2:"Repeated (2nd)",
   partsH:"Points during the semester",sem_total:"Semester total",addItem:"Add a test or item",itemName:"Name, e.g. Test 3",max:"max",add:"Add",
   min:"min",exam:"Exam",examAttempts:"Exam attempts",regular:"Regular",resit1:"1st resit",resit2:"2nd resit",
@@ -380,7 +429,12 @@ const T={
   footH:"How the tracker counts",
   foot:["Credits count automatically as soon as your points pass a course, and disappear again if you lower the points. Every exam has a regular term and two resits. A failed course can be taken once more, the next year.","Grades follow the BUT scale. Every exam has a regular term and two resit terms. A course you fail can be enrolled one more time, and that repeated enrolment is your last.","Point splits and thresholds come from each course page on fit.vut.cz for 2026/27. Teachers sometimes change details in the first lecture, so you can edit any maximum or add your own items."],
   gradesH:"Grade scale",yearLbl:"Year",semLbl:"Semester",semCap:{W:"Winter",S:"Summer"},
-  retake:"Retake next year",compH:"Compulsory courses",optH:"Optional courses",optEmpty:"No optional courses in this semester yet.",addOpt:"Add an optional course",
+  retake:"Retake next year",dlTrack:(n,t)=>`on track for ${n} of ${t} credits`,dlLeft:n=>`${n} day${n===1?"":"s"} left until the exam period ends`,dlBefore:n=>`the semester starts in ${n} day${n===1?"":"s"}`,
+  dlOver:"this semester is over",dlCaught:"it is catching up with you, collect more points",dlClose:"it is just ahead of you, keep collecting points",dlStudy:p=>`${p}% of your bachelor's study time has passed`,
+  ns:{credit:n=>`${n} pts to the course credit`,part:(p,n)=>`${p}: ${n} more pts needed`,zeros:(l,z,m)=>`${l} test${l===1?"":"s"} left · ${z} of ${m} zero allowed used`,
+    setThr:"Set the points needed for the course credit",exam:n=>`Exam: you need ${n} pts`,resits:(n,l)=>`Resit: you need ${n} pts · ${l} tries left`,
+    lastTry:n=>`Last resit: you need ${n} pts`,toPass:n=>`${n} pts to pass`,waitCr:"Waiting for the course credit",done:g=>g?`Done · grade ${g}`:"Done",
+    retake:"Failed · retake it next year",last:"Failed again · contact the study office"},compH:"Compulsory courses",optH:"Optional courses",optEmpty:"No optional courses in this semester yet.",addOpt:"Add an optional course",
   optPick:"Choose a course…",grpA:"English (one course, B1 or higher)",grpT:"Technical (one of these)",grpE:"Other electives",ownH:"Not on the list? Add your own",
   kind:{E:"optional",A:"English",T:"technical"},exTitle:"Exit the tracker?",exBody:"You will need the secret word to get back in. Your data stays saved.",exYes:"Yes, exit",exitBtn:"Exit",secretPh:"Type the secret word",resetBtn:"Reset all data",cancel:"Cancel",
   r1Title:"Reset everything?",r1Body:"This deletes all your points, exam scores, course statuses, electives and failed-course marks.",r1Yes:"Yes, reset",
@@ -404,7 +458,7 @@ const T={
   passedW:"splnené",notChosen:"ešte nevybrané",locked:"po získaní kreditov",
   sem:{W:"zimný",S:"letný"},yearN:y=>`${y}. ročník`,semTitle:(y,s)=>`${y}. ročník · ${s} semester`,now:"aktuálny",
   cr:"kr",credits:"kreditov",
-  st:{planned:"Plánované",enrolled:"Prebieha",credit:"Zápočet ✓",passed:"Absolvované",failed:"Neúspešné"},
+  st:{planned:"Plánované",enrolled:"Prebieha",risk:"Ohrozené",credit:"Zápočet ✓",passed:"Absolvované",failed:"Neúspešné"},
   status:"Stav",taken:"Zapísané v",enroll:"Zápis",e1:"1. zápis",e2:"Opakovaný (2.)",
   partsH:"Body počas semestra",sem_total:"Spolu za semester",addItem:"Pridať písomku alebo položku",itemName:"Názov, napr. Písomka 3",max:"max",add:"Pridať",
   min:"min",exam:"Skúška",examAttempts:"Termíny skúšky",regular:"Riadny",resit1:"1. opravný",resit2:"2. opravný",
@@ -430,7 +484,12 @@ const T={
   footH:"Ako tracker počíta",
   foot:["Kredity sa započítajú automaticky, keď ti body na predmet stačia, a zmiznú, ak body znížiš. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz, budúci rok.","Známky podľa stupnice VUT. Každá skúška má riadny a dva opravné termíny. Neúspešný predmet si môžeš zapísať ešte raz a tento opakovaný zápis je posledný.","Rozdelenie bodov a hranice sú zo stránok predmetov na fit.vut.cz pre 2026/27. Vyučujúci ich niekedy upresnia na prvej prednáške, preto môžeš každé maximum upraviť alebo pridať vlastné položky."],
   gradesH:"Stupnica hodnotenia",yearLbl:"Ročník",semLbl:"Semester",semCap:{W:"Zimný",S:"Letný"},
-  retake:"Opakovať budúci rok",compH:"Povinné predmety",optH:"Voliteľné predmety",optEmpty:"V tomto semestri zatiaľ nemáš voliteľné predmety.",addOpt:"Pridať voliteľný predmet",
+  retake:"Opakovať budúci rok",dlTrack:(n,t)=>`na dobrej ceste k ${n} z ${t} kreditov`,dlLeft:n=>`do konca skúškového ${n===1?"zostáva 1 deň":n<5?`zostávajú ${n} dni`:`zostáva ${n} dní`}`,dlBefore:n=>`semester začína o ${n} ${n===1?"deň":n<5?"dni":"dní"}`,
+  dlOver:"tento semester sa skončil",dlCaught:"dobieha ťa, zbieraj viac bodov",dlClose:"je tesne pred tebou, zbieraj body ďalej",dlStudy:p=>`prešlo ${p} % času tvojho bakalárskeho štúdia`,
+  ns:{credit:n=>`Do zápočtu chýba ${n} b`,part:(p,n)=>`${p}: ešte ${n} b`,zeros:(l,z,m)=>`${l===1?"Zostáva 1 písomka":l<5?`Zostávajú ${l} písomky`:`Zostáva ${l} písomiek`} · nuly ${z} z ${m}`,
+    setThr:"Nastav body potrebné na zápočet",exam:n=>`Skúška: potrebuješ ${n} b`,resits:(n,l)=>`Opravný termín: potrebuješ ${n} b · zostávajú ${l} pokusy`,
+    lastTry:n=>`Posledný termín: potrebuješ ${n} b`,toPass:n=>`Do splnenia chýba ${n} b`,waitCr:"Čaká sa na zápočet",done:g=>g?`Hotovo · známka ${g}`:"Hotovo",
+    retake:"Neúspešné · zopakuj budúci rok",last:"Opäť neúspešné · kontaktuj študijné oddelenie"},compH:"Povinné predmety",optH:"Voliteľné predmety",optEmpty:"V tomto semestri zatiaľ nemáš voliteľné predmety.",addOpt:"Pridať voliteľný predmet",
   optPick:"Vyber predmet…",grpA:"Angličtina (jeden predmet, B1 alebo vyššie)",grpT:"Technický (jeden z nich)",grpE:"Ostatné voliteľné",ownH:"Nie je v zozname? Pridaj vlastný",
   kind:{E:"voliteľný",A:"angličtina",T:"technický"},exTitle:"Odísť z trackera?",exBody:"Na návrat budeš potrebovať tajné slovo. Tvoje údaje ostanú uložené.",exYes:"Áno, odísť",exitBtn:"Odísť",secretPh:"Zadaj tajné slovo",resetBtn:"Vymazať všetky údaje",cancel:"Zrušiť",
   r1Title:"Vymazať všetko?",r1Body:"Vymažú sa všetky tvoje body, výsledky skúšok, stavy predmetov, voliteľné predmety aj značky neúspešných predmetov.",r1Yes:"Áno, vymazať",
@@ -549,16 +608,60 @@ function stats(){
 /* ---------- Rendering ---------- */
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function slotName(s){return L().semTitle(s[0],L().sem[s[1]])}
+// pictograms for the progress bar: student on the move, student celebrating, finish flag, graduation cap
+const SVG_RUN=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="14.5" cy="3.8" r="2.4" fill="currentColor" stroke="none"/><path d="M13.5 8 10.5 14M10.5 14l3 3.5-1 4.5M10.5 14l-3 3.5-3.5 1M12.8 9.2l3 2.6 3-1M12.8 9.2 8.6 10l-2.2 3"/></svg>`;
+const SVG_YAY=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="3.8" r="2.4" fill="currentColor" stroke="none"/><path d="M12 8v7M12 15l-3 7M12 15l3 7M12 9.5 7.5 5M12 9.5 16.5 5"/></svg>`;
+const GOAL_FLAG=`<span class="goal" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 22V3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6 3.5h12l-3 4 3 4H6z" fill="currentColor"/></svg></span>`;
+const GOAL_CAP=`<span class="goal" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4 1.5 9 12 14l10.5-5z" fill="currentColor"/><path d="M6 11.5V16c0 2 12 2 12 0v-4.5M21 9.5V15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>`;
+const rider=(met,pos)=>`<span class="rider" aria-hidden="true" style="left:${met?100:pos}%">${met?SVG_YAY:SVG_RUN}</span>`;
+// how far a course is on its way to being passed (0..1), from the points entered so far; passed = 1, failed / planned = 0
+function courseShare(d){
+  const r=cs(d.c);if(r.status==="passed")return 1;if(r.status!=="enrolled"&&r.status!=="credit")return 0;
+  const k=calc(d);
+  if(d.exam||d.t==="ClCr")return Math.min(.95,(d.exam?k.semPts+(k.examOk?k.lastExam:0):k.semPts)/50);
+  if(d.t==="Cr"&&k.parts.length&&k.threshold)return Math.min(.95,k.semPts/k.threshold);
+  return 0;
+}
+// credits you are on track for: passed credits plus each running course weighted by its share
+const onTrack=list=>list.reduce((a,d)=>a+d.cr*courseShare(d),0);
+// FIT calendar 2026/27 (fit.vut.cz/study/calendar/2026): winter teaching starts 14 Sep 2026, winter exams 4 Jan - 5 Feb 2027,
+// summer teaching from 8 Feb 2027, summer exams 10 May - 11 Jun 2027. Later years reuse the same weekdays 364 days later (approximate).
+const CAL0={ws:"2026-09-14",wx:"2027-01-04",we:"2027-02-05",ss:"2027-02-08",sx:"2027-05-10",se:"2027-06-11"};
+function calOf(y){const o={};for(const k in CAL0)o[k]=Date.parse(CAL0[k]+"T00:00:00")+(y-1)*364*864e5;return o}
+// the window the reaper walks: the 1st semester alone, one study year (the minimum is per year), or the whole bachelor's study
+function deadlineWindow(view,slot){
+  if(view==="all")return {a:calOf(1).ws,x:calOf(3).sx,b:calOf(3).se+864e5};
+  const c=calOf(+slot[0]);
+  return slot==="1W"?{a:c.ws,x:c.wx,b:c.we+864e5}:{a:c.ws,x:c.sx,b:c.se+864e5};
+}
+const SVG_REAPER=`<svg viewBox="0 0 24 24"><path d="M7.5 22.5c0-6.5.6-11 3.2-14 1.7-2 4.4-1.6 5 .9.6 2.6-.6 7 .2 13.1z" fill="currentColor"/><path d="M17.3 22.5 20.2 3.6M14.6 13.2l4.4-1.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M20.4 3.4c-4.6-2.4-9.4-1.2-11.8 2.4 3.6-1.6 7.6-1.5 11.6-.6z" fill="currentColor"/></svg>`;
+function reaperBits(view,slot,studentPct,met,track,target){
+  const t=L(),w=deadlineWindow(view,slot),now=Date.now(),day=864e5;
+  const share=Math.min(1,Math.max(0,(now-w.a)/(w.b-w.a))),tp=share*100;
+  // caught = the reaper (time) is clearly ahead of the student (credits you are on track for); 8 points of slack for the first weeks
+  const caught=!met&&now>w.a&&now<w.b&&tp-studentPct>8;
+  // danger 0..1: how far the reaper leads the student (full strength at 25 points ahead); drives the red aura around the bar
+  const danger=!met&&now>w.a&&now<w.b&&tp>studentPct?Math.min(1,(tp-studentPct)/25):0;
+  const aura=danger?` danger" style="--hi:${(.35+.6*danger).toFixed(2)};--lo:${(.12+.2*danger).toFixed(2)};--spd:${(2.4-1.2*danger).toFixed(2)}s`:"";
+  let cap;
+  const tr=t.dlTrack(fmt(Math.min(track,target)),target);
+  if(view==="all")cap=(caught?t.dlCaught:t.dlStudy(Math.round(tp)))+" · "+tr;
+  else if(now<w.a)cap=t.dlBefore(Math.ceil((w.a-now)/day));
+  else if(now>=w.b)cap=t.dlOver;
+  else cap=(caught?t.dlCaught:danger?t.dlClose:t.dlLeft(Math.ceil((w.b-now)/day)))+" · "+tr;
+  return {caught,aura,html:`<span class="reaper" aria-hidden="true" style="left:${tp}%">${SVG_REAPER}</span>`,cap:`<p class="dlcap${caught?" caught":""}"><span class="dl">Dead<b>line</b></span> · ${cap}</p>`};
+}
 let metPrev=null,barPrev={};
 // grow the bar from its last width (or from 0 on first view) to the new one
 function animateBars(key){
   const bar=document.querySelector("#summary .bar");if(!bar)return;
-  const done=bar.querySelector(".done"),prog=bar.querySelector(".prog");
-  const to={d:done.style.width,p:prog.style.width},from=barPrev[key]||{d:"0%",p:"0%"};
+  const done=bar.querySelector(".done"),prog=bar.querySelector(".prog"),rp=bar.querySelector(".reaper"),rd=bar.querySelector(".rider");
+  const to={d:done.style.width,p:prog.style.width,r:rp?rp.style.left:"",s:rd?rd.style.left:""},from=barPrev[key]||{d:"0%",p:"0%",r:"0%",s:"0%"};
   barPrev[key]=to;
-  if(matchMedia("(prefers-reduced-motion: reduce)").matches||(from.d===to.d&&from.p===to.p))return;
-  done.style.width=from.d;prog.style.width=from.p;getComputedStyle(done).width;getComputedStyle(prog).width;
-  done.style.width=to.d;prog.style.width=to.p;
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches||(from.d===to.d&&from.p===to.p&&from.r===to.r&&from.s===to.s))return;
+  done.style.width=from.d;prog.style.width=from.p;if(rp)rp.style.left=from.r;if(rd)rd.style.left=from.s;
+  getComputedStyle(done).width;getComputedStyle(prog).width;if(rp)getComputedStyle(rp).left;if(rd)getComputedStyle(rd).left;
+  done.style.width=to.d;prog.style.width=to.p;if(rp)rp.style.left=to.r;if(rd)rd.style.left=to.s;
 }
 function celebrate(msg){
   const toast=document.createElement("div");toast.className="toast";toast.textContent=msg;document.body.append(toast);
@@ -589,15 +692,15 @@ function renderSummary(){
   let h=`<div class="sumhead"><h2 class="sumtitle">${t.viewLbl}</h2><div class="seg slide" data-key="view" role="group" aria-label="${t.viewLbl}"><button type="button" data-view="sem" aria-pressed="${mode==="sem"}">${t.viewSem}</button><button type="button" data-view="all" aria-pressed="${mode==="all"}">${t.viewAll}</button></div></div>`;
   // failed-course counter: every failed course (now or before a retake) adds one ✕
   const nf=st.list.reduce((a,d)=>{const r=cs(d.c);return a+(r.enroll===2?1:0)+(r.status!=="passed"&&(r.status==="failed"||(d.exam&&calc(d).fails>=3))?1:0)},0);
-  h+=`<div class="failrow"><span class="k">${t.failLbl}</span><span class="strikes big3">${[0,1,2].map(i=>`<i class="sb ${i<nf?"x":""}">${i<nf?"✕":""}</i>`).join("")}</span>${nf>=3?`<span class="note"><b style="color:var(--bad)">${t.fail3}</b></span>`:""}</div>`;
+  h+=`<div class="failrow"><span class="k">${t.failLbl}</span><span class="strikes big3" data-x="sum">${[0,1,2].map(i=>`<i class="sb ${i<nf?"x":""}">${i<nf?"✕":""}</i>`).join("")}</span>${nf>=3?`<span class="note"><b style="color:var(--bad)">${t.fail3}</b></span>`:""}</div>`;
   if(mode==="sem"){
     // Study rule: at least 15 credits in the 1st semester, at least 30 credits in every year
     const c=cur(), isFirst=c==="1W", target=isFirst?15:30, val=isFirst?first:yr;
-    const progIn=st.list.filter(d=>{const r=cs(d.c);return (isFirst?r.taken===c:r.taken[0]===c[0])&&(r.status==="enrolled"||r.status==="credit")}).reduce((a,d)=>a+d.cr,0);
-    const pS=Math.min(100,val/target*100), ppS=Math.min(100-pS,progIn/target*100), left=Math.max(0,target-val);
+    const inWin=st.list.filter(d=>{const r=cs(d.c);return isFirst?r.taken===c:r.taken[0]===c[0]});
+    const track=onTrack(inWin),pS=Math.min(100,val/target*100),tS=Math.max(pS,Math.min(100,track/target*100)),left=Math.max(0,target-val);
     const met=left===0;
     h+=`<div class="big${met?" met":""}"><span class="pct mono">${val} / ${target}</span><span class="of">${isFirst?t.minFirst:t.minYear(c[0])}</span></div>
-    <div class="bar${met?" met":""}" role="img" aria-label="${val} / ${target}"><div class="prog" style="width:${pS+ppS}%"></div><div class="done" style="width:${pS}%"></div></div>    ${isFirst?"":`<p class="note">${c==="1S"?t.note1S:t.noteY}</p>`}${met?`<p class="metmsg">${t.minOkShort}</p>`:""}`;
+    ${(()=>{const R=reaperBits("sem",c,tS,met,track,target);return `<div class="track"><div class="bar${met?" met":""}${R.caught?" caught":""}${R.aura}" role="img" aria-label="${val} / ${target}"><div class="prog" style="width:${tS}%"></div>${GOAL_FLAG}${R.html}<div class="done" style="width:${pS}%"></div>${rider(met,tS)}</div>${R.cap}</div>`})()}    ${isFirst?"":`<p class="note">${c==="1S"?t.note1S:t.noteY}</p>`}${met?`<p class="metmsg">${t.minOkShort}</p>`:""}`;
     document.getElementById("summary").innerHTML=h;
     // celebrate only when the minimum is crossed while looking at the same semester, not on load
     if(metPrev&&metPrev.key===c&&!metPrev.met&&met)celebrate(t.minOkToast);
@@ -605,9 +708,11 @@ function renderSummary(){
     animateBars("sem:"+c);
     return;
   }
+  const trackAll=onTrack(st.list),tA=Math.max(pct,Math.min(100,trackAll/180*100));
+  const RA=reaperBits("all","",tA,st.passed>=180,trackAll,180);
   h+=`<div class="big"><span class="pct mono">${fmt(pct)}%</span><span class="of">${t.done} · <b class="mono">${st.passed}</b> ${t.of}</span><span class="of">· <b class="mono">${st.prog}</b> ${t.credits} ${t.inprog}</span></div>
-  <div><div class="bar${st.passed>=180?" met":""}" role="img" aria-label="${st.passed} / 180"><div class="prog" style="width:${pct+pp}%"></div><div class="done" style="width:${pct}%"></div>${[60,120].map(x=>`<div class="tick" style="left:${x/180*100}%"></div>`).join("")}</div>
-  <div class="scale mono"><span style="left:0">0</span><span style="left:33.33%">60 · ${t.yearN(1)}</span><span style="left:66.67%">120 · ${t.yearN(2)}</span><span style="left:100%">180</span></div></div>
+  <div class="track"><div class="bar${st.passed>=180?" met":""}${RA.caught?" caught":""}${RA.aura}" role="img" aria-label="${st.passed} / 180"><div class="prog" style="width:${tA}%"></div>${GOAL_CAP}${RA.html}<div class="done" style="width:${pct}%"></div>${rider(st.passed>=180,tA)}${[60,120].map(x=>`<div class="tick" style="left:${x/180*100}%"></div>`).join("")}</div>
+  <div class="scale mono"><span style="left:0">0</span><span style="left:33.33%">60 · ${t.yearN(1)}</span><span style="left:66.67%">120 · ${t.yearN(2)}</span><span style="left:100%">180</span></div>${RA.cap}</div>
   <div class="reqs">`;
   h+=req(st.comp>=146?"ok":"",t.rComp,`${st.comp} / 146`,t.rCompS);
   h+=req(engR&&engR.status==="passed"?"ok":"",t.rEng,engD?`${engD.c} · ${engR.status==="passed"?t.passedW:t.st[engR.status]}`:t.notChosen,"B1+");
@@ -625,14 +730,49 @@ function renderPicker(){
    `<div class="grp"><span class="lab">${t.yearLbl}</span><div class="seg slide" data-key="year" role="group" aria-label="${t.yearLbl}">${years.map(y=>`<button type="button" data-year="${y}" aria-pressed="${c[0]===y}">${y}.</button>`).join("")}</div></div>
     <div class="grp"><span class="lab">${t.semLbl}</span><div class="seg slide" data-key="half" role="group" aria-label="${t.semLbl}">${["W","S"].map(s=>`<button type="button" data-half="${s}" aria-pressed="${c[1]===s}">${t.semCap[s]}</button>`).join("")}</div></div>`;
 }
+// one short line for a closed card: the next thing to do in this course
+function nextStep(d,k,r,vs){
+  const t=L().ns,cc=d.t==="ClCr";
+  if(vs==="planned")return "";
+  if(vs==="failed")return r.enroll===2?t.last:t.retake;
+  if(vs==="passed"){
+    const g=d.exam&&k.lastExam!=null&&k.examOk?grade(k.total):cc&&k.anyPts?grade(k.semPts):"";
+    return t.done(g);
+  }
+  const needsCredit=d.t==="Cr+Ex"||(d.t==="Cr"&&k.parts.length);
+  if(needsCredit&&!k.creditOk){
+    if(d.zeroMax!=null)return t.zeros(k.missing,k.zeros,d.zeroMax);
+    if(k.threshold==null&&d.creditUnknown)return t.setThr;
+    const miss=k.threshold!=null?k.threshold-k.semPts:0;
+    if(miss>0)return t.credit(fmt(miss));
+    const pf=k.partFails[0];if(pf)return t.part(pf.n,fmt(pf.min-(num(pf.val)||0)));
+  }
+  if(d.exam){
+    const passedNow=k.lastExam!=null&&k.examOk&&k.total>=50;if(passedNow)return t.done(grade(k.total));
+    const need=fmt(Math.min(d.exam.max,Math.max(k.exMin,50-k.semPts))),left=3-k.used;
+    if(left<=0)return t.retake;
+    return k.used===0?t.exam(need):left===1?t.lastTry(need):t.resits(need,left);
+  }
+  if(cc){const n=50-k.semPts;return n>0?t.toPass(fmt(n)):t.done(grade(k.semPts))}
+  if(d.t==="Cr")return k.parts.length&&k.creditOk?t.done(""):t.waitCr;
+  return "";
+}
 function courseCard(d){
   const t=L(),k=calc(d),r=k.r,id=d.c;
   const crOnly=d.t==="Cr"; const cc=d.t==="ClCr";
   const stOpts=(crOnly||cc?["planned","enrolled","passed","failed"]:d.t==="Ex"?["planned","enrolled","passed","failed"]:["planned","enrolled","credit","passed","failed"]);
   const kindLbl=d.k&&d.k!=="C"?t.kind[d.k]:"";
-  let h=`<details class="course" data-st="${r.status}" id="c-${id}" ${S.open&&S.open[id]?"open":""}><summary>
-   <span class="code">${esc(d.c)}</span><span class="cname">${esc(nm(d))}</span><span class="pill ${r.status}">${t.st[r.status]}</span>
-   <span class="cmeta"><span class="mono">${d.cr} ${t.cr}</span><span>${TYPE[S.lang][d.t]||d.t}</span>${kindLbl?`<span>${kindLbl}</span>`:""}${r.enroll===2?`<span style="color:var(--warn)">${t.e2}</span>`:""}${k.anyPts?`<span class="mono">${fmt(k.semPts)}${d.exam?"":" / "+fmt(k.parts.reduce((a,p)=>a+(num(p.max)||0),0))} b</span>`:""}</span>
+  // what the card shows: the saved status, refined for courses in progress (at risk / course credit reached)
+  const risk=k.fails>=1||(d.zeroMax!=null&&k.zeros>0&&k.zeros>=d.zeroMax);
+  const creditShown=(d.t==="Cr+Ex")&&k.creditOk&&(k.threshold!=null||d.zeroMax!=null);
+  const vs=r.status!=="enrolled"?r.status:risk?"risk":creditShown?"credit":"enrolled";
+  const maxP=k.parts.reduce((a,p)=>a+(num(p.max)||0),0)+(d.exam?d.exam.max:0);
+  const got=d.exam?k.total:k.semPts;
+  const ticks=[k.threshold!=null&&d.zeroMax==null?k.threshold:null,(d.exam||cc)&&maxP>=50?50:null].filter(v=>v!=null&&v<maxP);
+  const bar=maxP>0&&r.status!=="planned"?`<span class="cbar" aria-hidden="true"><b style="width:${Math.min(100,got/maxP*100)}%"></b>${ticks.map(v=>`<i style="left:${v/maxP*100}%"></i>`).join("")}</span>`:"";
+  let h=`<details class="course" data-st="${r.status}" data-vs="${vs}" id="c-${id}" ${S.open&&S.open[id]?"open":""}><summary>
+   <span class="code">${esc(d.c)}</span><span class="cname">${esc(nm(d))}</span><span class="pill ${vs}">${t.st[vs]}</span>
+   <span class="cmeta"><span class="mono">${d.cr} ${t.cr}</span><span>${TYPE[S.lang][d.t]||d.t}</span>${kindLbl?`<span>${kindLbl}</span>`:""}${r.enroll===2?`<span style="color:var(--warn)">${t.e2}</span>`:""}${k.anyPts?`<span class="mono">${fmt(k.semPts)}${d.exam?"":" / "+fmt(k.parts.reduce((a,p)=>a+(num(p.max)||0),0))} b</span>`:""}</span>${bar}${(()=>{const n=nextStep(d,k,r,vs);return n?`<span class="next">→ ${esc(n)}</span>`:""})()}
   </summary><div class="cbody">
   <div class="row">
    <label>${t.status}<select id="st-${id}" data-f="status" data-c="${id}">${stOpts.map(o=>`<option value="${o}" ${o===r.status?"selected":""}>${t.st[o]}</option>`).join("")}</select></label>
@@ -654,7 +794,7 @@ function courseCard(d){
     const thr=k.threshold;
     if(d.zeroMax!=null){
       // one box per allowed zero + one more: a second ✕ means the course credit is lost
-      h+=`<div class="failrow"><span class="k">${t.zeroLbl}</span><span class="strikes">${Array.from({length:d.zeroMax+1},(_,i)=>`<i class="sb ${i<k.zeros?"x":""}">${i<k.zeros?"✕":""}</i>`).join("")}</span></div>`;
+      h+=`<div class="failrow"><span class="k">${t.zeroLbl}</span><span class="strikes" data-x="zero-${id}">${Array.from({length:d.zeroMax+1},(_,i)=>`<i class="sb ${i<k.zeros?"x":""}">${i<k.zeros?"✕":""}</i>`).join("")}</span></div>`;
       h+= k.zeros>d.zeroMax?`<div class="verdict bad">${t.zeroBad(k.zeros,d.zeroMax)}</div>`
         : k.missing?`<div class="verdict info">${t.zeroInfo(k.zeros,d.zeroMax,k.missing)}</div>`
         : `<div class="verdict ok">${t.zeroOk}</div>`;
@@ -674,7 +814,7 @@ function courseCard(d){
   // exam
   if(d.exam){
     const lbls=[t.regular,t.resit1,t.resit2];
-    h+=`<div><div class="row" style="justify-content:space-between"><b style="font-size:13px">${t.exam} <span class="mono" style="color:var(--muted);font-weight:400">/ ${d.exam.max}${d.exam.min?` · ${t.min} ${d.exam.min}`:""}</span></b><span class="strikes" role="img" aria-label="${t.examAttempts}: ${k.fails} ✕">${k.marks.map(m=>`<i class="sb ${m}">${m==="x"?"✕":m==="ok"?"✓":""}</i>`).join("")}</span></div>
+    h+=`<div><div class="row" style="justify-content:space-between"><b style="font-size:13px">${t.exam} <span class="mono" style="color:var(--muted);font-weight:400">/ ${d.exam.max}${d.exam.min?` · ${t.min} ${d.exam.min}`:""}</span></b><span class="strikes" data-x="exam-${id}" role="img" aria-label="${t.examAttempts}: ${k.fails} ✕">${k.marks.map(m=>`<i class="sb ${m}">${m==="x"?"✕":m==="ok"?"✓":""}</i>`).join("")}</span></div>
     <div class="attempts">${lbls.map((l,i)=>`<label>${l}<input type="text" inputmode="decimal" id="ex-${id}-${i}" data-f="exam" data-c="${id}" data-k="${i}" value="${esc(r.exam[i])}"></label>`).join("")}</div></div>`;
     const need=Math.max(k.exMin,50-k.semPts);
     if(k.lastExam==null){ if(!d.free||k.anyPts) h+=`<div class="verdict info">${t.needExam(fmt(Math.min(need,d.exam.max)),k.exMin)}</div>`; }
@@ -694,6 +834,26 @@ function courseCard(d){
   if(d.opt) h+=`<button class="linkbtn" type="button" data-rmel="${id}" style="color:var(--bad)">${t.remove}</button>`;
   h+=`</div></div></details>`;
   return h;
+}
+// compare with the previous render: pop in every new ✕ and play a "failed" stamp on courses that just failed
+let snapPrev=null;
+function animateChanges(){
+  const snap={x:{},st:{}};
+  document.querySelectorAll("[data-x]").forEach(el=>snap.x[el.dataset.x]=[...el.querySelectorAll(".sb")].map(b=>b.classList.contains("x")));
+  document.querySelectorAll("details.course").forEach(d=>snap.st[d.id]=d.dataset.st);
+  const prev=snapPrev;snapPrev=snap;
+  if(!prev||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  for(const key in snap.x){const was=prev.x[key];if(!was)continue;
+    const boxes=document.querySelectorAll(`[data-x="${key}"] .sb`);
+    snap.x[key].forEach((on,i)=>{if(on&&!was[i]){boxes[i].classList.add("newx");boxes[i].addEventListener("animationend",()=>boxes[i].classList.remove("newx"),{once:true})}});
+  }
+  for(const id in snap.st){
+    if(snap.st[id]!=="failed"||!prev.st[id]||prev.st[id]==="failed")continue;
+    const d=document.getElementById(id),sm=d.querySelector("summary");
+    const stamp=document.createElement("span");stamp.className="failstamp";stamp.setAttribute("aria-hidden","true");stamp.textContent="✕";
+    sm.append(stamp);d.classList.add("justfailed");
+    setTimeout(()=>{stamp.remove();d.classList.remove("justfailed")},1300);
+  }
 }
 function render(){
   const t=L();
@@ -725,6 +885,7 @@ function render(){
   }
   document.getElementById("sems").innerHTML=h;
   document.getElementById("foot").innerHTML=`<p style="margin:0">${t.foot[0]}</p><h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div><div class="footacts"><button class="btn danger-outline" type="button" id="reset-btn">${t.resetBtn}</button><button class="btn plain" type="button" id="exit-btn">${t.exitBtn}</button></div><p class="madeby">Made by Filipko &amp; Claude ❤️</p>`;
+  animateChanges();
 }
 
 // Light / Dark choice is kept per device; with no choice the page follows the system
