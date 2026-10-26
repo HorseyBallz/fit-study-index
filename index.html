@@ -225,7 +225,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .sem{display:grid;gap:12px}
 .sem-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px;border-bottom:2px solid var(--ink);padding-bottom:6px}
 .sem-head h2{font-size:22px}
-.courses{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:12px;align-items:start}
+/* cards sit in independent columns, so an open card only pushes down the cards under it, never leaves a gap beside it */
+.courses{display:flex;gap:12px;align-items:flex-start}
+.ccol{flex:1 1 0;min-width:0;display:grid;gap:12px}
 /* each card takes one tone from its state: planned grey, in progress blue, at risk amber, credit / passed green, failed red */
 details.course{--tone:var(--muted);--tone-soft:var(--paper);background:color-mix(in srgb,var(--tone) 5%,var(--card));border:1px solid color-mix(in srgb,var(--tone) 35%,var(--line));border-radius:12px;min-width:0;transition:background-color .3s,border-color .3s}
 details.course[data-vs="planned"]{border-style:dashed;background:var(--card)}
@@ -242,7 +244,10 @@ details.course[open] .next{display:none}
 .cbar{grid-column:1/-1;position:relative;height:6px;border-radius:3px;margin-top:6px;background:color-mix(in srgb,var(--tone) 16%,var(--paper))}
 .cbar b{position:absolute;inset:0 auto 0 0;border-radius:3px;background:var(--tone)}
 .cbar i{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;border-radius:1px;background:var(--ink);opacity:.35}
-.course summary{list-style:none;cursor:pointer;padding:12px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:center}
+.course summary{list-style:none;cursor:pointer;padding:12px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:center;align-content:center}
+/* closed cards in one row share the tallest one's height (set by alignRows), so the rows line up across the columns */
+details.course:not([open])>summary{min-height:var(--rowh,0)}
+details.course.measure[open] .next{display:block}
 .course summary::-webkit-details-marker{display:none}
 .code{font-family:var(--f-mono);font-weight:500;font-size:14px;background:var(--blue-soft);color:var(--blue);border-radius:6px;padding:2px 7px}
 .cname{font-weight:600;font-size:14px;line-height:1.3;min-width:0}
@@ -880,7 +885,24 @@ function burst(el){
     if(el2<1400)requestAnimationFrame(frame);else end()})(t0);
   setTimeout(end,1600);
 }
+// how many 330px+ card columns fit; cards are dealt left to right so the reading order stays the same as before
+let colsNow=0;
+function colCount(){const w=document.getElementById("sems").clientWidth||Math.min(1080,innerWidth)-32;return Math.max(1,Math.floor((w+12)/342))}
+function cardCols(ds){const cols=Array.from({length:colsNow},()=>[]);ds.forEach((d,i)=>cols[i%colsNow].push(courseCard(d)));return `<div class="courses">${cols.map(c=>`<div class="ccol">${c.join("")}</div>`).join("")}</div>`}
+// each row takes the height of its tallest closed card; an open card is measured with its next-step line showing, as it looks closed
+function alignRows(){
+  document.querySelectorAll("#sems .courses").forEach(g=>{
+    const cols=[...g.children].map(c=>[...c.children]);
+    cols.flat().forEach(d=>{d.style.removeProperty("--rowh");d.classList.add("measure")});
+    for(let i=0;i<Math.max(...cols.map(c=>c.length));i++){
+      const row=cols.map(c=>c[i]).filter(Boolean),h=Math.max(...row.map(d=>d.querySelector(":scope>summary").offsetHeight));
+      row.forEach(d=>d.style.setProperty("--rowh",h+"px"));
+    }
+    cols.flat().forEach(d=>d.classList.remove("measure"));
+  });
+}
 function render(){
+  colsNow=colCount();
   const t=L();
   document.documentElement.lang=S.lang;
   document.getElementById("t-title").textContent=t.title;
@@ -901,14 +923,15 @@ function render(){
     const comp=inSlot.filter(d=>d.k==="C"),opt=inSlot.filter(d=>d.k!=="C");
     const have=new Set(list.map(d=>d.c)),avail=(CAT[s]||[]).filter(x=>!have.has(x[0]));
     const grp=(g,lbl)=>{const xs=avail.filter(x=>x[5]===g);return xs.length?`<optgroup label="${lbl}">${xs.map(x=>`<option value="${x[0]}">${x[0]} · ${esc(S.lang==="sk"?x[2]:x[1])} (${x[3]} ${t.cr})</option>`).join("")}</optgroup>`:""};
-    h+=`<section class="sem" id="sem-${s}"><h3 class="grouph">${t.compH}</h3><div class="courses">${comp.map(courseCard).join("")}</div>
-      <h3 class="grouph">${t.optH}</h3>${opt.length?`<div class="courses">${opt.map(courseCard).join("")}</div>`:`<p class="emptyopt">${t.optEmpty}</p>`}
+    h+=`<section class="sem" id="sem-${s}"><h3 class="grouph">${t.compH}</h3>${cardCols(comp)}
+      <h3 class="grouph">${t.optH}</h3>${opt.length?cardCols(opt):`<p class="emptyopt">${t.optEmpty}</p>`}
       <details class="addel" id="more-${s}"><summary class="addbtn">+ ${t.addOpt}</summary><div class="cbody addbody">
       ${avail.length?`<div class="addrow"><select id="opt-pick-${s}" aria-label="${t.addOpt}" style="flex:1 1 220px"><option value="">${t.optPick}</option>${grp("A",t.grpA)}${grp("T",t.grpT)}${grp("E",t.grpE)}</select><button class="btn" type="button" data-addopt="${s}">${t.add}</button></div>`:""}
       <h3>${t.ownH}</h3><div class="addrow"><input type="text" id="el-c-${s}" placeholder="${t.elCode}" class="sm" style="flex-basis:76px" aria-label="${t.elCode}"><input type="text" id="el-n-${s}" placeholder="${t.elName}" aria-label="${t.elName}"><input type="text" inputmode="numeric" id="el-cr-${s}" placeholder="${t.elCr}" class="sm" style="flex-basis:48px" aria-label="${t.elCr}"><select id="el-t-${s}" aria-label="${t.elType}">${Object.keys(TYPE.en).map(k=>`<option value="${k}">${TYPE[S.lang][k]}</option>`).join("")}</select><button class="btn" type="button" data-addel="${s}">${t.add}</button></div></div></details>`;
     h+=`</section>`;
   }
   document.getElementById("sems").innerHTML=h;
+  alignRows();
   document.getElementById("foot").innerHTML=`<h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div><div class="footacts"><button class="btn danger-outline" type="button" id="reset-btn">${t.resetBtn}</button><button class="btn plain" type="button" id="exit-btn">${t.exitBtn}</button></div><p class="madeby">Made by Filipko &amp; Claude ❤️</p>`;
   animateChanges();
 }
@@ -979,16 +1002,25 @@ function lockAgain(){
 }
 /* ---------- Auto-exit after 15 minutes without activity ---------- */
 const IDLE=15*60*1000,LAST="fit-last-active";
-let lastAct=Date.now(),lastStored=0;
-function touchAct(){lastAct=Date.now();if(lastAct-lastStored>20000){lastStored=lastAct;try{localStorage.setItem(LAST,lastAct)}catch(e){}}}
-["pointerdown","pointermove","keydown","wheel","touchstart","scroll"].forEach(ev=>addEventListener(ev,touchAct,{passive:true}));
+let lastAct=Date.now(),lastStored=0,locking=false;
+// browsers pause or slow timers while the page is in the background, so the first movement after coming back
+// must check the idle time before it counts as new activity; otherwise it would reset the 15 minutes
+function touchAct(){
+  if(checkIdle())return;
+  lastAct=Date.now();if(lastAct-lastStored>20000){lastStored=lastAct;try{localStorage.setItem(LAST,lastAct)}catch(e){}}
+}
+["pointerdown","pointermove","keydown","wheel","touchstart","scroll"].forEach(ev=>addEventListener(ev,touchAct,{passive:true,capture:true}));
 function checkIdle(){
-  if(document.getElementById("app").hidden||Date.now()-lastAct<IDLE)return;
+  if(locking)return true;
+  if(document.getElementById("app").hidden||Date.now()-lastAct<IDLE)return false;
+  locking=true;setTimeout(()=>locking=false,1200);
   closeModal();try{localStorage.removeItem(GATE)}catch(e){}
   const i=document.getElementById("g-input");i.value="";i.classList.remove("nope");
   hideMark();renderGate();morphToGate(()=>i.focus());
+  return true;
 }
-setInterval(checkIdle,Math.min(15000,IDLE/5));document.addEventListener("visibilitychange",checkIdle);
+setInterval(checkIdle,Math.min(15000,IDLE/5));
+document.addEventListener("visibilitychange",checkIdle);addEventListener("focus",checkIdle);addEventListener("pageshow",checkIdle);
 // auto-exit: the whole tracker shrinks into the shape of the secret box, then the lock screen takes over
 function morphToGate(after){
   const a=document.getElementById("app"),b=document.getElementById("gate");
@@ -1139,6 +1171,12 @@ document.addEventListener("change",e=>{
   else return;
   rerender();changed();
 });
+// re-deal the cards when the window gets wide or narrow enough for a different number of columns,
+// otherwise just re-measure the rows, since names wrap differently at another width
+let semsW=0;
+new ResizeObserver(()=>{const w=document.getElementById("sems").clientWidth;if(w===semsW)return;semsW=w;
+  if(colsNow&&colCount()!==colsNow)rerender();else alignRows()}).observe(document.getElementById("sems"));
+if(document.fonts)document.fonts.ready.then(alignRows);
 document.addEventListener("toggle",e=>{
   const d=e.target;if(!d.classList||!d.classList.contains("course"))return;
   S.open=S.open||{};const k=d.id.slice(2);if(d.open)S.open[k]=1;else delete S.open[k];localSave();
