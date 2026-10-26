@@ -228,7 +228,7 @@ details.course{position:relative}
 /* the looping figures and the aura run on the GPU, and stop while the progress box is scrolled out of view */
 .bar .reaper svg,.bar .rider svg{will-change:transform}
 .bar.danger::after{will-change:opacity}
-.summary.offscreen *,.summary.offscreen *::after{animation-play-state:paused!important}
+.summary.offscreen,.summary.offscreen *,.summary.offscreen *::after{animation-play-state:paused!important}
 .bar.met{--fill:var(--ok)}
 .bar.met .done{border-radius:99px;background:var(--fill)}
 .bar.met .goal{display:none}
@@ -357,6 +357,26 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
 .sb{width:22px;height:22px;border:1.5px solid var(--line);border-radius:5px;display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:700;line-height:1}
 .sb.x{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
 .sb.ok{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+/* rising danger on the ✕ rows
+   1 = a warning: soft red, a faint steady glow, no pulse (1 failed course, 1 failed exam term)
+   2 = serious: stronger red, slow pulse (2 failed courses, last exam term left, the one allowed 0 in IDM / ILG used)
+   3 = game over: deep red, the same glow a little stronger and a little faster (3 failed courses, course failed, two 0s)
+   every pulse starts on one shared clock (syncPulses), so all ✕ on the page, and the Progress box, breathe together */
+.strikes[data-heat] .sb.x{transition:background-color .3s,box-shadow .3s}
+.strikes[data-heat="1"] .sb.x{background:color-mix(in srgb,var(--bad) 16%,var(--bad-soft));box-shadow:0 0 6px color-mix(in srgb,var(--bad) 35%,transparent)}
+.strikes[data-heat="2"] .sb.x{background:color-mix(in srgb,var(--bad) 40%,var(--bad-soft));color:#fff;--g0:0 0 6px 0 color-mix(in srgb,var(--bad) 45%,transparent);--g1:0 0 14px 3px color-mix(in srgb,var(--bad) 70%,transparent);--hs:1.6s;box-shadow:var(--g0)}
+.strikes[data-heat="3"] .sb.x{background:var(--bad);border-color:var(--bad);color:#fff;--g0:0 0 8px 1px color-mix(in srgb,var(--bad) 55%,transparent);--g1:0 0 18px 5px color-mix(in srgb,var(--bad) 85%,transparent);--hs:1.1s;box-shadow:var(--g0)}
+@media (prefers-reduced-motion:no-preference){
+  .strikes[data-heat="2"] .sb.x:not(.newx),.strikes[data-heat="3"] .sb.x:not(.newx){animation:heat var(--hs) ease-in-out infinite alternate}
+  .summary.doom{animation:doom 1.1s ease-in-out infinite alternate}
+}
+@keyframes heat{from{box-shadow:var(--g0)}to{box-shadow:var(--g1)}}
+.summary.doom{border-color:var(--bad);box-shadow:0 0 0 1px var(--bad),0 0 20px color-mix(in srgb,var(--bad) 30%,transparent)}
+@keyframes doom{from{box-shadow:0 0 0 1px var(--bad),0 0 20px color-mix(in srgb,var(--bad) 30%,transparent)}to{box-shadow:0 0 0 2px var(--bad),0 0 44px color-mix(in srgb,var(--bad) 60%,transparent)}}
+:root[data-perf="balanced"] .strikes .sb.x,:root[data-perf="balanced"] .summary.doom{animation:none!important}
+:root[data-perf="balanced"] .strikes .sb.x,:root[data-perf="low"] .strikes .sb.x{box-shadow:none}
+:root[data-perf="balanced"] .summary.doom,:root[data-perf="low"] .summary.doom{box-shadow:0 0 0 1px var(--bad)}
+
 .failrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
 .failrow .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .big3 .sb{width:30px;height:30px;font-size:17px}
@@ -745,7 +765,9 @@ function reaperBits(view,slot,studentPct,met,track,target){
   const caught=!met&&now>w.a&&now<w.b&&tp-studentPct>8;
   // danger 0..1: how far the reaper leads the student (full strength at 25 points ahead); drives the red aura around the bar
   const danger=!met&&now>w.a&&now<w.b&&tp>studentPct?Math.min(1,(tp-studentPct)/25):0;
-  const aura=danger?` danger" style="--hi:${(.35+.6*danger).toFixed(2)};--lo:${(.12+.2*danger).toFixed(2)};--spd:${(2.4-1.2*danger).toFixed(2)}s`:"";
+  // a calm breath rather than a flash: the glow only dips to about 65% of its peak, and one cycle takes 4.4 s to 3.2 s
+  const hi=.3+.5*danger;
+  const aura=danger?` danger" style="--hi:${hi.toFixed(2)};--lo:${(hi*.65).toFixed(2)};--spd:${(4.4-1.2*danger).toFixed(2)}s`:"";
   let cap;
   const tr=t.dlTrack(fmt(Math.min(track,target)),target);
   if(view==="all")cap=(caught?t.dlCaught:t.dlStudy(Math.round(tp)))+" · "+tr;
@@ -804,7 +826,8 @@ function renderSummary(){
   // failed-course counter: every failed course (now or before a retake) adds one ✕; a failed optional (E) course
   // does not, since the BUT rules (čl. 10 odst. 2) only make compulsory courses be retaken
   const nf=st.list.reduce((a,d)=>{const r=cs(d.c);return d.k==="E"?a:a+(r.enroll===2?1:0)+(r.status!=="passed"&&(r.status==="failed"||(d.exam&&calc(d).fails>=3))?1:0)},0);
-  h+=`<div class="failrow"><span class="k">${t.failLbl}</span><span class="strikes big3" data-x="sum">${[0,1,2].map(i=>`<i class="sb ${i<nf?"x":""}">${i<nf?"✕":""}</i>`).join("")}</span>${nf>=3?`<span class="note"><b style="color:var(--bad)">${t.fail3}</b></span>`:""}</div>`;
+  document.getElementById("summary").classList.toggle("doom",nf>=3);
+  h+=`<div class="failrow"><span class="k">${t.failLbl}</span><span class="strikes big3" data-x="sum"${nf?` data-heat="${Math.min(3,nf)}"`:""}>${[0,1,2].map(i=>`<i class="sb ${i<nf?"x":""}">${i<nf?"✕":""}</i>`).join("")}</span>${nf>=3?`<span class="note"><b style="color:var(--bad)">${t.fail3}</b></span>`:""}</div>`;
   if(mode==="sem"){
     // Study rule: at least 15 credits in the 1st semester, at least 30 credits in every year
     const c=cur(), isFirst=c==="1W", target=isFirst?15:30, val=isFirst?first:yr;
@@ -909,7 +932,7 @@ function courseCard(d){
     const thr=k.threshold;
     if(d.zeroMax!=null){
       // one box per allowed zero + one more: a second ✕ means the course credit is lost
-      h+=`<div class="failrow"><span class="k">${t.zeroLbl}</span><span class="strikes" data-x="zero-${id}">${Array.from({length:d.zeroMax+1},(_,i)=>`<i class="sb ${i<k.zeros?"x":""}">${i<k.zeros?"✕":""}</i>`).join("")}</span></div>`;
+      h+=`<div class="failrow"><span class="k">${t.zeroLbl}</span><span class="strikes" data-x="zero-${id}"${k.zeros?` data-heat="${k.zeros>d.zeroMax?3:k.zeros>=d.zeroMax?2:1}"`:""}>${Array.from({length:d.zeroMax+1},(_,i)=>`<i class="sb ${i<k.zeros?"x":""}">${i<k.zeros?"✕":""}</i>`).join("")}</span></div>`;
       h+= k.zeros>d.zeroMax?`<div class="verdict bad">${t.zeroBad(k.zeros,d.zeroMax)}</div>`
         : k.missing?""
         : `<div class="verdict ok">${t.zeroOk}</div>`;
@@ -929,7 +952,7 @@ function courseCard(d){
   // exam
   if(d.exam){
     const lbls=[t.regular,t.resit1,t.resit2];
-    h+=`<div><div class="row" style="justify-content:space-between"><b style="font-size:13px">${t.exam} <span class="mono" style="color:var(--muted);font-weight:400">/ ${d.exam.max}${d.exam.min?` · ${t.min} ${d.exam.min}`:""}</span></b><span class="strikes" data-x="exam-${id}" role="img" aria-label="${t.examAttempts}: ${k.fails} ✕">${(lock?["x","x","x"]:k.marks).map(m=>`<i class="sb ${m}">${m==="x"?"✕":m==="ok"?"✓":""}</i>`).join("")}</span></div>
+    h+=`<div><div class="row" style="justify-content:space-between"><b style="font-size:13px">${t.exam} <span class="mono" style="color:var(--muted);font-weight:400">/ ${d.exam.max}${d.exam.min?` · ${t.min} ${d.exam.min}`:""}</span></b><span class="strikes" data-x="exam-${id}"${lock||k.fails?` data-heat="${lock?3:Math.min(3,k.fails)}"`:""} role="img" aria-label="${t.examAttempts}: ${k.fails} ✕">${(lock?["x","x","x"]:k.marks).map(m=>`<i class="sb ${m}">${m==="x"?"✕":m==="ok"?"✓":""}</i>`).join("")}</span></div>
     <div class="attempts">${lbls.map((l,i)=>`<label>${l}<input type="text" inputmode="decimal" id="ex-${id}-${i}" data-f="exam" data-c="${id}" data-k="${i}" value="${esc(r.exam[i])}"${dis}></label>`).join("")}</div></div>`;
     const need=Math.max(k.exMin,50-k.semPts);
     if(k.lastExam==null){ if(r.status!=="failed"&&(!d.free||k.anyPts)) h+=`<div class="verdict info">${t.needExam(fmt(Math.min(need,d.exam.max)),k.exMin)}</div>`; }
@@ -1032,7 +1055,7 @@ function render(){
     h+=`</section>`;
   }
   document.getElementById("sems").innerHTML=h;
-  alignRows();
+  alignRows();syncPulses();requestAnimationFrame(syncPulses);
   document.getElementById("foot").innerHTML=`<h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div><div class="footacts"><button class="btn danger-outline" type="button" id="reset-btn">${t.resetBtn}</button><button class="btn plain" type="button" id="exit-btn">${t.exitBtn}</button></div><p class="madeby">Made by Filipko &amp; Claude ❤️</p>`;
   animateChanges();
 }
@@ -1300,6 +1323,16 @@ function undoToast(msg,fn){
   document.body.append(toast);setTimeout(()=>toast.remove(),7000);
 }
 
+// pin every danger pulse to the same clock: an animation whose start time is 0 on the page timeline has the same phase
+// as every other one with the same length, however late its ✕ appeared (after a pop-in, a re-render, another card)
+function syncPulses(){
+  document.querySelectorAll(".strikes[data-heat] .sb.x,.summary.doom").forEach(el=>el.getAnimations().forEach(a=>{
+    if((a.animationName==="heat"||a.animationName==="doom")&&a.startTime!==0)a.startTime=0}));
+}
+// also when a pulse begins later on its own: after a ✕ pops in, or inside a card that was closed until now
+document.addEventListener("animationstart",e=>{if(e.animationName==="heat"||e.animationName==="doom")syncPulses()});
+document.addEventListener("animationend",e=>{if(e.animationName==="xin")requestAnimationFrame(syncPulses)});
+
 /* ---------- Events ---------- */
 let focusId=null,caret=null;
 let refreshing=false;
@@ -1323,7 +1356,7 @@ function refreshCard(c){
   keepFocus(()=>{
     S.open=S.open||{};if(old.open)S.open[c]=1;
     const tmp=document.createElement("div");tmp.innerHTML=courseCard(d);old.replaceWith(tmp.firstElementChild);
-    renderSummary();queueMicrotask(syncSegs);alignRows();animateChanges();
+    renderSummary();queueMicrotask(syncSegs);alignRows();animateChanges();syncPulses();requestAnimationFrame(syncPulses);
   });
 }
 document.addEventListener("input",e=>{
@@ -1363,6 +1396,7 @@ if(document.fonts)document.fonts.ready.then(alignRows);
 document.addEventListener("toggle",e=>{
   const d=e.target;if(!d.classList||!d.classList.contains("course"))return;
   S.open=S.open||{};const k=d.id.slice(2);if(d.open)S.open[k]=1;else delete S.open[k];localSave();
+  if(d.open)requestAnimationFrame(syncPulses);
 },true);
 document.addEventListener("click",e=>{
   const sm=e.target.closest("details.course > summary, details.addel > summary, details.addt > summary");
