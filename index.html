@@ -332,7 +332,12 @@ body.dragging,body.dragging *{cursor:grabbing!important}
 .gear.exitb:hover svg{transform:translateX(-2px)}
 #reset-btn{padding:6px 12px}
 .gear:hover svg,.gear[aria-expanded="true"] svg{transform:rotate(60deg)}
-.mbox.sets{max-width:440px;text-align:left;gap:0;padding:18px 20px 16px;border-color:var(--line);box-shadow:0 24px 70px rgba(0,0,0,.35)}
+.mbox.sets{max-width:440px;text-align:left;gap:0;padding:18px 20px 16px;border-color:var(--line);box-shadow:0 24px 70px rgba(0,0,0,.35);max-height:calc(100dvh - 56px);overflow:auto}
+/* settings come in groups: a small heading over a rounded box of rows */
+.setsec{margin-top:14px}
+.setgh{margin:0 0 6px 4px;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.setgrp{border:1px solid var(--line);border-radius:12px;background:var(--paper);padding:0 14px}
+.setgrp>.setrow:last-child{border-bottom:0}
 .sethead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
 .sethead h2{font-size:20px}
 .setx{font-size:16px;width:32px;height:32px;border-radius:50%}
@@ -340,6 +345,12 @@ body.dragging,body.dragging *{cursor:grabbing!important}
 .setrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;padding:12px 0;border-bottom:1px solid var(--line)}
 .setk{font-size:14px;font-weight:600;display:grid;gap:2px;min-width:0;flex:1 1 140px}
 .setk small{font-size:12px;font-weight:400;color:var(--muted);line-height:1.35}
+/* failed course: just the verdict and the two ways forward */
+.failview{display:grid;justify-items:center;gap:8px;text-align:center;padding:16px 6px 8px}
+.failview .fx{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--bad-soft);color:var(--bad);font-size:22px;font-weight:700;box-shadow:0 0 0 6px color-mix(in srgb,var(--bad) 10%,transparent)}
+.failview b{font-size:15px}
+.failview p{margin:0;color:var(--muted);font-size:13px;line-height:1.45;max-width:34ch}
+.fbtns{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:6px}
 .mbox .setnote{margin:10px 0 0;font-size:12px}
 /* performance setting (Settings › Animations & effects), kept per device as data-perf on <html>
    balanced: no blur, glows, drop shadows or confetti; low: also no animations or transitions at all */
@@ -440,7 +451,15 @@ details.course{position:relative}
 
 /* semester picker bar */
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
-.picker{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);color:var(--ink);padding-block:10px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.picker{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;color:var(--ink);padding-block:10px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+/* once the bar sticks to the top, the page scrolls under frosted glass that fades out softly below it */
+.picker::before,.picker::after{content:"";position:absolute;left:-16px;right:-16px;pointer-events:none;opacity:0;transition:opacity .25s ease}
+.picker::before{top:calc(-1 * env(safe-area-inset-top,0px));bottom:0;z-index:-1;background:color-mix(in srgb,var(--paper) 72%,transparent);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3)}
+.picker::after{top:100%;height:24px;background:linear-gradient(color-mix(in srgb,var(--paper) 72%,transparent),transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  -webkit-mask-image:linear-gradient(#000,transparent);mask-image:linear-gradient(#000,transparent)}
+.picker.stuck::before,.picker.stuck::after{opacity:1}
+:root[data-perf="balanced"] .picker::before,:root[data-perf="low"] .picker::before{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--paper)}
+:root[data-perf="balanced"] .picker::after,:root[data-perf="low"] .picker::after{backdrop-filter:none;-webkit-backdrop-filter:none;background:linear-gradient(var(--paper),transparent)}
 .picker .lab{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
 .picker .grp{display:flex;align-items:center;gap:8px}
 .picker .seg button{padding:6px 14px}
@@ -693,6 +712,7 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
 <div class="modal" id="settings" hidden>
   <div class="mbox sets" role="dialog" aria-modal="true" aria-labelledby="set-title">
     <div class="sethead"><h2 id="set-title" data-t="settings">Settings</h2><button class="x setx" id="set-close" type="button" aria-label="Close">✕</button></div>
+    <section class="setsec"><h3 class="setgh" data-t="sgLook">Appearance</h3><div class="setgrp">
     <div class="setrow"><span class="setk" data-t="setLang">Language</span>
       <div class="seg slide" data-key="lang" role="group" aria-label="Language"><span class="thumb" aria-hidden="true"></span>
         <button id="lang-en" type="button" aria-pressed="true">EN</button>
@@ -709,18 +729,25 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
         <button type="button" data-perf="balanced" data-t="perfBal">Balanced</button>
         <button type="button" data-perf="low" data-t="perfLow">Low</button>
       </div></div>
-    <div class="setrow" data-full><span class="setk"><span data-t="dtT">Exam dates</span><small data-t="dtDesc"></small></span>
+    </div></section>
+    <section class="setsec" data-full><h3 class="setgh" data-t="sgCourse">Courses &amp; layout</h3><div class="setgrp">
+    <div class="setrow"><span class="setk"><span data-t="dtT">Exam dates</span><small data-t="dtDesc"></small></span>
       <button type="button" class="wsw" role="switch" id="dt-sw" aria-checked="true"><span></span></button></div>
-    <div class="setrow" data-full><span class="setk"><span data-t="logT">Version history</span><small data-t="logDesc"></small></span>
-      <button type="button" class="btn plain" id="log-open" data-t="logOpen">See what's new</button></div>
-    <div class="setrow" data-full><span class="setk"><span data-t="layT">Layout</span><small data-t="layDesc"></small></span>
+    <div class="setrow"><span class="setk"><span data-t="layT">Layout</span><small data-t="layDesc"></small></span>
       <button type="button" class="btn plain" id="lay-edit" data-t="layEdit">Edit layout</button></div>
-    <div class="setrow" data-full><span class="setk"><span data-t="bkTitle">Backup</span><small data-t="bkDesc"></small></span>
+    </div></section>
+    <section class="setsec" data-full><h3 class="setgh" data-t="sgData">Your data</h3><div class="setgrp">
+    <div class="setrow"><span class="setk"><span data-t="bkTitle">Backup</span><small data-t="bkDesc"></small></span>
       <div class="bkbtns"><button type="button" class="btn plain" id="bk-save" data-t="bkSave">Download</button><button type="button" class="btn plain" id="bk-load" data-t="bkLoad">Load file</button>
       <input type="file" id="bk-file" accept=".json,application/json" hidden></div></div>
     <p class="setnote" id="bk-msg" hidden></p>
-    <div class="setrow" data-full><span class="setk"><span data-t="resetT">Reset</span><small data-t="resetDesc"></small></span>
+    <div class="setrow"><span class="setk"><span data-t="resetT">Reset</span><small data-t="resetDesc"></small></span>
       <button type="button" class="btn danger-outline" id="reset-btn" data-t="resetBtn">Reset all data</button></div>
+    </div></section>
+    <section class="setsec" data-full><h3 class="setgh" data-t="sgAbout">About</h3><div class="setgrp">
+    <div class="setrow"><span class="setk"><span data-t="logT">Version history</span><small data-t="logDesc"></small></span>
+      <button type="button" class="btn plain" id="log-open" data-t="logOpen">See what's new</button></div>
+    </div></section>
     <p class="setnote" data-t="setSaved">Saved on this device.</p>
   </div>
 </div>
@@ -909,7 +936,9 @@ Object.assign(T.en,{
   noteLbl:"Notes",notePh:"Teacher, room, deadlines, what to bring…",
   tipTaken:(l,v,ok)=>`${l}: ${v} pts · ${ok?"passed":"failed"}`,tipOpen:l=>`${l}: not taken yet`,tipLocked:"Locked · the course failed",
   tipZero:n=>`${n}: 0 pts`,tipFailC:c=>`${c}: failed`,tipRetake:c=>`${c}: repeated enrolment`,
-  attPts:"Points",dtT:"Exam dates",dtDesc:"A date field next to each exam term, with countdowns and a Google Calendar link.",edate:"Date",gcal:"Add to Google Calendar",dueIn:n=>n===0?"today":n===1?"tomorrow":`in ${n} days`,examWord:"exam",
+  fvT:"Course failed",fvExam:"All 3 exam terms are used up.",fvZero:"Too many zero-point tests for the course credit.",fvCredit:"The course credit can no longer be reached.",fvManual:"You marked this course as failed.",
+  fvOpt:"It's optional, so you don't have to retake it.",fvLast:"This was the repeated enrolment, so there is no other retake.",fvEnd:"There is no later year to retake it in.",fvUndo:"I misclicked · undo",
+  sgLook:"Appearance",sgCourse:"Courses & layout",sgData:"Your data",sgAbout:"About",attPts:"Points",dtT:"Exam dates",dtDesc:"A date field next to each exam term, with countdowns and a Google Calendar link.",edate:"Date",gcal:"Add to Google Calendar",dueIn:n=>n===0?"today":n===1?"tomorrow":`in ${n} days`,examWord:"exam",
   upTitle:"Up next",upMore:n=>`Show all (${n})`,upLess:"Show less",resetOrder:"reset order",dragTip:"Drag to move · Alt + ↑ / ↓ with the keyboard",
   planY:y=>`Year ${y} plan`,planSub:"credits of the courses you take this year",planOf:"of 60",planPlan:"Planned",
   planR30:n=>n>=30?"✓ at least 30 this year":`${30-n} cr short of the 30 minimum`,planR15:n=>n>=15?"✓ 15+ in the 1st semester":`winter needs ${15-n} more for the 15 minimum`,planR65:n=>n<=65?"✓ under the 65 limit":`${n-65} cr over the 65 limit`,
@@ -936,7 +965,9 @@ Object.assign(T.sk,{
   noteLbl:"Poznámky",notePh:"Vyučujúci, miestnosť, termíny, čo si priniesť…",
   tipTaken:(l,v,ok)=>`${l}: ${v} b · ${ok?"úspešne":"neúspešne"}`,tipOpen:l=>`${l}: ešte nepísané`,tipLocked:"Zamknuté · predmet je neúspešný",
   tipZero:n=>`${n}: 0 b`,tipFailC:c=>`${c}: neúspešný`,tipRetake:c=>`${c}: opakovaný zápis`,
-  attPts:"Body",dtT:"Termíny skúšok",dtDesc:"Pole na dátum pri každom termíne skúšky, s odpočtom a odkazom do Google Kalendára.",edate:"Dátum",gcal:"Pridať do Google Kalendára",dueIn:n=>n===0?"dnes":n===1?"zajtra":`o ${n} ${n<5?"dni":"dní"}`,examWord:"skúška",
+  fvT:"Predmet neúspešný",fvExam:"Všetky 3 termíny skúšky sú vyčerpané.",fvZero:"Priveľa testov s nulou na zápočet.",fvCredit:"Zápočet sa už nedá dosiahnuť.",fvManual:"Predmet si označil ako neúspešný.",
+  fvOpt:"Je voliteľný, takže ho opakovať nemusíš.",fvLast:"Bol to opakovaný zápis, ďalšie opakovanie už nie je.",fvEnd:"Nie je neskorší ročník, kde by sa dal zopakovať.",fvUndo:"Omyl · vrátiť späť",
+  sgLook:"Zobrazenie",sgCourse:"Predmety a rozloženie",sgData:"Tvoje údaje",sgAbout:"O aplikácii",attPts:"Body",dtT:"Termíny skúšok",dtDesc:"Pole na dátum pri každom termíne skúšky, s odpočtom a odkazom do Google Kalendára.",edate:"Dátum",gcal:"Pridať do Google Kalendára",dueIn:n=>n===0?"dnes":n===1?"zajtra":`o ${n} ${n<5?"dni":"dní"}`,examWord:"skúška",
   upTitle:"Čo ďalej",upMore:n=>`Zobraziť všetko (${n})`,upLess:"Menej",resetOrder:"pôvodné poradie",dragTip:"Potiahni a presuň · Alt + ↑ / ↓ na klávesnici",
   planY:y=>`Plán ${y}. ročníka`,planSub:"kredity predmetov, ktoré máš tento rok",planOf:"zo 60",planPlan:"Naplánované",
   planR30:n=>n>=30?"✓ aspoň 30 za ročník":`chýba ${30-n} kr do minima 30`,planR15:n=>n>=15?"✓ 15+ v 1. semestri":`zime chýba ${15-n} kr do minima 15`,planR65:n=>n<=65?"✓ pod limitom 65":`o ${n-65} kr nad limitom 65`,
@@ -961,12 +992,18 @@ const TYPE={en:{"Cr+Ex":"Course credit + exam","Ex":"Exam","Cr":"Course credit",
 
 /* ---------- App version: one step per published update of the tracker (data auto-saves do not count) ---------- */
 // shown as X.X: every update adds 0.1, so the 79th update is 7.9 and the 80th becomes 8.0
-const APP_VER=83,APP_DATE="2026-10-26";
+const APP_VER=84,APP_DATE="2026-10-26";
 const verTxt=n=>`${Math.floor(n/10)}.${n%10}`;
 
 /* ---------- Version log: the 80 updates so far, related small ones merged into one version each ----------
    r = [first, last] update number (shown as X.X); n / i / f = new / improved / fixed, each item [English, Slovak] */
 const CHANGELOG=[
+ {r:[84,84],d:"2026-10-26",t:["Failed courses, calmer","Neúspešné predmety, pokojnejšie"],
+  n:[["A failed course folds into a short panel with two choices: retake next year, or undo a misclick","Neúspešný predmet sa zbalí do krátkeho panelu s dvoma voľbami: opakovať budúci rok alebo vrátiť omyl"],
+     ["Undo puts the course back exactly as it was before the change that failed it","Vrátenie obnoví predmet presne do stavu pred zmenou, ktorá ho zhodila"]],
+  i:[["The ✕ marks pop in first, then the card changes to the panel","Najprv vyskočia ✕, potom sa karta zmení na panel"],
+     ["The year / semester bar turns to frosted glass while it sticks to the top","Lišta ročníka a semestra sa pri prilepení hore zmení na matné sklo"],
+     ["Settings are grouped: Appearance, Courses & layout, Your data, About","Nastavenia sú v skupinách: Zobrazenie, Predmety a rozloženie, Tvoje údaje, O aplikácii"]]},
  {r:[81,83],d:"2026-10-26",t:["Clearer plan and chart","Prehľadnejší plán a graf"],
   n:[["Grade scale in colour: each mark has its own colour and the marks you got are filled in with a count","Farebná stupnica: každá známka má svoju farbu a tie, ktoré si dostal, sú vyplnené aj s počtom"],
      ["The grade on a finished course wears its mark's colour","Známka pri ukončenom predmete má farbu svojej známky"],
@@ -1341,8 +1378,12 @@ function nextStep(d,k,r,vs){
 }
 function courseCard(d){
   const t=L(),k=calc(d),r=k.r,id=d.c;
-  // a failed course is locked: points, exam terms and new items are greyed out until the status is changed back
+  // a failed course is locked; right after it fails it stays in that locked view for a moment so the ✕ can pop in,
+  // then the body folds into a small panel with just the next steps (retake / undo)
   const lock=r.status==="failed",dis=lock?" disabled":"";
+  if(lock&&lastSt[id]&&lastSt[id]!=="failed"&&!noMotion()&&!failHold[id]){failHold[id]=1;setTimeout(()=>failMorph(id),1700)}
+  lastSt[id]=r.status;
+  const failView=lock&&!failHold[id];
   const crOnly=d.t==="Cr"; const cc=d.t==="ClCr";
   const stOpts=(crOnly||cc?["planned","enrolled","passed","failed"]:d.t==="Ex"?["planned","enrolled","passed","failed"]:["planned","enrolled","credit","passed","failed"]);
   const kindLbl=d.k&&d.k!=="C"?t.kind[d.k]:"";
@@ -1357,8 +1398,9 @@ function courseCard(d){
   let h=`<details class="course" data-st="${r.status}" data-vs="${vs}" id="c-${id}" ${S.open&&S.open[id]?"open":""}><summary title="${t.dragTip}">
    <span class="code">${esc(d.c)}</span><span class="cname">${esc(nm(d))}</span><span class="pill ${vs}">${t.st[vs]}</span>
    <span class="cmeta"><span class="mono">${d.cr} ${t.cr}</span><span>${TYPE[S.lang][d.t]||d.t}</span>${kindLbl?`<span>${kindLbl}</span>`:""}${r.enroll===2?`<span style="color:var(--warn)">${t.e2}</span>`:""}${r.note&&r.note.trim()?`<span class="hasnote" title="${esc(r.note.trim())}">✎ ${t.noteLbl}</span>`:""}${k.anyPts?`<span class="mono">${fmt(k.semPts)}${d.exam?"":" / "+fmt(k.parts.reduce((a,p)=>a+(num(p.max)||0),0))} b</span>`:""}</span>${bar}${(()=>{const n=nextStep(d,k,r,vs),du=dueOf(d,k,r);return n?`<span class="next">→ ${du!=null?`<b class="due${du<=3?" soon":""}">${t.dueIn(du)}</b> · `:""}${esc(n)}</span>`:""})()}
-  </summary><div class="cbody">
-  <div class="row strow">
+  </summary><div class="cbody">`;
+  if(failView)return h+failPanel(d,k,r)+`</div></details>`;
+  h+=`<div class="row strow">
    <label>${t.status}<select id="st-${id}" data-f="status" data-c="${id}">${stOpts.map(o=>`<option value="${o}" ${o===r.status?"selected":""}>${t.st[o]}</option>`).join("")}</select></label>
    ${r.status==="failed"&&r.enroll===1&&SLOTS.indexOf(r.taken)+2<SLOTS.length?`<button class="btn" type="button" data-retake="${id}">${t.retake}</button>`:""}
   </div>`;
@@ -1422,6 +1464,39 @@ function courseCard(d){
   h+=`</div></div></details>`;
   return h;
 }
+// the panel a failed course shows: why it failed, and the two ways forward
+function failPanel(d,k,r){
+  const t=L(),id=d.c,canRetake=!d.opt&&r.enroll===1&&SLOTS.indexOf(r.taken)+2<SLOTS.length;
+  const why=d.zeroMax!=null&&k.zeros>d.zeroMax?t.fvZero:d.exam&&k.fails>=3?t.fvExam:k.creditLost?t.fvCredit:t.fvManual;
+  const next=d.opt?t.fvOpt:r.enroll===2?t.fvLast:!canRetake?t.fvEnd:"";
+  return `<div class="failview"><span class="fx" aria-hidden="true">✕</span><b>${t.fvT}</b><p>${why}${next?`<br>${next}`:""}</p>
+    <div class="fbtns">${canRetake?`<button class="btn" type="button" data-retake="${id}">${t.retake}</button>`:d.opt?`<button class="btn plain" type="button" data-rmel="${id}">${t.remove}</button>`:""}
+    <button class="btn plain" type="button" data-unfail="${id}">↶ ${t.fvUndo}</button></div></div>`;
+}
+const lastSt={},failHold={};
+// the locked card fades out, the panel fades in and the card's height glides between the two
+function failMorph(id){
+  delete failHold[id];
+  const old=document.getElementById("c-"+id),d=allCourses().find(x=>x.c===id);
+  if(!old||!d||cs(id).status!=="failed")return;
+  if(!old.open||noMotion()||document.hidden)return refreshCard(id);
+  const body=old.querySelector(".cbody"),h0=old.offsetHeight;
+  const out=body.animate([{opacity:1,filter:"blur(0)"},{opacity:0,filter:"blur(3px)"}],{duration:240,easing:"ease-in",fill:"forwards"});
+  let done=false;const swapIn=()=>{if(done)return;done=true;
+    const tmp=document.createElement("div");tmp.innerHTML=courseCard(d);const nb=tmp.firstElementChild.querySelector(".cbody");
+    body.replaceWith(nb);const h1=old.offsetHeight;old.style.overflow="hidden";
+    const a=old.animate([{height:h0+"px"},{height:h1+"px"}],{duration:420,easing:"cubic-bezier(.2,.8,.2,1)"});
+    const fin=()=>{old.style.overflow="";alignRows()};a.onfinish=fin;setTimeout(fin,600);
+    nb.querySelector(".failview").animate([{opacity:0,transform:"scale(.94) translateY(6px)"},{opacity:1,transform:"none"}],{duration:380,delay:120,easing:"cubic-bezier(.2,.9,.3,1.15)",fill:"backwards"});
+    renderSummary();renderUpNext();
+  };
+  out.onfinish=swapIn;setTimeout(swapIn,400);
+}
+// what a course looked like when you started changing a field, so a fail caused by that change can be undone;
+// kept per field until you leave it (the card redraws while you type and focuses the box again, which must not overwrite it)
+const PRE={};let preNow=null;
+const preSnap=r=>JSON.stringify({status:r.status,auto:r.auto,pts:r.pts,extra:r.extra,maxOv:r.maxOv,exam:r.exam,credit:r.credit});
+document.addEventListener("focusin",e=>{const el=e.target,c=el.dataset&&el.dataset.c;if(c&&el.dataset.f&&el.id&&!(el.id in PRE)&&S.courses[c]&&S.courses[c].status!=="failed")PRE[el.id]=preSnap(S.courses[c])});
 // exam dates: one optional date per term; the next term without a score that has a date drives the countdown
 function daysTo(iso){const [y,m,d]=iso.split("-").map(Number);const a=new Date(y,m-1,d),n=new Date();n.setHours(0,0,0,0);return Math.round((a-n)/864e5)}
 const fmtDate=iso=>{const [y,m,d]=iso.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString(S.lang==="sk"?"sk-SK":"en-GB",{day:"numeric",month:"short"})};
@@ -1606,7 +1681,7 @@ function autoStatus(code,soft){
   if(r.autoFail){r.auto=1;delete r.autoFail}
   const fail=(d.zeroMax!=null&&k.zeros>d.zeroMax)||(d.exam&&k.fails>=3&&!k.passedPts)||k.creditLost;
   // soft = while you are still typing: a half-typed number must not fail the course yet
-  if(fail){if(!soft&&r.status!=="failed"){r.status="failed";r.auto=1}}
+  if(fail){if(!soft&&r.status!=="failed"&&!r.keep){if(preNow)r.unfail=preNow;r.status="failed";r.auto=1}}
   else if(k.passedPts){if(r.status!=="passed"){r.status="passed";r.auto=1}}
   else if(r.auto){r.status="enrolled";delete r.auto}
 }
@@ -2331,6 +2406,7 @@ document.addEventListener("input",e=>{
   else if(f==="edate"){r.examDate=r.examDate||["","",""];r.examDate[+el.dataset.k]=el.value;changed();return}
   else return;
   if(f==="pt"){const x=r.extra.find(x=>x.id===el.dataset.k);if(x)x.val=el.value}
+  delete r.keep;
   autoStatus(c,true);
   refreshCard(c);changed();
 });
@@ -2338,13 +2414,14 @@ document.addEventListener("input",e=>{
 document.addEventListener("focusout",e=>{
   const el=e.target,c=el.dataset&&el.dataset.c;
   if(refreshing||!c||!["pt","max","exam","credit"].includes(el.dataset.f))return;
-  setTimeout(()=>{const before=cs(c).status;autoStatus(c);if(cs(c).status!==before){logIt({c,f:"status",a:before,b:cs(c).status,auto:1});refreshCard(c);renderHistory();changed()}},0);
+  const pre=PRE[el.id];delete PRE[el.id];
+  setTimeout(()=>{const before=cs(c).status;preNow=pre;autoStatus(c);preNow=null;if(cs(c).status!==before){logIt({c,f:"status",a:before,b:cs(c).status,auto:1});refreshCard(c);renderHistory();changed()}},0);
 });
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.dataset&&["pt","max","exam","credit"].includes(e.target.dataset.f))e.target.blur()});
 document.addEventListener("change",e=>{
   const el=e.target,f=el.dataset.f,c=el.dataset.c;if(!f)return;
   if(f==="edate"){refreshCard(c);return}
-  if(f==="status"){const r=cs(c);logIt({c,f:"status",a:r.status,b:el.value});r.status=el.value;delete r.auto;delete r.autoFail}
+  if(f==="status"){const r=cs(c);logIt({c,f:"status",a:r.status,b:el.value});if(el.value==="failed")r.unfail=PRE[el.id]||preSnap(r);delete PRE[el.id];r.status=el.value;delete r.auto;delete r.autoFail}
   else if(f==="taken")cs(c).taken=el.value;
   else if(f==="enroll")cs(c).enroll=+el.value;
   else return;
@@ -2357,6 +2434,10 @@ let semsW=0;
 new ResizeObserver(()=>{const w=document.getElementById("sems").clientWidth;if(w===semsW)return;semsW=w;
   if(colsNow&&colCount()!==colsNow)rerender();else alignRows()}).observe(document.getElementById("sems"));
 if(document.fonts)document.fonts.ready.then(alignRows);
+// the year / semester bar gets its glass only while it is stuck to the top
+{let q=false;const stick=()=>{q=false;const p=document.getElementById("picker");if(!p||!p.offsetParent)return;
+  p.classList.toggle("stuck",scrollY>0&&p.getBoundingClientRect().top<=parseFloat(getComputedStyle(p).top)+.5)};
+  addEventListener("scroll",()=>{if(!q){q=true;requestAnimationFrame(stick)}},{passive:true});addEventListener("resize",stick)}
 document.addEventListener("toggle",e=>{
   const d=e.target;if(!d.classList||!d.classList.contains("course"))return;
   S.open=S.open||{};const k=d.id.slice(2);if(d.open)S.open[k]=1;else delete S.open[k];localSave();
@@ -2433,6 +2514,16 @@ document.addEventListener("click",e=>{
     const c=g("el-c-"+s).value.trim().toUpperCase(),n=g("el-n-"+s).value.trim(),cr=parseInt(g("el-cr-"+s).value,10),t=g("el-t-"+s).value;
     if(!c||allCourses().some(x=>x.c===c))return g("el-c-"+s).focus(); if(!(cr>0))return g("el-cr-"+s).focus();
     S.electives.push({c,en:n||c,sk:n||c,cr,t,s,g:"E"});logIt({c,f:"addc"});const r=cs(c);r.taken=s;r.status=s===cur()?"enrolled":"planned";S.open=S.open||{};S.open[c]=1;rerender();changed();return}
+  if(b.dataset.unfail){const c=b.dataset.unfail,r=cs(c);
+    // back to how the course was before the change that failed it; without that record (older data) only the status goes back,
+    // and the automatic check leaves it alone until the points are changed again
+    if(r.unfail){Object.assign(r,JSON.parse(r.unfail));if(r.auto===undefined)delete r.auto;if(r.status==="failed")r.status="enrolled"}
+    else{r.status="enrolled";delete r.auto;r.keep=1}
+    delete r.unfail;autoStatus(c);if(r.status==="failed"){r.status="enrolled";r.keep=1;delete r.unfail}
+    logIt({c,f:"status",a:"failed",b:r.status});
+    const d=document.getElementById("c-"+c);if(d&&!noMotion()){const bd=d.querySelector(".cbody");bd.animate([{opacity:1},{opacity:0}],{duration:160,fill:"forwards"}).onfinish=()=>{rerender();const nb=document.querySelector("#c-"+c+" .cbody");if(nb)nb.animate([{opacity:0,transform:"translateY(-6px)"},{opacity:1,transform:"none"}],{duration:300,easing:"cubic-bezier(.2,.8,.2,1)"})}}
+    else rerender();
+    renderHistory();changed();return}
   if(b.dataset.rmel){const c=b.dataset.rmel;logIt({c,f:"rmc"});S.electives=S.electives.filter(x=>x.c!==c);delete S.courses[c];rerender();changed();return}
 });
 
