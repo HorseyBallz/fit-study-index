@@ -56,6 +56,7 @@ button,select,input{font:inherit;color:inherit}
 .logorow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;min-width:0}
 .logo{height:52px;width:auto;max-width:100%;object-fit:contain;object-position:left;align-self:start}
 .madeby{margin:8px 0 0;font-size:13px;color:var(--muted);text-align:center}
+.appver{margin:0;font-size:11px;color:var(--muted);opacity:.75;cursor:help}
 .big.met .pct{color:var(--ok)}
 .metmsg{margin:0;font-size:14px;font-weight:600;color:var(--ok)}
 .bar.pulse{animation:pulse .9s ease 2}
@@ -148,6 +149,42 @@ body.editing .win.lifted .winbar{cursor:grabbing;border-color:var(--blue)}
 .edacts{display:flex;gap:6px}
 .edacts .btn{padding:7px 14px}
 body.editing .bbar{display:none}
+/* version history page */
+body.inlog #settings [data-full]{display:none}
+.chip.uptodate{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,var(--line))}
+.chip.uptodate .dot{animation:none!important;background:var(--ok);border:0}
+.gear.backb:hover svg{transform:translateX(-2px)}
+.logpage #lg-desc{margin:0;color:var(--muted);font-size:13px}
+.logbody{display:grid;grid-template-columns:260px minmax(0,1fr);gap:28px;align-items:start}
+.loglist{position:sticky;top:calc(16px + env(safe-area-inset-top,0px));display:grid;gap:8px;max-height:calc(100vh - 40px);overflow:auto;padding-right:4px}
+.loglist .grouph{margin:0 0 2px}
+.loglist ol{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.logitem{width:100%;display:grid;grid-template-columns:auto 1fr;gap:0 10px;text-align:left;padding:8px 10px;border-radius:10px;border:1px solid transparent;background:none;color:var(--ink);cursor:pointer;transition:background-color .2s,border-color .2s}
+.logitem:hover{background:var(--card);border-color:var(--line)}
+.logitem.on{background:var(--card);border-color:var(--blue)}
+.logitem .lv{grid-row:span 2;align-self:center;font-size:12.5px;font-weight:500;color:var(--blue);background:var(--blue-soft);border-radius:6px;padding:2px 6px}
+.logitem .lt{font-size:13.5px;font-weight:600;line-height:1.3}
+.logitem .ld{font-size:11.5px;color:var(--muted)}
+.logmain{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 32px;display:grid;gap:18px;max-width:720px;width:100%;justify-self:center;min-height:320px}
+.logkicker{margin:0;font-size:12px;color:var(--muted)}
+.logtitle{font-size:30px;line-height:1.15}
+.logtitle .mono{color:var(--blue);font-size:.8em;margin-right:6px}
+.logcat h3{margin:0 0 8px}
+.logcat .tag{display:inline-block;font-family:var(--f-body);font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:3px 10px;border-radius:99px}
+.logcat.n .tag{background:var(--ok-soft);color:var(--ok)}
+.logcat.i .tag{background:var(--blue-soft);color:var(--blue)}
+.logcat.f .tag{background:var(--warn-soft);color:var(--warn)}
+.logcat ul{margin:0;padding-left:20px;display:grid;gap:6px;font-size:14.5px}
+.logcat li::marker{color:var(--muted)}
+@media (max-width:760px){
+  .logbody{grid-template-columns:1fr}
+  .loglist{position:static;max-height:none;overflow:visible}
+  .loglist ol{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x proximity}
+  .loglist li{flex:none;scroll-snap-align:start}
+  .logitem{width:auto;min-width:150px;background:var(--card);border-color:var(--line)}
+  .logmain{padding:20px 18px}
+  .logtitle{font-size:24px}
+}
 /* backup buttons in Settings */
 .bkbtns{display:flex;gap:6px;flex-wrap:wrap}
 .bkbtns .btn{padding:6px 12px}
@@ -599,6 +636,24 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
     <button type="button" data-jump="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span data-bb="bbSet">Settings</span></button>
   </nav>
 </div>
+<!-- version history: a page of its own with the tracker's header (up-to-date badge, settings, back) -->
+<div class="wrap logpage" id="logview" hidden>
+  <header class="top">
+    <div class="brand"><div style="display:grid;gap:10px;min-width:0">
+      <div class="logorow"><img class="logo" id="logo2" src="logo-en.webp" alt=""><h1 id="lg-title">Version history</h1></div>
+      <p id="lg-desc"></p></div></div>
+    <div class="tools">
+      <span class="chip saved uptodate" id="lg-up"><span class="dot"></span><span id="lg-uptxt"></span></span>
+      <button class="gear" id="set-btn2" type="button" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.4h-4l-.4 2.5A7.5 7.5 0 0 0 7 6.4l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
+      <button class="gear backb" id="log-back" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </header>
+  <div class="logbody">
+    <nav class="loglist" id="loglist" aria-label="Versions"></nav>
+    <article class="logmain" id="logmain" aria-live="polite"></article>
+  </div>
+  <footer class="foot"><p class="madeby">Made by Filipko &amp; Claude ❤️</p><p class="appver mono" id="lg-ver"></p></footer>
+</div>
 <!-- settings pop-up: stays in the page (hidden) so the language and theme buttons always exist -->
 <div class="modal" id="settings" hidden>
   <div class="mbox sets" role="dialog" aria-modal="true" aria-labelledby="set-title">
@@ -619,13 +674,15 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
         <button type="button" data-perf="balanced" data-t="perfBal">Balanced</button>
         <button type="button" data-perf="low" data-t="perfLow">Low</button>
       </div></div>
-    <div class="setrow"><span class="setk"><span data-t="layT">Layout</span><small data-t="layDesc"></small></span>
+    <div class="setrow" data-full><span class="setk"><span data-t="logT">Version history</span><small data-t="logDesc"></small></span>
+      <button type="button" class="btn plain" id="log-open" data-t="logOpen">See what's new</button></div>
+    <div class="setrow" data-full><span class="setk"><span data-t="layT">Layout</span><small data-t="layDesc"></small></span>
       <button type="button" class="btn plain" id="lay-edit" data-t="layEdit">Edit layout</button></div>
-    <div class="setrow"><span class="setk"><span data-t="bkTitle">Backup</span><small data-t="bkDesc"></small></span>
+    <div class="setrow" data-full><span class="setk"><span data-t="bkTitle">Backup</span><small data-t="bkDesc"></small></span>
       <div class="bkbtns"><button type="button" class="btn plain" id="bk-save" data-t="bkSave">Download</button><button type="button" class="btn plain" id="bk-load" data-t="bkLoad">Load file</button>
       <input type="file" id="bk-file" accept=".json,application/json" hidden></div></div>
     <p class="setnote" id="bk-msg" hidden></p>
-    <div class="setrow"><span class="setk"><span data-t="resetT">Reset</span><small data-t="resetDesc"></small></span>
+    <div class="setrow" data-full><span class="setk"><span data-t="resetT">Reset</span><small data-t="resetDesc"></small></span>
       <button type="button" class="btn danger-outline" id="reset-btn" data-t="resetBtn">Reset all data</button></div>
     <p class="setnote" data-t="setSaved">Saved on this device.</p>
   </div>
@@ -830,7 +887,8 @@ Object.assign(T.en,{
   ccT:"Credits per semester",ccPass:"Passed",ccProg:"In progress",ccPace:"30 a semester",ccTip:(s,p,g)=>`${s}: ${p} passed · ${g} in progress`,semAb:{W:"W",S:"S"},
   winT:{summary:"Progress",upnext:"Up next",plan:"Year plan",courses:"Courses",chart:"Credits chart",ms:"Milestones",hist:"History"},
   layT:"Layout",layDesc:"Move the windows around and hide the ones you don't need.",layEdit:"Edit layout",layBarT:"Editing layout",
-  resetT:"Reset",resetDesc:"Delete all points, statuses and settings in this tracker.",
+  resetT:"Reset",resetDesc:"Delete all points, statuses and settings in this tracker.",verLbl:(v,d)=>`Version ${v} · updated ${d}`,logT:"Version history",logDesc:"What changed in every version of the tracker.",logOpen:"See what's new",logBack:"Back",
+  logUp:v=>`Up to date · ${v}`,logUpTip:"You are on the newest version",logVers:"Versions",logCat:{n:"New",i:"Improved",f:"Fixed"},logRange:(a,b)=>a===b?`Update ${a}`:`Updates ${a} – ${b}`,verTip:"Counts the updates to the tracker itself, not the automatic saves of your data",
   layBarHint:"Drag a window by its bar · switch windows on or off",layReset:"Reset",layDone:"Done",layOn:"Shown",layOff:"Hidden",layFixed:"Always shown",layMove:"Move · Alt + ↑ / ↓"
 });
 Object.assign(T.sk,{
@@ -854,10 +912,87 @@ Object.assign(T.sk,{
   ccT:"Kredity za semester",ccPass:"Získané",ccProg:"Prebieha",ccPace:"30 za semester",ccTip:(s,p,g)=>`${s}: ${p} získaných · ${g} prebieha`,semAb:{W:"Z",S:"L"},
   winT:{summary:"Postup",upnext:"Čo ďalej",plan:"Plán ročníka",courses:"Predmety",chart:"Graf kreditov",ms:"Míľniky",hist:"História"},
   layT:"Rozloženie",layDesc:"Presúvaj okná a skry tie, ktoré nepotrebuješ.",layEdit:"Upraviť rozloženie",layBarT:"Úprava rozloženia",
-  resetT:"Vymazanie",resetDesc:"Vymaže všetky body, stavy a nastavenia v tomto trackeri.",
+  resetT:"Vymazanie",resetDesc:"Vymaže všetky body, stavy a nastavenia v tomto trackeri.",verLbl:(v,d)=>`Verzia ${v} · aktualizované ${d}`,logT:"História verzií",logDesc:"Čo sa zmenilo v každej verzii trackera.",logOpen:"Pozrieť novinky",logBack:"Späť",
+  logUp:v=>`Aktuálna verzia · ${v}`,logUpTip:"Máš najnovšiu verziu",logVers:"Verzie",logCat:{n:"Nové",i:"Vylepšené",f:"Opravené"},logRange:(a,b)=>a===b?`Aktualizácia ${a}`:`Aktualizácie ${a} – ${b}`,verTip:"Počíta aktualizácie samotného trackera, nie automatické ukladanie tvojich údajov",
   layBarHint:"Okno potiahni za jeho lištu · okná zapni alebo vypni",layReset:"Pôvodné",layDone:"Hotovo",layOn:"Zobrazené",layOff:"Skryté",layFixed:"Vždy zobrazené",layMove:"Presunúť · Alt + ↑ / ↓"
 });
 const TYPE={en:{"Cr+Ex":"Course credit + exam","Ex":"Exam","Cr":"Course credit","ClCr":"Graded course credit"},sk:{"Cr+Ex":"Zápočet + skúška","Ex":"Skúška","Cr":"Zápočet","ClCr":"Klasifikovaný zápočet"}};
+
+/* ---------- App version: one step per published update of the tracker (data auto-saves do not count) ---------- */
+// shown as X.X: every update adds 0.1, so the 79th update is 7.9 and the 80th becomes 8.0
+const APP_VER=80,APP_DATE="2026-10-26";
+const verTxt=n=>`${Math.floor(n/10)}.${n%10}`;
+
+/* ---------- Version log: the 80 updates so far, related small ones merged into one version each ----------
+   r = [first, last] update number (shown as X.X); n / i / f = new / improved / fixed, each item [English, Slovak] */
+const CHANGELOG=[
+ {r:[78,80],d:"2026-10-26",t:["Version history","História verzií"],
+  n:[["This page: every version of the tracker and what changed in it","Táto stránka: každá verzia trackera a čo sa v nej zmenilo"],
+     ["Version number at the bottom of the tracker, counted in steps of 0.1","Číslo verzie na spodku trackera, počítané po 0,1"]]},
+ {r:[74,77],d:"2026-10-26",t:["Your own layout","Vlastné rozloženie"],
+  n:[["Edit layout in Settings: drag the windows into any order","Upraviť rozloženie v Nastaveniach: okná presunieš v ľubovoľnom poradí"],
+     ["Switch Up next, Year plan, Credits chart, Milestones and History on or off","Okná Čo ďalej, Plán ročníka, Graf kreditov, Míľniky a História sa dajú zapnúť a vypnúť"],
+     ["Animations when the editor opens and closes and when a window folds away","Animácie pri otvorení a zatvorení editora a pri skladaní okna"]],
+  i:[["Exit is now a button next to the gear","Odísť je teraz tlačidlo vedľa ozubeného kolieska"],["Reset all data moved into Settings","Vymazanie všetkých údajov sa presunulo do Nastavení"]]},
+ {r:[70,73],d:"2026-10-26",t:["Big feature update","Veľká aktualizácia funkcií"],
+  n:[["What-if slider: try an exam score and see the grade","Posuvník „čo ak“: skús body zo skúšky a uvidíš známku"],
+     ["Weighted average by the BUT formula","Vážený priemer podľa vzorca VUT"],
+     ["Notes on every course and explanations on the ✕ / ✓ boxes","Poznámky ku každému predmetu a vysvetlivky pri políčkach ✕ / ✓"],
+     ["Exam dates with countdowns and Google Calendar links","Dátumy skúšok s odpočtom a odkazom do Google Kalendára"],
+     ["Up next: the most urgent steps from all courses","Čo ďalej: najnaliehavejšie kroky zo všetkých predmetov"],
+     ["Drag course cards into your own order","Karty predmetov si môžeš poprehadzovať"],
+     ["Year plan check (30–65 credits a year) and a history of changes","Kontrola plánu ročníka (30–65 kreditov) a história zmien"],
+     ["Backup to a file, phone bottom bar and swipe between semesters","Záloha do súboru, spodná lišta na mobile a prechod medzi semestrami potiahnutím"],
+     ["Milestones and a credits-per-semester chart","Míľniky a graf kreditov za semester"]]},
+ {r:[67,69],d:"2026-10-26",t:["Danger levels","Úrovne nebezpečenstva"],
+  n:[["The ✕ boxes get redder and pulse more as failures add up","Políčka ✕ sú červenšie a pulzujú viac, keď pribúdajú neúspechy"],
+     ["At 3 failed courses the whole Progress box glows red","Pri 3 neúspešných predmetoch celé okno Postup žiari načerveno"]],
+  i:[["All pulses run in sync","Všetky pulzy bežia naraz"],["Calmer pulse around the progress bar","Pokojnejší pulz okolo lišty postupu"]]},
+ {r:[60,66],d:"2026-10-26",t:["Cleaner course cards","Prehľadnejšie karty predmetov"],
+  n:[["A failed course is locked: fields greyed out, exam boxes ✕","Neúspešný predmet sa zamkne: polia sú sivé, políčka skúšky ✕"]],
+  i:[["Shorter, clearer messages on the cards","Kratšie a jasnejšie správy na kartách"],["Status picker and Retake button share one size","Výber stavu a tlačidlo Opakovať majú rovnakú veľkosť"],
+     ["Add a test or item: a compact button that rolls down","Pridať písomku: kompaktné tlačidlo s rozbaľovaním"],["Exit and auto-exit use the same shrink animation","Odchod aj automatický odchod majú rovnakú animáciu"]],
+  f:[["A course no longer fails while you are still typing a score","Predmet už nezlyhá, kým ešte píšeš body"],["The status picker no longer looks bigger after a change","Výber stavu už po zmene nevyzerá väčší"]]},
+ {r:[55,59],d:"2026-10-26",t:["Settings and smarter rules","Nastavenia a presnejšie pravidlá"],
+  n:[["Settings with language, theme and Full / Balanced / Low performance","Nastavenia s jazykom, vzhľadom a výkonom Plné / Vyvážené / Nízke"],["Undo for Retake next year","Možnosť vrátiť Opakovať budúci rok"]],
+  i:[["A course fails on its own once the course credit is out of reach","Predmet zlyhá sám, keď zápočet už nie je dosiahnuteľný"],
+     ["A failed optional course needs no retake (BUT rules)","Neúspešný voliteľný predmet netreba opakovať (pravidlá VUT)"],
+     ["Faster typing: only the changed card is redrawn","Rýchlejšie písanie: prekreslí sa len zmenená karta"],["The reaper and the student no longer overlap","Smrtka a študent sa už neprekrývajú"]]},
+ {r:[52,54],d:"2026-10-26",t:["Card layout","Rozloženie kariet"],
+  i:[["Cards sit in columns, so an open card leaves no gaps","Karty sú v stĺpcoch, otvorená karta nenechá medzery"],["Rows of cards line up","Riadky kariet sú zarovnané"],["Cards roll down smoothly when opened","Karty sa pri otvorení plynulo rozbalia"]]},
+ {r:[48,51],d:"2026-10-24",t:["Polish","Doladenie"],
+  i:[["Centered add-course button with a roll-down panel","Vycentrované tlačidlo na pridanie predmetu s rozbaľovacím panelom"],["More space above the grade scale","Viac miesta nad stupnicou známok"]],
+  f:[["Auto-exit now works after the tab was in the background","Automatický odchod funguje aj po čase na pozadí"]]},
+ {r:[41,47],d:"2026-10-24",t:["The deadline reaper","Smrtka termínov"],
+  n:[["Next-step line on every closed card","Riadok s ďalším krokom na každej zatvorenej karte"],["New progress bar with a running student and a goal flag","Nová lišta postupu s bežiacim študentom a cieľom"],
+     ["A reaper that walks with the semester and a red aura when it leads","Smrtka, ktorá kráča so semestrom, a červená žiara, keď vedie"],["Fail and pass animations","Animácie pri neúspechu a úspechu"]],
+  i:[["The student moves by the credits your points are on track for","Študent sa posúva podľa kreditov, na ktoré smerujú tvoje body"]]},
+ {r:[37,40],d:"2026-10-24",t:["Optional courses","Voliteľné predmety"],
+  n:[["Optional courses in their own section, picked from the FIT study plan","Voliteľné predmety vo vlastnej časti, vyberané zo študijného plánu FIT"],["Each card shows its status in colour and a points bar","Každá karta ukazuje stav farbou a lištu bodov"]],
+  i:[["Optional courses can be removed","Voliteľné predmety sa dajú odstrániť"]]},
+ {r:[26,36],d:"2026-10-24",t:["Secret word and auto-exit","Tajné slovo a automatický odchod"],
+  n:[["Secret word screen with ✕ / ✓ marks and EN / SK","Obrazovka s tajným slovom, značkami ✕ / ✓ a EN / SK"],["Exit with a confirmation","Odchod s potvrdením"],
+     ["Auto-exit after 15 minutes without activity","Automatický odchod po 15 minútach nečinnosti"],["Saving indicator: orange ring, green dot","Indikátor ukladania: oranžový krúžok, zelená bodka"]],
+  i:[["Transitions between the screens","Prechody medzi obrazovkami"]],
+  f:[["The page no longer jumps when a card closes","Stránka už neskáče pri zatváraní karty"]]},
+ {r:[22,25],d:"2026-10-23",t:["Reset all data","Vymazanie údajov"],
+  n:[["Reset all data with two warnings","Vymazanie všetkých údajov s dvoma upozorneniami"],["A cancelled warning shatters and falls away","Zrušené upozornenie sa rozbije a spadne"]],
+  i:[["Footer credits Filipko & Claude","Pätička uvádza Filipka a Clauda"]]},
+ {r:[17,21],d:"2026-10-23",t:["Automatic credits and animations","Automatické kredity a animácie"],
+  n:[["The bar turns green with confetti at the minimum","Lišta zozelenie a padnú konfety pri minime"],["Sliding toggles and rolling course cards","Posuvné prepínače a rozbaľovacie karty"]],
+  i:[["Credits count automatically from your points","Kredity sa počítajú automaticky z bodov"],["Bigger Progress title, less clutter","Väčší nadpis Postup, menej neporiadku"]]},
+ {r:[13,16],d:"2026-10-23",t:["Faculty look","Vzhľad fakulty"],
+  n:[["Faculty logos in English and Slovak","Logá fakulty v angličtine a slovenčine"],["Unofficial notice and “Made by Filipko” footer","Upozornenie o neoficiálnosti a pätička „Made by Filipko“"]],
+  i:[["Title beside the logo, centered footer","Nadpis vedľa loga, vycentrovaná pätička"]]},
+ {r:[4,12],d:"2026-10-23",t:["Course credit and failures","Zápočet a neúspechy"],
+  n:[["Failed-course counter: 3 ✕ ends the studies","Počítadlo neúspechov: 3 ✕ ukončia štúdium"],["IDM and ILG: five tests, one 0 allowed, with ✕ boxes","IDM a ILG: päť písomiek, jedna 0 povolená, s políčkami ✕"],
+     ["Exam term boxes and automatic fail on a second 0","Políčka termínov skúšky a automatický neúspech pri druhej 0"]],
+  i:[["Semester bar matches light and dark mode","Lišta semestrov ladí so svetlým aj tmavým režimom"],["Less text on screen","Menej textu na obrazovke"]]},
+ {r:[2,3],d:"2026-10-23",t:["Semesters and themes","Semestre a vzhľad"],
+  n:[["Year and semester picker","Výber ročníka a semestra"],["Light and dark mode","Svetlý a tmavý režim"],["Semester minimum or whole study view","Pohľad na minimum semestra alebo celé štúdium"]]},
+ {r:[1,1],d:"2026-10-23",t:["First version","Prvá verzia"],
+  n:[["Tracker for the BIT courses: points, course credit, exams and retakes","Tracker pre predmety BIT: body, zápočty, skúšky a opakovanie"],["Progress towards 180 credits, in English and Slovak","Postup k 180 kreditom, po anglicky aj po slovensky"]]}
+];
 
 /* ---------- State ---------- */
 const LS="fit-index-state-v1";
@@ -1363,7 +1498,7 @@ function render(){
   document.getElementById("sems").innerHTML=h;
   alignRows();syncPulses();requestAnimationFrame(syncPulses);
   renderHistory();
-  document.getElementById("foot").innerHTML=`<h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div><p class="madeby">Made by Filipko &amp; Claude ❤️</p>`;
+  document.getElementById("foot").innerHTML=`<h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div><p class="madeby">Made by Filipko &amp; Claude ❤️</p><p class="appver mono" title="${t.verTip}">${t.verLbl(verTxt(APP_VER),new Date(APP_DATE+"T12:00:00").toLocaleDateString(S.lang==="sk"?"sk-SK":"en-GB",{day:"numeric",month:"short",year:"numeric"}))}</p>`;
   animateChanges();
 }
 
@@ -1428,7 +1563,7 @@ function unlock(){
   swap("gate","app");
 }
 function lockAgain(){
-  exitEdit(true);
+  exitEdit(true);leaveLogNow();
   try{localStorage.removeItem(GATE)}catch(e){}
   const i=document.getElementById("g-input");i.value="";i.classList.remove("nope");
   // Exit button and auto-exit share one look: the tracker shrinks into the secret box
@@ -1448,7 +1583,7 @@ function touchAct(){
 ["pointerdown","pointermove","keydown","wheel","touchstart","scroll"].forEach(ev=>addEventListener(ev,touchAct,{passive:true,capture:true}));
 function checkIdle(){
   if(locking)return true;
-  if(document.getElementById("app").hidden||Date.now()-lastAct<IDLE)return false;
+  if((document.getElementById("app").hidden&&document.getElementById("logview").hidden)||Date.now()-lastAct<IDLE)return false;
   try{localStorage.removeItem(GATE)}catch(e){}
   // time ran out while the tab is in the background: the page is locked now, but the shrink animation waits
   // until you come back (visibilitychange runs this again), so you actually see it instead of a finished lock screen
@@ -1891,6 +2026,34 @@ document.addEventListener("keydown",e=>{
   saveLayout();bar.focus();
 });
 
+/* ---------- Version history page ---------- */
+let logSel=0;
+const verOf=n=>verTxt(n);
+const logDate=iso=>new Date(iso+"T12:00:00").toLocaleDateString(S.lang==="sk"?"sk-SK":"en-GB",{day:"numeric",month:"short",year:"numeric"});
+function renderLog(anim){
+  const t=L(),k=S.lang==="sk"?1:0,e=CHANGELOG[logSel];
+  document.getElementById("lg-title").textContent=t.logT;document.getElementById("lg-desc").textContent=t.logDesc;
+  const lg=document.getElementById("logo2");lg.src=S.lang==="sk"?"logo-cz.webp":"logo-en.webp";lg.alt=t.logoAlt;
+  document.getElementById("lg-uptxt").textContent=t.logUp(verOf(APP_VER));document.getElementById("lg-up").title=t.logUpTip;
+  const sb=document.getElementById("set-btn2");sb.setAttribute("aria-label",t.settings);sb.title=t.settings;
+  const bb=document.getElementById("log-back");bb.setAttribute("aria-label",t.logBack);bb.title=t.logBack;
+  document.getElementById("loglist").setAttribute("aria-label",t.logVers);
+  document.getElementById("lg-ver").textContent=t.verLbl(verOf(APP_VER),logDate(APP_DATE));
+  document.getElementById("loglist").innerHTML=`<h2 class="grouph">${t.logVers}</h2><ol>${CHANGELOG.map((x,i)=>`<li><button type="button" class="logitem${i===logSel?" on":""}" data-logv="${i}"${i===logSel?' aria-current="true"':""}>
+    <span class="lv mono">${verOf(x.r[1])}</span><span class="lt">${esc(x.t[k])}</span><span class="ld">${logDate(x.d)}</span></button></li>`).join("")}</ol>`;
+  const sec=(key,cls)=>e[key]&&e[key].length?`<section class="logcat ${cls}"><h3><span class="tag">${t.logCat[key]}</span></h3><ul>${e[key].map(x=>`<li>${esc(x[k])}</li>`).join("")}</ul></section>`:"";
+  const m=document.getElementById("logmain");
+  m.innerHTML=`<p class="logkicker mono">${t.logRange(verOf(e.r[0]),verOf(e.r[1]))} · ${logDate(e.d)}</p><h2 class="logtitle"><span class="mono">${verOf(e.r[1])}</span> ${esc(e.t[k])}</h2>${sec("n","n")}${sec("i","i")}${sec("f","f")}`;
+  if(anim&&!noMotion())m.animate([{opacity:0,transform:"translateY(8px)"},{opacity:1,transform:"none"}],{duration:260,easing:"cubic-bezier(.2,.8,.2,1)"});
+}
+function openLog(){
+  closeSettings(true);exitEdit(true);logSel=0;renderLog();document.body.classList.add("inlog");
+  swap("app","logview");
+}
+function closeLog(){swap("logview","app",()=>{document.body.classList.remove("inlog");alignRows()})}
+// the page is left at once when the tracker locks itself
+function leaveLogNow(){const v=document.getElementById("logview");if(v.hidden)return;v.hidden=true;document.getElementById("app").hidden=false;document.body.classList.remove("inlog")}
+
 /* ---------- Up next: the next step of every running course, most urgent first ---------- */
 let upAll=false;
 function urgency(d,k,r){
@@ -2134,7 +2297,7 @@ document.addEventListener("click",e=>{
   }
   const b=e.target.closest("button");if(!b)return;
   if(b.id==="g-en"||b.id==="g-sk"){S.lang=b.id.slice(2);render();renderGate();localSave();return}
-  if(b.id==="lang-en"||b.id==="lang-sk"){S.lang=b.id.slice(5);rerender();changed();return}
+  if(b.id==="lang-en"||b.id==="lang-sk"){S.lang=b.id.slice(5);rerender();if(!document.getElementById("logview").hidden)renderLog();changed();return}
   if(b.dataset.goto){goTo(b.dataset.goto);return}
   if(b.dataset.jump){const j=b.dataset.jump;if(j==="settings")return openSettings();
     const el=document.getElementById(j),off=j==="sems"?document.getElementById("picker").offsetHeight+12:12;
@@ -2149,6 +2312,10 @@ document.addEventListener("click",e=>{
   if(b.id==="set-close"){closeSettings();return}
   if(b.id==="bk-save"){saveBackup();return}
   if(b.id==="lay-edit"){enterEdit();return}
+  if(b.id==="log-open"){openLog();return}
+  if(b.id==="log-back"){closeLog();return}
+  if(b.id==="set-btn2"){openSettings();return}
+  if(b.dataset.logv!=null){logSel=+b.dataset.logv;renderLog(true);if(innerWidth<760)document.getElementById("logmain").scrollIntoView({behavior:noMotion()?"auto":"smooth",block:"start"});return}
   if(b.id==="ed-done"){exitEdit();return}
   if(b.id==="ed-reset"){delete S.layout;applyLayout();drawBars();changed();return}
   if(b.dataset.wsw){toggleWin(b.dataset.wsw,b);return}
