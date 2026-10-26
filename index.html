@@ -71,9 +71,9 @@ button,select,input{font:inherit;color:inherit}
 }
 /* course card rolls down when opened by a click (class added only then, so re-renders don't replay it) */
 @media (prefers-reduced-motion:no-preference){
-  details.course.anim .cbody,details.addel.anim .addbody{animation:roll .32s cubic-bezier(.2,.8,.2,1)}
+  details.course.anim .cbody,details.addel.anim .addbody,details.addt.anim .addbody{animation:roll .32s cubic-bezier(.2,.8,.2,1)}
   details.course.anim{animation:lift .32s ease}
-  details.course.closing .cbody,details.addel.closing .addbody{animation:roll .3s cubic-bezier(.4,0,.6,1) reverse forwards}
+  details.course.closing .cbody,details.addel.closing .addbody,details.addt.closing .addbody{animation:roll .3s cubic-bezier(.4,0,.6,1) reverse forwards}
 }
 @keyframes roll{from{opacity:0;transform:translateY(-8px);clip-path:inset(0 0 100% 0)}to{opacity:1;transform:none;clip-path:inset(0 0 0 0)}}
 @keyframes lift{50%{box-shadow:0 6px 18px rgba(0,0,0,.12)}}
@@ -331,10 +331,28 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
 .src a{color:var(--blue)}
 .addel{display:grid;gap:8px;background:transparent;margin-top:30px}
 /* centered pill that rolls the add-course panel down */
-.addel>summary.addbtn{justify-self:center;padding:8px 18px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--blue);font-size:13px;font-weight:600;transition:background-color .2s,border-color .2s,transform .15s}
-.addel>summary.addbtn:hover{border-color:var(--blue);background:var(--blue-soft)}
-.addel[open]>summary.addbtn{border-color:var(--blue);background:var(--blue-soft)}
+.addel>summary.addbtn,.addt>summary.addbtn{justify-self:center;padding:8px 18px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--blue);font-size:13px;font-weight:600;transition:background-color .2s,border-color .2s,transform .15s}
+.addel>summary.addbtn:hover,.addt>summary.addbtn:hover{border-color:var(--blue);background:var(--blue-soft)}
+.addel[open]>summary.addbtn,.addt[open]>summary.addbtn{border-color:var(--blue);background:var(--blue-soft)}
 .addel .addbody{display:grid;gap:10px;padding:14px;margin-top:4px;border-radius:12px;background:var(--card);border:1px solid var(--line)}
+/* the same centered pill and roll-down panel for adding a test or item inside a course card, a size smaller */
+.addt{display:grid;gap:8px}
+/* display:block undoes the card header's 3-column grid (.course summary), whose empty columns left a gap after the text */
+/* locked (failed) course: greyed-out fields and add button */
+.cbody input:disabled{opacity:.45;cursor:not-allowed}
+.addt.off>summary.addbtn{opacity:.4;pointer-events:none;color:var(--muted)}
+.addt>summary.addbtn{display:block;justify-self:start;padding:6px 14px;font-size:12.5px}
+.addt .addbody{justify-self:start;width:fit-content;max-width:100%;padding:8px;border-radius:10px;background:var(--paper);border:1px solid var(--line)}
+.addt .addrow input{flex:0 1 170px;width:170px}
+.addt .addrow input.sm{flex:0 0 64px;width:64px}
+/* status picker and "Retake next year" sit on one line at the same height */
+.strow{align-items:flex-end}
+.strow select,.strow .btn{height:34px;border-radius:8px;font-size:13px}
+.strow select{padding:0 8px}
+/* the picker keeps focus after a change; its focus ring is drawn inside the edge so it never looks bigger than the button */
+.strow select:focus,.strow select:focus-visible,.strow .btn:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.strow select:focus:not(:focus-visible){outline:none}
+.strow .btn{padding:0 14px}
 .strikes{display:inline-flex;gap:4px}
 .sb{width:22px;height:22px;border:1.5px solid var(--line);border-radius:5px;display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:700;line-height:1}
 .sb.x{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
@@ -485,23 +503,23 @@ const T={
   status:"Status",taken:"Taken in",enroll:"Enrolment",e1:"1st time",e2:"Repeated (2nd)",
   partsH:"Points during the semester",sem_total:"Semester total",addItem:"Add a test or item",itemName:"Name, e.g. Test 3",max:"max",add:"Add",
   min:"min",exam:"Exam",examAttempts:"Exam attempts",regular:"Regular",resit1:"1st resit",resit2:"2nd resit",
-  needCredit:(n,t)=>`<b>${n} more points</b> needed for the course credit (${t} required).`,
-  creditOk:t=>`<b>Course credit reached</b> (${t} required). You can sign up for the exam.`,
-  creditUnknown:"The course page does not list how many points the course credit needs. Set the one your teacher announced:",
-  creditSet:"Points needed for credit",
-  partMin:(name,m)=>`${name}: at least ${m} pts needed`,
-  needExam:(n,m)=>`You need <b>${n} pts</b> from the exam to reach 50.${m?` Exam minimum is ${m}.`:""}`,
-  examBelowMin:m=>`Exam score is below the minimum of ${m} pts, so the exam counts as failed.`,
+  needCredit:(n,t)=>`<b>${n} more pts</b> for the course credit`,
+  creditOk:t=>`<b>Course credit ✓</b>`,
+  creditUnknown:"Credit threshold isn't listed.",
+  creditSet:"Points needed",
+  partMin:(name,m)=>`${name}: min ${m} pts`,
+  needExam:(n,m)=>`Exam: <b>${n} pts</b> needed`,
+  examBelowMin:m=>`Below the exam minimum (${m} pts)`,
   totalLbl:"Total",gradeLbl:"Grade",
-  passedMsg:g=>`Passed with ${g}.`,failedMsg:"Not passed yet (under 50 points).",
-  lastTry:"This is your last exam attempt in this enrolment.",
-  noTriesLeft1:"3 ✕: all exam terms failed. You must take the course again next year, and that is your last chance.",
-  noTriesLeft2:"3 ✕ in your repeated enrolment: you cannot continue your studies. Contact the study office right away.",
-  repeatWarn:"Repeated enrolment: this is the last chance to pass the course.",undoRetake:"Undo retake (back to the first attempt)",settings:"Settings",setLang:"Language",setTheme:"Theme",setPerf:"Animations & effects",perfFull:"Full",perfBal:"Balanced",perfLow:"Low",close:"Close",setSaved:"Saved on this device.",
+  passedMsg:g=>`Passed ✓`,failedMsg:"",
+  lastTry:"Last attempt ·",
+  noTriesLeft1:"All 3 exam terms failed · retake next year",
+  noTriesLeft2:"All 3 terms failed again · contact the study office",
+  repeatWarn:"Repeated enrolment · last chance",undoRetake:"Undo retake",settings:"Settings",setLang:"Language",setTheme:"Theme",setPerf:"Animations & effects",perfFull:"Full",perfBal:"Balanced",perfLow:"Low",close:"Close",setSaved:"Saved on this device.",
   perfDesc:{full:"Everything on: animations, confetti, glows and blur.",balanced:"Animations stay; confetti, glows and blur are off.",low:"No animations or effects. Best for slower computers."},undo:"Undo",movedTo:(c,s)=>`${c} moved to ${s}`,
-  crOnly:"This course ends with a course credit only. Mark it as Passed once you get it.",
+  crOnly:"Course credit only · set Passed when you get it",
   noPts:"No points are tracked for this course. Change the status when it is done.",
-  ccNote:"Graded course credit: the total from 100 points sets your grade.",
+  ccNote:"Graded credit · total out of 100 sets the grade",
   src:"Rules from",fitPage:"the course page",remove:"Remove course",
   addElective:"Add an elective course",elCode:"Code",elName:"Name",elCr:"Cr",elType:"Ends with",
   saved:"Saved",saving:"Saving…",unsaved:"Unsaved changes",local:"Saved on this device",readonly:"View only · saved on this device",saveErr:"Could not save · kept on this device",
@@ -519,9 +537,9 @@ const T={
   r1Title:"Reset everything?",r1Body:"This deletes all your points, exam scores, course statuses, electives and failed-course marks.",r1Yes:"Yes, reset",
   r2Title:"Are you absolutely sure?",r2Body:"All your data will be deleted for good. This cannot be undone.",r2Yes:"Delete everything",resetDone:"All data was reset.",minOkShort:"✓ Minimum reached. You can continue your studies.",minOkToast:"🎉 You reached the minimum credits!",unoff:"Unofficial student tool, not run by VUT or FIT.",logoAlt:"Brno University of Technology, Faculty of Information Technology",
   zeroLbl:"Tests with 0 points",failLbl:"Failed courses",fail3:"3 ✕: you cannot continue your studies.",
-  zeroBad:(z,m)=>`<b>${z} tests have 0 points.</b> Only ${m} is allowed, so the course credit is not met and the course is marked Failed.`,
+  zeroBad:(z,m)=>`<b>${z} zeros</b> (max ${m}) · no course credit`,
   zeroInfo:(z,m,left)=>`Tests with 0 points: <b>${z} of ${m} allowed</b>. ${left} test${left>1?"s":""} still to write.`,
-  zeroOk:"<b>Course credit reached.</b> All tests written, at most one with 0 points. You can sign up for the exam.",light:"Light",dark:"Dark",
+  zeroOk:"<b>Course credit ✓</b>",light:"Light",dark:"Dark",
   viewLbl:"Progress",viewSem:"Semester minimum",viewAll:"Whole study",
   minFirst:"credits passed · minimum for the 1st semester",minYear:y=>`credits passed in year ${y} · minimum for the year`,
   minLeft:(n,p)=>`<b>${n} more credits</b> needed to reach the minimum.${p?` ${p} credits are in progress.`:""}`,
@@ -541,23 +559,23 @@ const T={
   status:"Stav",taken:"Zapísané v",enroll:"Zápis",e1:"1. zápis",e2:"Opakovaný (2.)",
   partsH:"Body počas semestra",sem_total:"Spolu za semester",addItem:"Pridať písomku alebo položku",itemName:"Názov, napr. Písomka 3",max:"max",add:"Pridať",
   min:"min",exam:"Skúška",examAttempts:"Termíny skúšky",regular:"Riadny",resit1:"1. opravný",resit2:"2. opravný",
-  needCredit:(n,t)=>`Na zápočet ti chýba <b>${n} bodov</b> (treba ${t}).`,
-  creditOk:t=>`<b>Zápočet máš</b> (treba ${t}). Môžeš sa prihlásiť na skúšku.`,
-  creditUnknown:"Stránka predmetu neuvádza hranicu na zápočet. Nastav si tú, ktorú oznámil vyučujúci:",
-  creditSet:"Hranica na zápočet",
-  partMin:(name,m)=>`${name}: treba aspoň ${m} b`,
-  needExam:(n,m)=>`Zo skúšky potrebuješ <b>${n} b</b>, aby si mal 50.${m?` Minimum zo skúšky je ${m}.`:""}`,
-  examBelowMin:m=>`Skúška je pod minimom ${m} b, takže sa počíta ako neúspešná.`,
+  needCredit:(n,t)=>`Na zápočet chýba <b>${n} b</b>`,
+  creditOk:t=>`<b>Zápočet ✓</b>`,
+  creditUnknown:"Hranica na zápočet nie je uvedená.",
+  creditSet:"Potrebné body",
+  partMin:(name,m)=>`${name}: min ${m} b`,
+  needExam:(n,m)=>`Skúška: treba <b>${n} b</b>`,
+  examBelowMin:m=>`Pod minimom skúšky (${m} b)`,
   totalLbl:"Spolu",gradeLbl:"Známka",
-  passedMsg:g=>`Absolvované so známkou ${g}.`,failedMsg:"Zatiaľ nesplnené (menej ako 50 bodov).",
-  lastTry:"Toto je tvoj posledný termín v tomto zápise.",
-  noTriesLeft1:"3 ✕: všetky termíny skúšky neúspešné. Predmet si musíš zapísať znova budúci rok a to je posledná šanca.",
-  noTriesLeft2:"3 ✕ v opakovanom zápise: v štúdiu nemôžeš pokračovať. Hneď kontaktuj študijné oddelenie.",
-  repeatWarn:"Opakovaný zápis: je to posledná šanca predmet splniť.",undoRetake:"Zrušiť opakovanie (späť na prvý pokus)",settings:"Nastavenia",setLang:"Jazyk",setTheme:"Vzhľad",setPerf:"Animácie a efekty",perfFull:"Plné",perfBal:"Vyvážené",perfLow:"Nízke",close:"Zavrieť",setSaved:"Uložené v tomto zariadení.",
+  passedMsg:g=>`Absolvované ✓`,failedMsg:"",
+  lastTry:"Posledný termín ·",
+  noTriesLeft1:"Všetky 3 termíny neúspešné · opakuj budúci rok",
+  noTriesLeft2:"Opäť všetky 3 termíny neúspešné · kontaktuj študijné oddelenie",
+  repeatWarn:"Opakovaný zápis · posledná šanca",undoRetake:"Zrušiť opakovanie",settings:"Nastavenia",setLang:"Jazyk",setTheme:"Vzhľad",setPerf:"Animácie a efekty",perfFull:"Plné",perfBal:"Vyvážené",perfLow:"Nízke",close:"Zavrieť",setSaved:"Uložené v tomto zariadení.",
   perfDesc:{full:"Všetko zapnuté: animácie, konfety, žiara a rozmazanie.",balanced:"Animácie ostávajú; konfety, žiara a rozmazanie sú vypnuté.",low:"Bez animácií a efektov. Najlepšie pre slabšie počítače."},undo:"Späť",movedTo:(c,s)=>`${c} presunutý do: ${s}`,
-  crOnly:"Predmet končí len zápočtom. Keď ho dostaneš, označ ho ako Absolvované.",
+  crOnly:"Len zápočet · keď ho dostaneš, nastav Absolvované",
   noPts:"Pri tomto predmete sa body nesledujú. Po splnení zmeň stav.",
-  ccNote:"Klasifikovaný zápočet: známku určuje súčet zo 100 bodov.",
+  ccNote:"Klasifikovaný zápočet · známku určuje súčet zo 100",
   src:"Pravidlá zo",fitPage:"stránky predmetu",remove:"Odstrániť predmet",
   addElective:"Pridať voliteľný predmet",elCode:"Skratka",elName:"Názov",elCr:"Kr",elType:"Ukončenie",
   saved:"Uložené",saving:"Ukladám…",unsaved:"Neuložené zmeny",local:"Uložené v tomto zariadení",readonly:"Len na čítanie · uložené v zariadení",saveErr:"Nepodarilo sa uložiť · ostáva v zariadení",
@@ -575,9 +593,9 @@ const T={
   r1Title:"Vymazať všetko?",r1Body:"Vymažú sa všetky tvoje body, výsledky skúšok, stavy predmetov, voliteľné predmety aj značky neúspešných predmetov.",r1Yes:"Áno, vymazať",
   r2Title:"Naozaj to chceš urobiť?",r2Body:"Všetky údaje sa natrvalo vymažú. Nedá sa to vrátiť späť.",r2Yes:"Vymazať všetko",resetDone:"Všetky údaje boli vymazané.",minOkShort:"✓ Minimum splnené. Môžeš pokračovať v štúdiu.",minOkToast:"🎉 Máš minimum kreditov!",unoff:"Neoficiálny študentský nástroj, VUT ani FIT ho neprevádzkujú.",logoAlt:"Vysoké učení technické v Brně, Fakulta informačních technologií",
   zeroLbl:"Písomky za 0 bodov",failLbl:"Neúspešné predmety",fail3:"3 ✕: v štúdiu nemôžeš pokračovať.",
-  zeroBad:(z,m)=>`<b>${z} písomky máš za 0 bodov.</b> Povolená je len ${m}, takže zápočet nie je splnený a predmet je označený ako neúspešný.`,
+  zeroBad:(z,m)=>`<b>${z} nuly</b> (max ${m}) · bez zápočtu`,
   zeroInfo:(z,m,left)=>`Písomky za 0 bodov: <b>${z} z ${m} povolenej</b>. Ešte ťa čaká ${left} ${left===1?"písomka":left<5?"písomky":"písomiek"}.`,
-  zeroOk:"<b>Zápočet máš.</b> Všetky písomky napísané, najviac jedna za 0 bodov. Môžeš sa prihlásiť na skúšku.",light:"Svetlý",dark:"Tmavý",
+  zeroOk:"<b>Zápočet ✓</b>",light:"Svetlý",dark:"Tmavý",
   viewLbl:"Postup",viewSem:"Minimum za semester",viewAll:"Celé štúdium",
   minFirst:"získaných kreditov · minimum za 1. semester",minYear:y=>`získaných kreditov v ${y}. ročníku · minimum za ročník`,
   minLeft:(n,p)=>`Do minima ti chýba <b>${n} kreditov</b>.${p?` Rozbehnutých máš ${p} kreditov.`:""}`,
@@ -853,6 +871,8 @@ function nextStep(d,k,r,vs){
 }
 function courseCard(d){
   const t=L(),k=calc(d),r=k.r,id=d.c;
+  // a failed course is locked: points, exam terms and new items are greyed out until the status is changed back
+  const lock=r.status==="failed",dis=lock?" disabled":"";
   const crOnly=d.t==="Cr"; const cc=d.t==="ClCr";
   const stOpts=(crOnly||cc?["planned","enrolled","passed","failed"]:d.t==="Ex"?["planned","enrolled","passed","failed"]:["planned","enrolled","credit","passed","failed"]);
   const kindLbl=d.k&&d.k!=="C"?t.kind[d.k]:"";
@@ -868,9 +888,9 @@ function courseCard(d){
    <span class="code">${esc(d.c)}</span><span class="cname">${esc(nm(d))}</span><span class="pill ${vs}">${t.st[vs]}</span>
    <span class="cmeta"><span class="mono">${d.cr} ${t.cr}</span><span>${TYPE[S.lang][d.t]||d.t}</span>${kindLbl?`<span>${kindLbl}</span>`:""}${r.enroll===2?`<span style="color:var(--warn)">${t.e2}</span>`:""}${k.anyPts?`<span class="mono">${fmt(k.semPts)}${d.exam?"":" / "+fmt(k.parts.reduce((a,p)=>a+(num(p.max)||0),0))} b</span>`:""}</span>${bar}${(()=>{const n=nextStep(d,k,r,vs);return n?`<span class="next">→ ${esc(n)}</span>`:""})()}
   </summary><div class="cbody">
-  <div class="row">
+  <div class="row strow">
    <label>${t.status}<select id="st-${id}" data-f="status" data-c="${id}">${stOpts.map(o=>`<option value="${o}" ${o===r.status?"selected":""}>${t.st[o]}</option>`).join("")}</select></label>
-   ${r.status==="failed"&&r.enroll===1&&SLOTS.indexOf(r.taken)+2<SLOTS.length?`<button class="btn" type="button" data-retake="${id}" style="align-self:end">${t.retake}</button>`:""}
+   ${r.status==="failed"&&r.enroll===1&&SLOTS.indexOf(r.taken)+2<SLOTS.length?`<button class="btn" type="button" data-retake="${id}">${t.retake}</button>`:""}
   </div>`;
   if(r.enroll===2&&r.status!=="passed") h+=`<div class="verdict warn">${t.repeatWarn}</div>`;
   if(r.enroll===2) h+=`<button class="linkbtn" type="button" data-unretake="${id}" style="justify-self:start">↶ ${t.undoRetake}</button>`;
@@ -878,12 +898,12 @@ function courseCard(d){
   if(k.parts.length||!d.free){
     h+=`<div><table class="pts"><tbody>`;
     for(const p of k.parts){
-      h+=`<tr><td>${esc(p.n)}${p.min?` <span class="minnote">${t.min} ${p.min}</span>`:""}</td><td class="n"><input type="text" inputmode="decimal" id="v-${id}-${p.key}" data-f="pt" data-c="${id}" data-k="${p.key}" value="${esc(p.val)}" aria-label="${esc(p.n)}"> / <input type="text" inputmode="decimal" id="m-${id}-${p.key}" data-f="max" data-c="${id}" data-k="${p.key}" value="${esc(p.max)}" aria-label="${t.max}" style="width:44px;background:transparent;border-color:transparent"></td><td>${p.custom?`<button class="x" type="button" data-del="${id}" data-k="${p.key}" aria-label="×">×</button>`:""}</td></tr>`;
+      h+=`<tr><td>${esc(p.n)}${p.min?` <span class="minnote">${t.min} ${p.min}</span>`:""}</td><td class="n"><input type="text" inputmode="decimal" id="v-${id}-${p.key}" data-f="pt" data-c="${id}" data-k="${p.key}" value="${esc(p.val)}"${dis} aria-label="${esc(p.n)}"> / <input type="text" inputmode="decimal" id="m-${id}-${p.key}" data-f="max" data-c="${id}" data-k="${p.key}" value="${esc(p.max)}"${dis} aria-label="${t.max}" style="width:44px;background:transparent;border-color:transparent"></td><td>${p.custom?`<button class="x" type="button" data-del="${id}" data-k="${p.key}" aria-label="×"${dis}>×</button>`:""}</td></tr>`;
     }
     if(k.parts.length) h+=`<tr class="sum"><td>${t.sem_total}</td><td class="n mono" style="color:var(--ink)">${fmt(k.semPts)} / ${fmt(k.parts.reduce((a,p)=>a+(num(p.max)||0),0))}</td><td></td></tr>`;
     h+=`</tbody></table></div>`;
   }
-  h+=`<details class="addt" id="ad-${id}" ${S.addOpen===id?"open":""}><summary class="linkbtn">+ ${t.addItem}</summary><div class="addrow" style="margin-top:6px"><input type="text" id="an-${id}" placeholder="${t.itemName}" aria-label="${t.itemName}"><input type="text" class="sm" inputmode="decimal" id="am-${id}" placeholder="${t.max}" aria-label="${t.max}"><button class="btn" type="button" data-add="${id}">${t.add}</button></div></details>`;
+  h+=`<details class="addt${lock?" off":""}" id="ad-${id}" ${S.addOpen===id&&!lock?"open":""}><summary class="addbtn"${lock?' tabindex="-1" aria-disabled="true"':""}>+ ${t.addItem}</summary><div class="addbody"><div class="addrow"><input type="text" id="an-${id}" placeholder="${t.itemName}" aria-label="${t.itemName}"><input type="text" class="sm" inputmode="decimal" id="am-${id}" placeholder="${t.max}" aria-label="${t.max}"><button class="btn" type="button" data-add="${id}">${t.add}</button></div></div></details>`;
   // zápočet
   if(d.t==="Cr+Ex"||(crOnly&&k.parts.length)){
     const thr=k.threshold;
@@ -891,11 +911,11 @@ function courseCard(d){
       // one box per allowed zero + one more: a second ✕ means the course credit is lost
       h+=`<div class="failrow"><span class="k">${t.zeroLbl}</span><span class="strikes" data-x="zero-${id}">${Array.from({length:d.zeroMax+1},(_,i)=>`<i class="sb ${i<k.zeros?"x":""}">${i<k.zeros?"✕":""}</i>`).join("")}</span></div>`;
       h+= k.zeros>d.zeroMax?`<div class="verdict bad">${t.zeroBad(k.zeros,d.zeroMax)}</div>`
-        : k.missing?`<div class="verdict info">${t.zeroInfo(k.zeros,d.zeroMax,k.missing)}</div>`
+        : k.missing?""
         : `<div class="verdict ok">${t.zeroOk}</div>`;
     }
     else if(thr==null&&d.creditUnknown){
-      h+=`<div class="verdict info">${t.creditUnknown}<label class="row" style="color:inherit">${t.creditSet} <input type="text" inputmode="decimal" id="cr-${id}" data-f="credit" data-c="${id}" value="${esc(r.credit==null?"":r.credit)}" style="width:60px"></label></div>`;
+      h+=`<div class="verdict info">${t.creditUnknown}<label class="row" style="color:inherit">${t.creditSet} <input type="text" inputmode="decimal" id="cr-${id}" data-f="credit" data-c="${id}" value="${esc(r.credit==null?"":r.credit)}"${dis} style="width:60px"></label></div>`;
     }
     if(thr!=null&&d.zeroMax==null){
       const miss=Math.max(0,thr-k.semPts);
@@ -909,16 +929,16 @@ function courseCard(d){
   // exam
   if(d.exam){
     const lbls=[t.regular,t.resit1,t.resit2];
-    h+=`<div><div class="row" style="justify-content:space-between"><b style="font-size:13px">${t.exam} <span class="mono" style="color:var(--muted);font-weight:400">/ ${d.exam.max}${d.exam.min?` · ${t.min} ${d.exam.min}`:""}</span></b><span class="strikes" data-x="exam-${id}" role="img" aria-label="${t.examAttempts}: ${k.fails} ✕">${k.marks.map(m=>`<i class="sb ${m}">${m==="x"?"✕":m==="ok"?"✓":""}</i>`).join("")}</span></div>
-    <div class="attempts">${lbls.map((l,i)=>`<label>${l}<input type="text" inputmode="decimal" id="ex-${id}-${i}" data-f="exam" data-c="${id}" data-k="${i}" value="${esc(r.exam[i])}"></label>`).join("")}</div></div>`;
+    h+=`<div><div class="row" style="justify-content:space-between"><b style="font-size:13px">${t.exam} <span class="mono" style="color:var(--muted);font-weight:400">/ ${d.exam.max}${d.exam.min?` · ${t.min} ${d.exam.min}`:""}</span></b><span class="strikes" data-x="exam-${id}" role="img" aria-label="${t.examAttempts}: ${k.fails} ✕">${(lock?["x","x","x"]:k.marks).map(m=>`<i class="sb ${m}">${m==="x"?"✕":m==="ok"?"✓":""}</i>`).join("")}</span></div>
+    <div class="attempts">${lbls.map((l,i)=>`<label>${l}<input type="text" inputmode="decimal" id="ex-${id}-${i}" data-f="exam" data-c="${id}" data-k="${i}" value="${esc(r.exam[i])}"${dis}></label>`).join("")}</div></div>`;
     const need=Math.max(k.exMin,50-k.semPts);
-    if(k.lastExam==null){ if(!d.free||k.anyPts) h+=`<div class="verdict info">${t.needExam(fmt(Math.min(need,d.exam.max)),k.exMin)}</div>`; }
+    if(k.lastExam==null){ if(r.status!=="failed"&&(!d.free||k.anyPts)) h+=`<div class="verdict info">${t.needExam(fmt(Math.min(need,d.exam.max)),k.exMin)}</div>`; }
     else{
       const g=grade(k.total);
       const okAll=k.examOk&&k.total>=50;
       if(!k.examOk) h+=`<div class="verdict bad">${t.examBelowMin(k.exMin)}</div>`;
       h+=`<div class="totline"><span>${t.totalLbl}: <b class="mono">${fmt(k.total)}</b> / 100</span><span>${t.gradeLbl} <span class="grade" style="color:var(${okAll?"--ok":"--bad"})">${okAll?g:"F"}</span></span></div>`;
-      h+= okAll?`<div class="verdict ok">${t.passedMsg(g)}</div>`:(k.used>=3?`<div class="verdict bad">${r.enroll===2?t.noTriesLeft2:t.noTriesLeft1}</div>`:k.used===2?`<div class="verdict warn">${t.failedMsg} ${t.lastTry}</div>`:`<div class="verdict warn">${t.failedMsg} ${t.needExam(fmt(Math.min(need,d.exam.max)),k.exMin)}</div>`);
+      if(!okAll) h+= k.used>=3?`<div class="verdict bad">${r.enroll===2?t.noTriesLeft2:t.noTriesLeft1}</div>`:`<div class="verdict warn">${k.used===2?t.lastTry+" ":""}${t.needExam(fmt(Math.min(need,d.exam.max)),k.exMin)}</div>`;
     }
   } else if(cc && k.anyPts){
     const g=grade(k.semPts);
@@ -1043,12 +1063,13 @@ function applyTheme(){
 
 // Status follows the points: Passed when the points pass the course, Failed on a second 0-point test (IDM, ILG)
 // or 3 failed exam terms. Only a status set this way is undone when points change back; one picked by hand stays.
-function autoStatus(code){
+function autoStatus(code,soft){
   const d=allCourses().find(x=>x.c===code);if(!d)return;
   const r=cs(code),k=calc(d);
   if(r.autoFail){r.auto=1;delete r.autoFail}
   const fail=(d.zeroMax!=null&&k.zeros>d.zeroMax)||(d.exam&&k.fails>=3&&!k.passedPts)||k.creditLost;
-  if(fail){if(r.status!=="failed"){r.status="failed";r.auto=1}}
+  // soft = while you are still typing: a half-typed number must not fail the course yet
+  if(fail){if(!soft&&r.status!=="failed"){r.status="failed";r.auto=1}}
   else if(k.passedPts){if(r.status!=="passed"){r.status="passed";r.auto=1}}
   else if(r.auto){r.status="enrolled";delete r.auto}
 }
@@ -1079,7 +1100,8 @@ function unlock(){
 function lockAgain(){
   try{localStorage.removeItem(GATE)}catch(e){}
   const i=document.getElementById("g-input");i.value="";i.classList.remove("nope");
-  hideMark();renderGate();swap("app","gate",()=>i.focus());
+  // Exit button and auto-exit share one look: the tracker shrinks into the secret box
+  hideMark();renderGate();morphToGate(()=>i.focus());
 }
 /* ---------- Auto-exit after 15 minutes without activity ---------- */
 const IDLE=15*60*1000,LAST="fit-last-active";
@@ -1096,10 +1118,12 @@ function touchAct(){
 function checkIdle(){
   if(locking)return true;
   if(document.getElementById("app").hidden||Date.now()-lastAct<IDLE)return false;
+  try{localStorage.removeItem(GATE)}catch(e){}
+  // time ran out while the tab is in the background: the page is locked now, but the shrink animation waits
+  // until you come back (visibilitychange runs this again), so you actually see it instead of a finished lock screen
+  if(document.hidden)return true;
   locking=true;setTimeout(()=>locking=false,1200);
-  closeModal();closeSettings(true);try{localStorage.removeItem(GATE)}catch(e){}
-  const i=document.getElementById("g-input");i.value="";i.classList.remove("nope");
-  hideMark();renderGate();morphToGate(()=>i.focus());
+  closeModal();closeSettings(true);lockAgain();
   return true;
 }
 setInterval(checkIdle,Math.min(15000,IDLE/5));
@@ -1278,9 +1302,10 @@ function undoToast(msg,fn){
 
 /* ---------- Events ---------- */
 let focusId=null,caret=null;
+let refreshing=false;
 function keepFocus(fn){
   const a=document.activeElement;focusId=a&&a.id;caret=a&&a.selectionStart;
-  fn();
+  refreshing=true;try{fn()}finally{refreshing=false}
   if(focusId){const el=document.getElementById(focusId);if(el&&el!==document.activeElement){el.focus();try{if(caret!=null)el.setSelectionRange(caret,caret)}catch(e){}}}
 }
 function rerender(){
@@ -1310,9 +1335,16 @@ document.addEventListener("input",e=>{
   else if(f==="credit")r.credit=num(el.value);
   else return;
   if(f==="pt"){const x=r.extra.find(x=>x.id===el.dataset.k);if(x)x.val=el.value}
-  autoStatus(c);
+  autoStatus(c,true);
   refreshCard(c);changed();
 });
+// the fail check runs when you leave a points box (click elsewhere, Tab or Enter), not on every keystroke
+document.addEventListener("focusout",e=>{
+  const el=e.target,c=el.dataset&&el.dataset.c;
+  if(refreshing||!c||!["pt","max","exam","credit"].includes(el.dataset.f))return;
+  setTimeout(()=>{const before=cs(c).status;autoStatus(c);if(cs(c).status!==before){refreshCard(c);changed()}},0);
+});
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.dataset&&["pt","max","exam","credit"].includes(e.target.dataset.f))e.target.blur()});
 document.addEventListener("change",e=>{
   const el=e.target,f=el.dataset.f,c=el.dataset.c;if(!f)return;
   if(f==="status"){const r=cs(c);r.status=el.value;delete r.auto;delete r.autoFail}
@@ -1333,8 +1365,9 @@ document.addEventListener("toggle",e=>{
   S.open=S.open||{};const k=d.id.slice(2);if(d.open)S.open[k]=1;else delete S.open[k];localSave();
 },true);
 document.addEventListener("click",e=>{
-  const sm=e.target.closest("details.course > summary, details.addel > summary");
+  const sm=e.target.closest("details.course > summary, details.addel > summary, details.addt > summary");
   if(sm){const d=sm.parentElement;
+    if(d.classList.contains("off")){e.preventDefault();return}
     if(!d.open){d.classList.remove("closing");d.classList.add("anim");d.addEventListener("animationend",()=>d.classList.remove("anim"),{once:true});
       // opening: grow the card's height smoothly, the mirror of the roll-up below
       if(!noMotion()){
