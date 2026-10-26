@@ -213,30 +213,55 @@ body.inlog #settings [data-full]{display:none}
 .cclegend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted)}
 .cclegend span{display:inline-flex;align-items:center;gap:6px}
 .sw{width:10px;height:10px;border-radius:3px;display:inline-block}
-.sw.pass{background:var(--c-pass)}.sw.prog{background:var(--c-prog)}
+.sw.pass{background:var(--c-pass)}.sw.prog{background:var(--c-prog)}.sw.fail{background:var(--bad)}
 .sw.pace{width:14px;height:0;border-top:2px dashed var(--muted);border-radius:0}
 .ccplot{position:relative;height:150px;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;align-items:end;border-bottom:1px solid var(--line)}
 .ccpace{position:absolute;left:0;right:0;border-top:1px dashed color-mix(in srgb,var(--muted) 70%,transparent);pointer-events:none}
 .cccol{position:relative;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;cursor:default;outline:none}
-.cccol:hover,.cccol:focus-visible{background:color-mix(in srgb,var(--ink) 4%,transparent);border-radius:6px 6px 0 0}
+.cccol.on,.cccol:focus-visible{background:color-mix(in srgb,var(--ink) 4%,transparent);border-radius:6px 6px 0 0}
 .ccstack{width:22px;display:flex;flex-direction:column;gap:2px}
 .ccstack .seg{display:block;min-height:3px}
 .ccstack .seg:first-child{border-radius:4px 4px 0 0}
-.seg.pass{background:var(--c-pass)}.seg.prog{background:var(--c-prog);opacity:.75}
+.seg.pass{background:var(--c-pass)}.seg.prog{background:var(--c-prog);opacity:.75}.seg.fail{background:var(--bad);opacity:.8}
+.ccval .ccf{color:var(--bad)}
 .ccval{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-bottom:3px}
 .ccx{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;font-family:var(--f-mono);font-size:11px;color:var(--muted);text-align:center}
-.cccol[data-tip]:hover::after,.cccol[data-tip]:focus::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);white-space:nowrap;
-  background:var(--ink);color:var(--paper);font:500 11.5px/1.3 var(--f-body);padding:5px 9px;border-radius:7px;pointer-events:none;z-index:6}
-.cccol[data-tip]:first-child:hover::after,.cccol[data-tip]:first-child:focus::after{left:0;transform:none}
-.cccol[data-tip]:last-child:hover::after,.cccol[data-tip]:last-child:focus::after{left:auto;right:0;transform:none}
+/* one tooltip for the whole plot: it glides between columns and is kept inside the plot, so it never leaves the page */
+.cctip{position:absolute;left:0;top:0;z-index:6;max-width:100%;width:max-content;background:var(--ink);color:var(--paper);font:500 11.5px/1.3 var(--f-body);padding:5px 9px;border-radius:7px;pointer-events:none;
+  opacity:0;transform:translateY(4px);transition:opacity .18s ease,transform .18s ease,left .22s cubic-bezier(.2,.8,.2,1),top .22s cubic-bezier(.2,.8,.2,1)}
+.cctip.on{opacity:1;transform:none}
+.cctip.jump{transition:opacity .18s ease,transform .18s ease}
+.cccol{transition:background-color .2s ease}
+.ccstack,.ccval{transition:opacity .2s ease}
+.ccplot.hov .cccol:not(.on) .ccstack,.ccplot.hov .cccol:not(.on) .ccval{opacity:.45}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 /* year plan strip at the top of each semester */
-.plan{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:13px;cursor:help}
+.plan{display:grid;gap:10px;padding:12px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:13px}
 .plan .pmut{color:var(--muted);font-size:12.5px}
+.phead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 14px}
+.phead>div{display:grid;gap:1px}
+.ptot{font-size:13px;color:var(--muted)}.ptot b{font-size:18px;color:var(--ink)}
+.prow{display:grid;grid-template-columns:62px minmax(0,1fr) auto;align-items:center;gap:10px}
+.plbl{font-size:12.5px;font-weight:600}
+.ptrack{position:relative;height:10px;border-radius:99px;background:var(--paper);display:flex;gap:2px;overflow:hidden}
+.pseg{display:block;height:100%}
+.pseg.pass{background:var(--c-pass)}.pseg.prog{background:var(--c-prog)}.pseg.fail{background:var(--bad);opacity:.8}
+.pval .pf{color:var(--bad);margin-left:6px}
+.pseg.pln{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--muted) 45%,transparent) 0 3px,color-mix(in srgb,var(--muted) 18%,transparent) 3px 6px)}
+.pmark{position:absolute;top:-3px;bottom:-3px;border-left:2px solid var(--ink);opacity:.5}
+.pval{font-size:12px;color:var(--muted);min-width:64px;text-align:right}.pval b{color:var(--ink)}
+.plegend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted)}
+.plegend span{display:inline-flex;align-items:center;gap:6px}
+.sw.pln{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--muted) 55%,transparent) 0 2px,color-mix(in srgb,var(--muted) 20%,transparent) 2px 4px)}
+.prules{display:flex;flex-wrap:wrap;gap:6px}
+.pchip{cursor:help}
 .pchip{font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--paper);color:var(--muted)}
 .pchip.ok{background:var(--ok-soft);color:var(--ok)}.pchip.warn{background:var(--warn-soft);color:var(--warn)}.pchip.bad{background:var(--bad-soft);color:var(--bad)}
 /* history list */
 .hist{display:grid}
+.hico{width:15px;height:15px;vertical-align:-3px;margin-right:6px;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.histd>summary:hover .hico,.histd[open]>summary .hico{transform:rotate(-40deg)}
+:root[data-perf="low"] .hico{transition:none}
 .histd{margin-top:0}
 .hlist{list-style:none;margin:0;padding:0;display:grid;gap:2px;max-height:420px;overflow:auto}
 .hday{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:8px 0 2px}
@@ -489,7 +514,10 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
 .verdict.info{background:var(--blue-soft);color:var(--blue)}
 .verdict b{font-weight:600}
 /* exam terms: one row each — name, score, date, calendar link */
-.attempts{display:grid;gap:6px}
+.attempts{display:grid;gap:6px;margin-top:10px}
+.att.atth{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:-2px}
+.att.atth span:nth-child(2){text-align:right}
+.attempts.nodate .att{grid-template-columns:minmax(64px,1fr) 64px}
 .att{display:grid;grid-template-columns:minmax(64px,1fr) 64px minmax(0,140px) 28px;align-items:center;gap:8px}
 .att .attl{font-size:12px;color:var(--muted)}
 .att input[type=text]{width:100%;text-align:right;font-family:var(--f-mono)}
@@ -507,7 +535,9 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
 .whatif{display:grid;gap:4px;padding:10px 12px 6px;border-radius:10px;background:var(--paper);border:1px solid var(--line)}
 .wihead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 10px;font-size:12px;color:var(--muted)}
 .wiout{font-family:var(--f-mono);font-size:12.5px;font-weight:500;color:var(--ink)}
-.wiout.g-F{color:var(--bad)}.wiout.g-A,.wiout.g-B{color:var(--ok)}
+.wiout{transition:color .2s}
+.wiout.g-A{color:var(--g-A)}.wiscale input[type=range].g-A{accent-color:var(--g-A)}.wiout.g-B{color:var(--g-B)}.wiscale input[type=range].g-B{accent-color:var(--g-B)}.wiout.g-C{color:var(--g-C)}.wiscale input[type=range].g-C{accent-color:var(--g-C)}.wiout.g-D{color:var(--g-D)}.wiscale input[type=range].g-D{accent-color:var(--g-D)}.wiout.g-E{color:var(--g-E)}.wiscale input[type=range].g-E{accent-color:var(--g-E)}.wiout.g-F{color:var(--g-F)}.wiscale input[type=range].g-F{accent-color:var(--g-F)}
+.witicks span{transition:color .2s}.witicks span.on{color:var(--gc);font-weight:700}.witicks span.on i{background:var(--gc);opacity:1}
 .wiscale{position:relative;padding-bottom:16px}
 .wiscale input[type=range]{width:100%;margin:4px 0 0;accent-color:var(--blue);cursor:pointer}
 .witicks span{position:absolute;bottom:0;transform:translateX(-50%);font-family:var(--f-mono);font-size:10px;color:var(--muted);display:grid;justify-items:center;line-height:1}
@@ -588,6 +618,11 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
 .foot h3{font-family:var(--f-body);font-size:13px;color:var(--ink)}
 .grades{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .grades span{font-family:var(--f-mono);font-size:11px;border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+/* every mark has its own colour, from green A to red F; marks you already got are filled in, with how many */
+:root{--g-A:var(--ok);--g-B:color-mix(in srgb,var(--ok) 72%,var(--warn));--g-C:color-mix(in srgb,var(--ok) 40%,var(--warn));--g-D:var(--warn);--g-E:color-mix(in srgb,var(--warn) 55%,var(--bad));--g-F:var(--bad)}
+.grades .gm{color:var(--gc);border-color:color-mix(in srgb,var(--gc) 45%,var(--line));transition:background-color .3s,color .3s}
+.grades .gm.got{background:var(--gc);border-color:var(--gc);color:var(--card);font-weight:600}
+.grades .gm sup{font-size:9px;margin-left:3px;vertical-align:4px}
 @media (prefers-reduced-motion:no-preference){.bar .done,.bar .prog{transition:width .7s cubic-bezier(.2,.8,.2,1),background-color .4s ease,border-color .4s ease}}
 </style>
 
@@ -674,6 +709,8 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
         <button type="button" data-perf="balanced" data-t="perfBal">Balanced</button>
         <button type="button" data-perf="low" data-t="perfLow">Low</button>
       </div></div>
+    <div class="setrow" data-full><span class="setk"><span data-t="dtT">Exam dates</span><small data-t="dtDesc"></small></span>
+      <button type="button" class="wsw" role="switch" id="dt-sw" aria-checked="true"><span></span></button></div>
     <div class="setrow" data-full><span class="setk"><span data-t="logT">Version history</span><small data-t="logDesc"></small></span>
       <button type="button" class="btn plain" id="log-open" data-t="logOpen">See what's new</button></div>
     <div class="setrow" data-full><span class="setk"><span data-t="layT">Layout</span><small data-t="layDesc"></small></span>
@@ -872,11 +909,13 @@ Object.assign(T.en,{
   noteLbl:"Notes",notePh:"Teacher, room, deadlines, what to bring…",
   tipTaken:(l,v,ok)=>`${l}: ${v} pts · ${ok?"passed":"failed"}`,tipOpen:l=>`${l}: not taken yet`,tipLocked:"Locked · the course failed",
   tipZero:n=>`${n}: 0 pts`,tipFailC:c=>`${c}: failed`,tipRetake:c=>`${c}: repeated enrolment`,
-  edate:"Date",gcal:"Add to Google Calendar",dueIn:n=>n===0?"today":n===1?"tomorrow":`in ${n} days`,examWord:"exam",
+  attPts:"Points",dtT:"Exam dates",dtDesc:"A date field next to each exam term, with countdowns and a Google Calendar link.",edate:"Date",gcal:"Add to Google Calendar",dueIn:n=>n===0?"today":n===1?"tomorrow":`in ${n} days`,examWord:"exam",
   upTitle:"Up next",upMore:n=>`Show all (${n})`,upLess:"Show less",resetOrder:"reset order",dragTip:"Drag to move · Alt + ↑ / ↓ with the keyboard",
-  planY:y=>`Year ${y} plan`,planSplit:(w,s)=>`winter ${w} · summer ${s}`,planOk:"✓ within 30–65",planShort:n=>`${n} cr short of 30`,planOver:n=>`${n} cr over the 65 limit`,
-  planFirst:n=>n>=15?"✓ winter has 15+":`winter needs ${15-n} more`,planAll:n=>`${n} / 180 planned in total`,planTip:"FIT: at least 30 credits a year (15 in the 1st semester), at most 65 enrolled a year",
-  histT:"History",histEmpty:"Changes to points, exams and statuses will show up here.",histMore:"Show older",histClear:"Clear history",
+  planY:y=>`Year ${y} plan`,planSub:"credits of the courses you take this year",planOf:"of 60",planPlan:"Planned",
+  planR30:n=>n>=30?"✓ at least 30 this year":`${30-n} cr short of the 30 minimum`,planR15:n=>n>=15?"✓ 15+ in the 1st semester":`winter needs ${15-n} more for the 15 minimum`,planR65:n=>n<=65?"✓ under the 65 limit":`${n-65} cr over the 65 limit`,
+  planT30:"FIT: you need at least 30 credits a year to continue",planT15:"FIT: at least 15 credits in the 1st semester",planT65:"FIT: at most 65 credits enrolled in one year",
+  planMark:"30 = a full semester",planLost:n=>`${n} cr failed, can't be earned this semester`,planAll:(n,l)=>`Whole degree: ${n} / 180 cr in your plan`+(l>0?` · ${l} cr still to add from optional courses`:" ✓"),
+  gotN:n=>`${n} ${n===1?"course":"courses"} finished with this mark`,histT:"History",histEmpty:"Changes to points, exams and statuses will show up here.",histMore:"Show older",histClear:"Clear history",
   hRetake:s=>`moved to ${s} (retake)`,hUnretake:"retake undone",hAddItem:"item added",hDelItem:"item removed",hAddC:"course added",hRmC:"course removed",auto:"auto",
   bkTitle:"Backup",bkDesc:"Save all your data to a file, or load one back.",bkSave:"Download",bkLoad:"Load file",bkNoDl:"Downloading isn't available in this view.",
   bkBad:"That file isn't a backup of this tracker.",bkQTitle:"Load this backup?",bkQBody:d=>`Everything you have now is replaced with the backup from ${d}.`,bkYes:"Yes, load it",bkDone:"Backup loaded.",bkSaved:"Backup saved.",bkFail:"The backup could not be saved.",
@@ -884,7 +923,7 @@ Object.assign(T.en,{
   msT:"Milestones",msToast:n=>`🏆 Milestone: ${n}!`,
   ms:{pass1:"First course passed",firstA:"First A",clean:"Clean semester",half:"Halfway · 90 credits",all:"All 180 credits"},
   msD:{pass1:"Pass any course",firstA:"Get an A in any course",clean:"Pass every course of a semester without a failed exam term",half:"Pass 90 credits",all:"Pass 180 credits"},
-  ccT:"Credits per semester",ccPass:"Passed",ccProg:"In progress",ccPace:"30 a semester",ccTip:(s,p,g)=>`${s}: ${p} passed · ${g} in progress`,semAb:{W:"W",S:"S"},
+  ccT:"Credits per semester",ccPass:"Passed",ccProg:"In progress",ccPace:"30 a semester",ccFail:"Failed",ccTip:(s,p,g,f)=>`${s}: ${p} passed · ${g} in progress`+(f?` · ${f} failed`:""),semAb:{W:"W",S:"S"},
   winT:{summary:"Progress",upnext:"Up next",plan:"Year plan",courses:"Courses",chart:"Credits chart",ms:"Milestones",hist:"History"},
   layT:"Layout",layDesc:"Move the windows around and hide the ones you don't need.",layEdit:"Edit layout",layBarT:"Editing layout",
   resetT:"Reset",resetDesc:"Delete all points, statuses and settings in this tracker.",verLbl:(v,d)=>`Version ${v} · updated ${d}`,logT:"Version history",logDesc:"What changed in every version of the tracker.",logOpen:"See what's new",logBack:"Back",
@@ -897,11 +936,13 @@ Object.assign(T.sk,{
   noteLbl:"Poznámky",notePh:"Vyučujúci, miestnosť, termíny, čo si priniesť…",
   tipTaken:(l,v,ok)=>`${l}: ${v} b · ${ok?"úspešne":"neúspešne"}`,tipOpen:l=>`${l}: ešte nepísané`,tipLocked:"Zamknuté · predmet je neúspešný",
   tipZero:n=>`${n}: 0 b`,tipFailC:c=>`${c}: neúspešný`,tipRetake:c=>`${c}: opakovaný zápis`,
-  edate:"Dátum",gcal:"Pridať do Google Kalendára",dueIn:n=>n===0?"dnes":n===1?"zajtra":`o ${n} ${n<5?"dni":"dní"}`,examWord:"skúška",
+  attPts:"Body",dtT:"Termíny skúšok",dtDesc:"Pole na dátum pri každom termíne skúšky, s odpočtom a odkazom do Google Kalendára.",edate:"Dátum",gcal:"Pridať do Google Kalendára",dueIn:n=>n===0?"dnes":n===1?"zajtra":`o ${n} ${n<5?"dni":"dní"}`,examWord:"skúška",
   upTitle:"Čo ďalej",upMore:n=>`Zobraziť všetko (${n})`,upLess:"Menej",resetOrder:"pôvodné poradie",dragTip:"Potiahni a presuň · Alt + ↑ / ↓ na klávesnici",
-  planY:y=>`Plán ${y}. ročníka`,planSplit:(w,s)=>`zima ${w} · leto ${s}`,planOk:"✓ v rozsahu 30–65",planShort:n=>`chýba ${n} kr do 30`,planOver:n=>`o ${n} kr nad limitom 65`,
-  planFirst:n=>n>=15?"✓ zima má 15+":`zime chýba ${15-n} kr`,planAll:n=>`${n} / 180 naplánovaných celkovo`,planTip:"FIT: aspoň 30 kreditov za ročník (15 v 1. semestri), najviac 65 zapísaných za ročník",
-  histT:"História",histEmpty:"Tu sa zobrazia zmeny bodov, skúšok a stavov.",histMore:"Zobraziť staršie",histClear:"Vymazať históriu",
+  planY:y=>`Plán ${y}. ročníka`,planSub:"kredity predmetov, ktoré máš tento rok",planOf:"zo 60",planPlan:"Naplánované",
+  planR30:n=>n>=30?"✓ aspoň 30 za ročník":`chýba ${30-n} kr do minima 30`,planR15:n=>n>=15?"✓ 15+ v 1. semestri":`zime chýba ${15-n} kr do minima 15`,planR65:n=>n<=65?"✓ pod limitom 65":`o ${n-65} kr nad limitom 65`,
+  planT30:"FIT: na pokračovanie potrebuješ aspoň 30 kreditov za ročník",planT15:"FIT: aspoň 15 kreditov v 1. semestri",planT65:"FIT: najviac 65 zapísaných kreditov za ročník",
+  planMark:"30 = plný semester",planLost:n=>`${n} kr neúspešných, tento semester ich už nezískaš`,planAll:(n,l)=>`Celé štúdium: ${n} / 180 kr v pláne`+(l>0?` · ešte ${l} kr z voliteľných predmetov`:" ✓"),
+  gotN:n=>`${n} ${n===1?"predmet ukončený":n<5?"predmety ukončené":"predmetov ukončených"} touto známkou`,histT:"História",histEmpty:"Tu sa zobrazia zmeny bodov, skúšok a stavov.",histMore:"Zobraziť staršie",histClear:"Vymazať históriu",
   hRetake:s=>`presunuté do: ${s} (opakovanie)`,hUnretake:"opakovanie zrušené",hAddItem:"položka pridaná",hDelItem:"položka odstránená",hAddC:"predmet pridaný",hRmC:"predmet odstránený",auto:"auto",
   bkTitle:"Záloha",bkDesc:"Ulož všetky údaje do súboru alebo nahraj zálohu späť.",bkSave:"Stiahnuť",bkLoad:"Nahrať súbor",bkNoDl:"Sťahovanie tu nie je dostupné.",
   bkBad:"Tento súbor nie je záloha tohto trackera.",bkQTitle:"Nahrať túto zálohu?",bkQBody:d=>`Všetko, čo máš teraz, sa nahradí zálohou z ${d}.`,bkYes:"Áno, nahrať",bkDone:"Záloha nahraná.",bkSaved:"Záloha uložená.",bkFail:"Zálohu sa nepodarilo uložiť.",
@@ -909,7 +950,7 @@ Object.assign(T.sk,{
   msT:"Míľniky",msToast:n=>`🏆 Míľnik: ${n}!`,
   ms:{pass1:"Prvý absolvovaný predmet",firstA:"Prvé A",clean:"Čistý semester",half:"Polovica · 90 kreditov",all:"Všetkých 180 kreditov"},
   msD:{pass1:"Absolvuj ľubovoľný predmet",firstA:"Získaj A z ľubovoľného predmetu",clean:"Absolvuj všetky predmety semestra bez neúspešného termínu skúšky",half:"Získaj 90 kreditov",all:"Získaj 180 kreditov"},
-  ccT:"Kredity za semester",ccPass:"Získané",ccProg:"Prebieha",ccPace:"30 za semester",ccTip:(s,p,g)=>`${s}: ${p} získaných · ${g} prebieha`,semAb:{W:"Z",S:"L"},
+  ccT:"Kredity za semester",ccPass:"Získané",ccProg:"Prebieha",ccPace:"30 za semester",ccFail:"Neúspešné",ccTip:(s,p,g,f)=>`${s}: ${p} získaných · ${g} prebieha`+(f?` · ${f} neúspešných`:""),semAb:{W:"Z",S:"L"},
   winT:{summary:"Postup",upnext:"Čo ďalej",plan:"Plán ročníka",courses:"Predmety",chart:"Graf kreditov",ms:"Míľniky",hist:"História"},
   layT:"Rozloženie",layDesc:"Presúvaj okná a skry tie, ktoré nepotrebuješ.",layEdit:"Upraviť rozloženie",layBarT:"Úprava rozloženia",
   resetT:"Vymazanie",resetDesc:"Vymaže všetky body, stavy a nastavenia v tomto trackeri.",verLbl:(v,d)=>`Verzia ${v} · aktualizované ${d}`,logT:"História verzií",logDesc:"Čo sa zmenilo v každej verzii trackera.",logOpen:"Pozrieť novinky",logBack:"Späť",
@@ -920,12 +961,25 @@ const TYPE={en:{"Cr+Ex":"Course credit + exam","Ex":"Exam","Cr":"Course credit",
 
 /* ---------- App version: one step per published update of the tracker (data auto-saves do not count) ---------- */
 // shown as X.X: every update adds 0.1, so the 79th update is 7.9 and the 80th becomes 8.0
-const APP_VER=80,APP_DATE="2026-10-26";
+const APP_VER=83,APP_DATE="2026-10-26";
 const verTxt=n=>`${Math.floor(n/10)}.${n%10}`;
 
 /* ---------- Version log: the 80 updates so far, related small ones merged into one version each ----------
    r = [first, last] update number (shown as X.X); n / i / f = new / improved / fixed, each item [English, Slovak] */
 const CHANGELOG=[
+ {r:[81,83],d:"2026-10-26",t:["Clearer plan and chart","Prehľadnejší plán a graf"],
+  n:[["Grade scale in colour: each mark has its own colour and the marks you got are filled in with a count","Farebná stupnica: každá známka má svoju farbu a tie, ktoré si dostal, sú vyplnené aj s počtom"],
+     ["The grade on a finished course wears its mark's colour","Známka pri ukončenom predmete má farbu svojej známky"],
+     ["Failed credits in red in the year plan and the credits chart: credits you can no longer earn that semester","Neúspešné kredity načerveno v pláne ročníka aj v grafe kreditov: kredity, ktoré už v tom semestri nezískaš"],
+     ["The what-if slider and its result take the colour of the grade you would get","Posuvník „čo ak“ a jeho výsledok majú farbu známky, ktorú by si dostal"],
+     ["Exam dates can be switched off in Settings","Termíny skúšok sa dajú vypnúť v Nastaveniach"]],
+  i:[["Year plan redone: a bar per semester (passed, in progress, planned) against 30 credits, and FIT's rules as separate checks","Plán ročníka prerobený: lišta pre každý semester (získané, prebieha, naplánované) voči 30 kreditom a pravidlá FIT ako samostatné kontroly"],
+     ["Credits chart: the tooltip glides between semesters and the other bars fade","Graf kreditov: popis plynulo prechádza medzi semestrami a ostatné stĺpce zoslabnú"],
+     ["History has its own icon","História má vlastnú ikonu"],
+     ["Milestones are off by default; switch them on in Edit layout","Míľniky sú predvolene vypnuté; zapneš ich v Upraviť rozloženie"]],
+  f:[["The chart's tooltip no longer runs off the page on a narrow window","Popis v grafe už na úzkom okne nevybieha mimo stránky"],
+     ["More room between the exam ✕ boxes and the exam rows, with Points / Date headings","Viac miesta medzi políčkami ✕ a riadkami skúšky, s nadpismi Body / Dátum"],
+     ["Grade marks on the what-if slider no longer overlap at the exam minimum","Známky na posuvníku „čo ak“ sa pri minime skúšky už neprekrývajú"]]},
  {r:[78,80],d:"2026-10-26",t:["Version history","História verzií"],
   n:[["This page: every version of the tracker and what changed in it","Táto stránka: každá verzia trackera a čo sa v nej zmenilo"],
      ["Version number at the bottom of the tracker, counted in steps of 0.1","Číslo verzie na spodku trackera, počítané po 0,1"]]},
@@ -1047,6 +1101,12 @@ const fmt=n=>Math.round(n*10)/10;
 const L=()=>T[S.lang];
 const nm=o=>o[S.lang]||o.en;
 function grade(p){return p>=90?"A":p>=80?"B":p>=70?"C":p>=60?"D":p>=50?"E":"F"}
+// the grade scale in the footer: each mark in its colour, filled in with a count once a finished course got it
+const GRANGE={A:"90–100",B:"80–89",C:"70–79",D:"60–69",E:"50–59",F:"&lt;50"};
+function gradeChips(){
+  const n={};for(const d of allCourses()){const g=gradeOf(d);if(g)n[g]=(n[g]||0)+1}
+  return Object.keys(GRANGE).map(g=>`<span class="gm${n[g]?" got":""}" style="--gc:var(--g-${g})"${n[g]?` title="${L().gotN(n[g])}"`:""}>${g} ${GRANGE[g]}${n[g]?`<sup>×${n[g]}</sup>`:""}</span>`).join("");
+}
 // BUT weighted average (Studijní a zkušební řád čl. 14–15): Σ credits × grade value ÷ Σ credits, over courses that end
 // with an exam or a graded course credit; A 1, B 1.5, C 2, D 2.5, E 3, F 4. Course-credit-only courses have no grade.
 const GV={A:1,B:1.5,C:2,D:2.5,E:3,F:4};
@@ -1340,20 +1400,20 @@ function courseCard(d){
   if(d.exam){
     const lbls=[t.regular,t.resit1,t.resit2];
     h+=`<div><div class="row" style="justify-content:space-between"><b style="font-size:13px">${t.exam} <span class="mono" style="color:var(--muted);font-weight:400">/ ${d.exam.max}${d.exam.min?` · ${t.min} ${d.exam.min}`:""}</span></b><span class="strikes" data-x="exam-${id}"${lock||k.fails?` data-heat="${lock?3:Math.min(3,k.fails)}"`:""} role="img" aria-label="${t.examAttempts}: ${k.fails} ✕">${(lock?["x","x","x"]:k.marks).map((m,i)=>`<i class="sb ${m}"${tip((k.tries[i]!=null?t.tipTaken(lbls[i],fmt(k.tries[i]),m==="ok"):lock?t.tipLocked:t.tipOpen(lbls[i]))+((r.examDate||[])[i]?" · "+fmtDate(r.examDate[i]):""))}>${m==="x"?"✕":m==="ok"?"✓":""}</i>`).join("")}</span></div>
-    <div class="attempts">${lbls.map((l,i)=>{const iso=(r.examDate||[])[i]||"";return `<div class="att"><label class="attl" for="ex-${id}-${i}">${l}</label><input type="text" inputmode="decimal" id="ex-${id}-${i}" data-f="exam" data-c="${id}" data-k="${i}" value="${esc(r.exam[i])}"${dis} aria-label="${l}"><input type="date" id="ed-${id}-${i}" data-f="edate" data-c="${id}" data-k="${i}" value="${esc(iso)}"${dis} aria-label="${l} · ${t.edate}">${iso&&!lock?`<a class="gcal" href="${gcalUrl(d,l,iso)}" target="_blank" rel="noopener" title="${t.gcal}" aria-label="${t.gcal}">${SVG_CAL}</a>`:"<span></span>"}</div>`}).join("")}</div></div>`;
+    <div class="attempts${S.noDates?" nodate":""}"><div class="att atth" aria-hidden="true"><span></span><span>${t.attPts}</span>${S.noDates?"":`<span>${t.edate}</span><span></span>`}</div>${lbls.map((l,i)=>{const iso=(r.examDate||[])[i]||"";return `<div class="att"><label class="attl" for="ex-${id}-${i}">${l}</label><input type="text" inputmode="decimal" id="ex-${id}-${i}" data-f="exam" data-c="${id}" data-k="${i}" value="${esc(r.exam[i])}"${dis} aria-label="${l}">${S.noDates?"":`<input type="date" id="ed-${id}-${i}" data-f="edate" data-c="${id}" data-k="${i}" value="${esc(iso)}"${dis} aria-label="${l} · ${t.edate}">${iso&&!lock?`<a class="gcal" href="${gcalUrl(d,l,iso)}" target="_blank" rel="noopener" title="${t.gcal}" aria-label="${t.gcal}">${SVG_CAL}</a>`:"<span></span>"}`}</div>`}).join("")}</div></div>`;
     const need=Math.max(k.exMin,50-k.semPts);
     if(k.lastExam==null){ if(r.status!=="failed"&&(!d.free||k.anyPts)) h+=`<div class="verdict info">${t.needExam(fmt(Math.min(need,d.exam.max)),k.exMin)}</div>`; }
     else{
       const g=grade(k.total);
       const okAll=k.examOk&&k.total>=50;
       if(!k.examOk) h+=`<div class="verdict bad">${t.examBelowMin(k.exMin)}</div>`;
-      h+=`<div class="totline"><span>${t.totalLbl}: <b class="mono">${fmt(k.total)}</b> / 100</span><span>${t.gradeLbl} <span class="grade" style="color:var(${okAll?"--ok":"--bad"})">${okAll?g:"F"}</span></span></div>`;
+      h+=`<div class="totline"><span>${t.totalLbl}: <b class="mono">${fmt(k.total)}</b> / 100</span><span>${t.gradeLbl} <span class="grade" style="color:var(--g-${okAll?g:"F"})">${okAll?g:"F"}</span></span></div>`;
       if(!okAll) h+= k.used>=3?`<div class="verdict bad">${r.enroll===2?t.noTriesLeft2:t.noTriesLeft1}</div>`:`<div class="verdict warn">${k.used===2?t.lastTry+" ":""}${t.needExam(fmt(Math.min(need,d.exam.max)),k.exMin)}</div>`;
     }
     if(!lock&&r.status!=="passed"&&!(k.lastExam!=null&&k.examOk&&k.total>=50))h+=whatIf(d,k);
   } else if(cc && k.anyPts){
     const g=grade(k.semPts);
-    h+=`<div class="totline"><span>${t.totalLbl}: <b class="mono">${fmt(k.semPts)}</b> / 100</span><span>${t.gradeLbl} <span class="grade" style="color:var(${k.semPts>=50?"--ok":"--bad"})">${g}</span></span></div>`;
+    h+=`<div class="totline"><span>${t.totalLbl}: <b class="mono">${fmt(k.semPts)}</b> / 100</span><span>${t.gradeLbl} <span class="grade" style="color:var(--g-${g})">${g}</span></span></div>`;
   }
   h+=`<label class="notef"><span>${t.noteLbl}</span><textarea id="nt-${id}" data-note="${id}" rows="2" placeholder="${t.notePh}">${esc(r.note||"")}</textarea></label>`;
   h+=`<div class="row" style="justify-content:space-between">`;
@@ -1367,7 +1427,7 @@ function daysTo(iso){const [y,m,d]=iso.split("-").map(Number);const a=new Date(y
 const fmtDate=iso=>{const [y,m,d]=iso.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString(S.lang==="sk"?"sk-SK":"en-GB",{day:"numeric",month:"short"})};
 function dueOf(d,k,r){
   if(!d.exam||r.status==="failed"||r.status==="passed"||k.used>2)return null;
-  const iso=(r.examDate||[])[k.used];if(!iso)return null;
+  const iso=!S.noDates&&(r.examDate||[])[k.used];if(!iso)return null;
   const n=daysTo(iso);return n>=0?n:null;
 }
 function gcalUrl(d,lbl,iso){
@@ -1385,10 +1445,11 @@ function whatIf(d,k){
   const t=L(),id=d.c,max=d.exam.max,need=Math.min(max,Math.max(k.exMin,Math.ceil(50-k.semPts)));
   const v=WI[id]!=null?Math.min(WI[id],max):Math.max(0,need),o=wiRead(d,k,v);
   const pos=x=>`calc(8px + (100% - 16px) * ${x/max})`;
-  const ticks=[["E",50],["D",60],["C",70],["B",80],["A",90]].map(([g,p])=>[g,Math.max(k.exMin,Math.ceil(p-k.semPts))]).filter(([,x])=>x>=0&&x<=max);
+  const ticks=[["E",50],["D",60],["C",70],["B",80],["A",90]].map(([g,p])=>[g,Math.max(k.exMin,Math.ceil(p-k.semPts))]).filter(([,x],i,a)=>x>=0&&x<=max&&!(a[i+1]&&a[i+1][1]===x));
+  // grades that start below the exam minimum all land on it; only the best of them is shown there
   return `<div class="whatif"><div class="wihead"><span>${t.wiLbl}</span><b class="wiout g-${o.g}" id="wo-${id}">${o.txt}</b></div>
-    <div class="wiscale"><input type="range" min="0" max="${max}" step="1" value="${v}" id="wi-${id}" data-wi="${id}" aria-label="${t.wiLbl}">
-    <div class="witicks" aria-hidden="true">${ticks.map(([g,x])=>`<span style="left:${pos(x)}"><i></i>${g}</span>`).join("")}</div></div></div>`;
+    <div class="wiscale"><input type="range" class="g-${o.g}" min="0" max="${max}" step="1" value="${v}" id="wi-${id}" data-wi="${id}" aria-label="${t.wiLbl}">
+    <div class="witicks" aria-hidden="true">${ticks.map(([g,x])=>`<span data-g="${g}" class="${g===o.g?"on":""}" style="left:${pos(x)};--gc:var(--g-${g})"><i></i>${g}</span>`).join("")}</div></div></div>`;
 }
 // notes are saved as you type, without redrawing the card
 document.addEventListener("input",e=>{
@@ -1399,7 +1460,8 @@ document.addEventListener("input",e=>{
   const id=e.target.dataset&&e.target.dataset.wi;if(!id)return;
   const d=allCourses().find(x=>x.c===id);if(!d)return;
   const v=+e.target.value;WI[id]=v;const o=wiRead(d,calc(d),v),out=document.getElementById("wo-"+id);
-  out.textContent=o.txt;out.className="wiout g-"+o.g;
+  out.textContent=o.txt;out.className="wiout g-"+o.g;e.target.className="g-"+o.g;
+  e.target.parentNode.querySelectorAll(".witicks span").forEach(s=>s.classList.toggle("on",s.dataset.g===o.g));
 });
 
 // compare with the previous render: pop in every new ✕ and play a "failed" stamp on courses that just failed
@@ -1441,14 +1503,24 @@ function burst(el){
 let colsNow=0;
 function colCount(){const w=document.getElementById("sems").clientWidth||Math.min(1080,innerWidth)-32;return Math.max(1,Math.floor((w+12)/342))}
 function cardCols(ds,key){const cols=Array.from({length:colsNow},()=>[]);ordered(ds,key).forEach((d,i)=>cols[i%colsNow].push(courseCard(d)));return `<div class="courses" data-group="${key}">${cols.map(c=>`<div class="ccol">${c.join("")}</div>`).join("")}</div>`}
-// the credits planned for this study year (every course taken in its winter or summer that has not failed),
+// the credits of this study year, one bar per semester: passed, in progress and still planned (failed courses don't count),
 // checked against FIT's rules: at least 30 a year (15 in the 1st semester), at most 65 enrolled a year
 function planStrip(slot){
-  const t=L(),y=slot[0],list=allCourses(),cr=h=>list.filter(d=>{const r=cs(d.c);return r.taken===y+h&&r.status!=="failed"}).reduce((a,d)=>a+d.cr,0);
-  const w=cr("W"),sm=cr("S"),tot=w+sm,all=list.filter(d=>cs(d.c).status!=="failed").reduce((a,d)=>a+d.cr,0);
-  const cls=tot>65?"bad":tot<30?"warn":"ok",msg=tot>65?t.planOver(tot-65):tot<30?t.planShort(30-tot):t.planOk;
-  return `<div class="plan" title="${t.planTip}"><b>${t.planY(y)}</b><span class="mono">${tot} ${t.cr}</span><span class="pmut">${t.planSplit(w,sm)}</span>
-    <span class="pchip ${cls}">${msg}</span>${y==="1"?`<span class="pchip ${w>=15?"ok":"warn"}">${t.planFirst(w)}</span>`:""}<span class="pmut">${t.planAll(all)}</span></div>`;
+  const t=L(),y=slot[0],list=allCourses();
+  const sem=h=>{const ds=list.filter(d=>{const r=cs(d.c);return r.taken===y+h&&r.status!=="failed"}),sum=f=>ds.filter(d=>f(cs(d.c).status)).reduce((a,d)=>a+d.cr,0);
+    const p=sum(v=>v==="passed"),g=sum(v=>v==="enrolled"||v==="credit"),n=sum(v=>v==="planned");
+    const f=list.filter(d=>{const r=cs(d.c);return r.taken===y+h&&r.status==="failed"}).reduce((a,d)=>a+d.cr,0);return {h,p,g,n,f,tot:p+g+n}};
+  const S2=[sem("W"),sem("S")],tot=S2[0].tot+S2[1].tot,all=list.filter(d=>cs(d.c).status!=="failed").reduce((a,d)=>a+d.cr,0);
+  const max=Math.max(30,...S2.map(x=>x.tot+x.f)),pc=v=>v/max*100,anyF=S2.some(x=>x.f);
+  const row=x=>`<div class="prow"><span class="plbl">${t.semCap[x.h]}</span><div class="ptrack" role="img" aria-label="${t.semCap[x.h]}: ${x.p} ${t.ccPass}, ${x.g} ${t.ccProg}, ${x.n} ${t.planPlan}${x.f?`, ${x.f} ${t.ccFail}`:""}">
+      ${x.p?`<b class="pseg pass" style="width:${pc(x.p)}%"></b>`:""}${x.g?`<b class="pseg prog" style="width:${pc(x.g)}%"></b>`:""}${x.n?`<b class="pseg pln" style="width:${pc(x.n)}%"></b>`:""}${x.f?`<b class="pseg fail" style="width:${pc(x.f)}%" title="${t.planLost(x.f)}"></b>`:""}
+      ${max>30?`<i class="pmark" style="left:${pc(30)}%" title="${t.planMark}"></i>`:""}</div><span class="pval mono"${anyF?' style="min-width:118px"':""}><b>${x.tot}</b> / 30 ${t.cr}${x.f?`<span class="pf" title="${t.planLost(x.f)}">✕ ${x.f}</span>`:""}</span></div>`;
+  const chip=(ok,bad,txt,tip)=>`<span class="pchip ${ok?"ok":bad?"bad":"warn"}" title="${tip}">${txt}</span>`;
+  return `<div class="plan"><div class="phead"><div><b>${t.planY(y)}</b><span class="pmut">${t.planSub}</span></div><span class="ptot mono"><b>${tot}</b> ${t.planOf} ${t.cr}</span></div>
+    ${S2.map(row).join("")}
+    <div class="plegend"><span><i class="sw pass"></i>${t.ccPass}</span><span><i class="sw prog"></i>${t.ccProg}</span><span><i class="sw pln"></i>${t.planPlan}</span>${anyF?`<span><i class="sw fail"></i>${t.ccFail}</span>`:""}</div>
+    <div class="prules">${chip(tot>=30,false,t.planR30(tot),t.planT30)}${y==="1"?chip(S2[0].tot>=15,false,t.planR15(S2[0].tot),t.planT15):""}${chip(tot<=65,true,t.planR65(tot),t.planT65)}</div>
+    <span class="pmut">${t.planAll(all,180-all)}</span></div>`;
 }
 const reorderLink=key=>S.order&&S.order[key]?` <button type="button" class="linkbtn reord" data-reorder="${key}">↺ ${L().resetOrder}</button>`:"";
 // each row takes the height of its tallest closed card; an open card is measured with its next-step line showing, as it looks closed
@@ -1498,7 +1570,7 @@ function render(){
   document.getElementById("sems").innerHTML=h;
   alignRows();syncPulses();requestAnimationFrame(syncPulses);
   renderHistory();
-  document.getElementById("foot").innerHTML=`<h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div><p class="madeby">Made by Filipko &amp; Claude ❤️</p><p class="appver mono" title="${t.verTip}">${t.verLbl(verTxt(APP_VER),new Date(APP_DATE+"T12:00:00").toLocaleDateString(S.lang==="sk"?"sk-SK":"en-GB",{day:"numeric",month:"short",year:"numeric"}))}</p>`;
+  document.getElementById("foot").innerHTML=`<h3>${t.gradesH}</h3><div class="grades">${gradeChips()}</div><p class="madeby">Made by Filipko &amp; Claude ❤️</p><p class="appver mono" title="${t.verTip}">${t.verLbl(verTxt(APP_VER),new Date(APP_DATE+"T12:00:00").toLocaleDateString(S.lang==="sk"?"sk-SK":"en-GB",{day:"numeric",month:"short",year:"numeric"}))}</p>`;
   animateChanges();
 }
 
@@ -1700,6 +1772,7 @@ function renderSettings(){
   box.querySelectorAll("[data-t]").forEach(el=>el.textContent=t[el.dataset.t]);
   box.querySelectorAll("[data-perf]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.perf===perf));
   document.getElementById("perf-desc").textContent=t.perfDesc[perf];
+  const dt=document.getElementById("dt-sw");dt.setAttribute("aria-checked",String(!S.noDates));dt.setAttribute("aria-label",t.dtT);
   document.getElementById("set-close").setAttribute("aria-label",t.close);
   const g=document.getElementById("set-btn");g.setAttribute("aria-label",t.settings);g.title=t.settings;
   const x=document.getElementById("exit-btn");x.setAttribute("aria-label",t.exitBtn);x.title=t.exitBtn;
@@ -1832,7 +1905,7 @@ function histVal(e,v){
 function renderHistory(){
   const t=L(),box=document.getElementById("hist"),log=(S.log||[]).slice().reverse();
   const wasOpen=box.querySelector("details")&&box.querySelector("details").open;
-  let h=`<details class="addel histd"${wasOpen?" open":""}><summary class="addbtn">🕘 ${t.histT}${log.length?` (${log.length})`:""}</summary><div class="cbody addbody">`;
+  let h=`<details class="addel histd"${wasOpen?" open":""}><summary class="addbtn"><svg class="hico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1L3.5 8.5"/><path d="M3.5 3.5v5h5"/><path d="M12 7.5V12l3 2"/></svg>${t.histT}${log.length?` (${log.length})`:""}</summary><div class="cbody addbody">`;
   if(!log.length)h+=`<p class="emptyopt">${t.histEmpty}</p>`;
   else{
     let day="";h+=`<ol class="hlist">`;
@@ -1870,7 +1943,7 @@ let msReady=false;
 function checkMilestones(){
   const got=milestones(),t=L(),fresh=[];S.ms=S.ms||{};
   for(const k in got)if(got[k]&&!S.ms[k]){S.ms[k]=Date.now();fresh.push(t.ms[k])}
-  if(fresh.length&&msReady)celebrate(t.msToast(fresh.join(" · ")));
+  if(fresh.length&&msReady&&!lay().off.ms)celebrate(t.msToast(fresh.join(" · ")));
 }
 function badgesHtml(){
   const t=L(),got=milestones();
@@ -1880,30 +1953,50 @@ function badgesHtml(){
 function chartHtml(){
   const t=L(),list=allCourses(),slots=slotsShown();
   const data=slots.map(sl=>{const ds=list.filter(d=>cs(d.c).taken===sl);
-    return {sl,p:ds.filter(d=>cs(d.c).status==="passed").reduce((a,d)=>a+d.cr,0),g:ds.filter(d=>["enrolled","credit"].includes(cs(d.c).status)).reduce((a,d)=>a+d.cr,0)}});
-  const max=Math.max(36,...data.map(x=>x.p+x.g)),lab=sl=>`${sl[0]}·${t.semAb[sl[1]]}`;
-  const tip=x=>esc(t.ccTip(slotName(x.sl),x.p,x.g));
-  return `<figure class="cchart"><figcaption><h3 class="grouph">${t.ccT}</h3><span class="cclegend"><span><i class="sw pass"></i>${t.ccPass}</span><span><i class="sw prog"></i>${t.ccProg}</span><span><i class="sw pace"></i>${t.ccPace}</span></span></figcaption>
-    <div class="ccplot" role="img" aria-label="${esc(t.ccT)}: ${data.map(x=>`${lab(x.sl)} ${x.p}+${x.g}`).join(", ")}">
-      <div class="ccpace" style="bottom:${30/max*100}%"></div>
-      ${data.map(x=>`<div class="cccol" data-tip="${tip(x)}" tabindex="0"><span class="ccval">${x.p+x.g||""}</span>
-        <div class="ccstack" style="height:${(x.p+x.g)/max*100}%">${x.g?`<b class="seg prog" style="flex:${x.g}"></b>`:""}${x.p?`<b class="seg pass" style="flex:${x.p}"></b>`:""}</div></div>`).join("")}
+    const sum=f=>ds.filter(d=>f(cs(d.c).status)).reduce((a,d)=>a+d.cr,0);
+    return {sl,p:sum(v=>v==="passed"),g:sum(v=>v==="enrolled"||v==="credit"),f:sum(v=>v==="failed")}});
+  const max=Math.max(36,...data.map(x=>x.p+x.g+x.f)),anyF=data.some(x=>x.f),lab=sl=>`${sl[0]}·${t.semAb[sl[1]]}`;
+  const tip=x=>esc(t.ccTip(slotName(x.sl),x.p,x.g,x.f));
+  return `<figure class="cchart"><figcaption><h3 class="grouph">${t.ccT}</h3><span class="cclegend"><span><i class="sw pass"></i>${t.ccPass}</span><span><i class="sw prog"></i>${t.ccProg}</span>${anyF?`<span><i class="sw fail"></i>${t.ccFail}</span>`:""}<span><i class="sw pace"></i>${t.ccPace}</span></span></figcaption>
+    <div class="ccplot" role="img" aria-label="${esc(t.ccT)}: ${data.map(x=>`${lab(x.sl)} ${x.p}+${x.g}${x.f?` ✕${x.f}`:""}`).join(", ")}">
+      <div class="ccpace" style="bottom:${30/max*100}%"></div><div class="cctip" aria-hidden="true"></div>
+      ${data.map(x=>`<div class="cccol" data-tip="${tip(x)}" tabindex="0"><span class="ccval">${x.p+x.g||(x.f?0:"")}${x.f?` <span class="ccf">✕${x.f}</span>`:""}</span>
+        <div class="ccstack" style="height:${(x.p+x.g+x.f)/max*100}%">${x.f?`<b class="seg fail" style="flex:${x.f}"></b>`:""}${x.g?`<b class="seg prog" style="flex:${x.g}"></b>`:""}${x.p?`<b class="seg pass" style="flex:${x.p}"></b>`:""}</div></div>`).join("")}
     </div><div class="ccx">${data.map(x=>`<span>${lab(x.sl)}</span>`).join("")}</div>
-    <table class="sr-only"><tr><th>${t.semLbl}</th><th>${t.ccPass}</th><th>${t.ccProg}</th></tr>${data.map(x=>`<tr><td>${slotName(x.sl)}</td><td>${x.p}</td><td>${x.g}</td></tr>`).join("")}</table></figure>`;
+    <table class="sr-only"><tr><th>${t.semLbl}</th><th>${t.ccPass}</th><th>${t.ccProg}</th><th>${t.ccFail}</th></tr>${data.map(x=>`<tr><td>${slotName(x.sl)}</td><td>${x.p}</td><td>${x.g}</td><td>${x.f}</td></tr>`).join("")}</table></figure>`;
 }
+
+// the chart's tooltip: shown for the column under the pointer (or focused / tapped), it slides from column to column
+// and is kept inside the plot so it never runs off the page on a narrow window
+function ccShow(col){
+  const plot=col.closest(".ccplot"),tip=plot.querySelector(".cctip"),was=tip.classList.contains("on");
+  plot.querySelectorAll(".cccol.on").forEach(c=>c!==col&&c.classList.remove("on"));col.classList.add("on");plot.classList.add("hov");
+  tip.textContent=col.dataset.tip;tip.classList.toggle("jump",!was);
+  const W=plot.clientWidth,w=tip.offsetWidth,h=tip.offsetHeight,cx=col.offsetLeft+col.offsetWidth/2,top=col.querySelector(".ccstack").offsetTop;
+  tip.style.left=Math.max(0,Math.min(W-w,cx-w/2))+"px";tip.style.top=Math.max(-h-4,top-h-26)+"px";
+  if(!was)requestAnimationFrame(()=>{tip.classList.remove("jump");tip.classList.add("on")});
+}
+function ccHide(plot){plot.classList.remove("hov");plot.querySelectorAll(".cccol.on").forEach(c=>c.classList.remove("on"));const tip=plot.querySelector(".cctip");if(tip)tip.classList.remove("on")}
+document.addEventListener("pointerover",e=>{const c=e.target.closest&&e.target.closest(".cccol");if(c)ccShow(c)});
+document.addEventListener("pointerout",e=>{const p=e.target.closest&&e.target.closest(".ccplot");if(p&&!p.contains(e.relatedTarget)&&!p.contains(document.activeElement))ccHide(p)});
+document.addEventListener("focusin",e=>{const c=e.target.closest&&e.target.closest(".cccol");if(c)ccShow(c)});
+document.addEventListener("focusout",e=>{const p=e.target.closest&&e.target.closest(".ccplot");if(p&&!p.contains(e.relatedTarget))ccHide(p)});
 
 /* ---------- Windows: the plan, chart and milestones each have their own window ---------- */
 function renderSide(){
   document.getElementById("planbox").innerHTML=planStrip(cur());
   document.getElementById("chartbox").innerHTML=chartHtml();
   document.getElementById("msbox").innerHTML=badgesHtml();
+  const gr=document.querySelector("#foot .grades");if(gr)gr.innerHTML=gradeChips();
 }
 
 /* ---------- Layout: the order of the windows and which are shown, edited in "Edit layout" ---------- */
 // S.layout = {order:[window ids], off:{id:true}}; Progress and Courses can be moved but never hidden
 const WINS=["summary","upnext","plan","courses","chart","ms","hist"],WIN_FIXED=["summary","courses"];
 let editing=false;
-const lay=()=>{const l=S.layout||{};return {order:[...(l.order||[]).filter(w=>WINS.includes(w)),...WINS.filter(w=>!(l.order||[]).includes(w))],off:l.off||{}}};
+// Milestones start switched off (WIN_OFF); a window someone switched on is stored as off:false
+const WIN_OFF={ms:true};
+const lay=()=>{const l=S.layout||{};return {order:[...(l.order||[]).filter(w=>WINS.includes(w)),...WINS.filter(w=>!(l.order||[]).includes(w))],off:Object.assign({},WIN_OFF,l.off)}};
 const winEl=id=>document.querySelector(`.win[data-win="${id}"]`);
 function applyLayout(){
   const L0=lay(),wrap=document.getElementById("app"),foot=document.getElementById("foot");
@@ -2321,6 +2414,7 @@ document.addEventListener("click",e=>{
   if(b.dataset.wsw){toggleWin(b.dataset.wsw,b);return}
   if(b.id==="bk-load"){bkMsg("");document.getElementById("bk-file").click();return}
   if(b.dataset.perf){setPerf(b.dataset.perf);return}
+  if(b.id==="dt-sw"){S.noDates=!S.noDates;if(!S.noDates)delete S.noDates;b.setAttribute("aria-checked",String(!S.noDates));rerender();changed();return}
   if(b.id==="th-light"||b.id==="th-dark"){try{localStorage.setItem("fit-theme",b.id.slice(3))}catch(e){}applyTheme();return}
   if(b.dataset.view){S.view=b.dataset.view;render();changed();return}
   if(b.dataset.year||b.dataset.half){const c=cur();S.current=(b.dataset.year||c[0])+(b.dataset.half||c[1]);render();changed();return}
@@ -2358,6 +2452,8 @@ function migrate(){
     r.extra=r.extra.filter(x=>{const m=/^(test|písomka)\s*([1-5])$/i.exec(x.n.trim());if(!m)return true;r.pts["p"+(m[2]-1)]=x.val;delete r.pts[x.id];return false});
   }
   S.idm5=1;
+  // Milestones became an opt-in window: switch it off once for everyone, after that it stays as the user sets it
+  if(!S.msOpt){if(S.layout&&S.layout.off)delete S.layout.off.ms;S.msOpt=1}
 }
 
 /* ---------- Boot ---------- */
