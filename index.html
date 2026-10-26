@@ -113,6 +113,41 @@ button,select,input{font:inherit;color:inherit}
 @keyframes glow{50%{box-shadow:0 0 0 2px rgba(255,77,100,.7),0 0 80px rgba(255,40,60,.85),0 0 160px rgba(255,40,60,.45)}}
 .shards{position:fixed;inset:0;z-index:61;pointer-events:none;overflow:hidden}
 .grouph{font-family:var(--f-body);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:6px 0 0}
+/* windows and the edit-layout mode */
+.win{position:relative;min-width:0;display:grid;gap:12px}
+.win.off,.win.empty{display:none}
+.win[data-win="courses"]{gap:28px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:grid;gap:12px}
+.panel .cchart,.panel .msrow{margin:0}
+.winbar{display:none}
+body.editing .win,body.editing .win.off,body.editing .win.empty{display:grid;gap:8px;max-height:240px;overflow:hidden;border-radius:16px;outline:2px dashed color-mix(in srgb,var(--blue) 40%,var(--line));outline-offset:5px;background:var(--paper)}
+body.editing .win>:not(.winbar){pointer-events:none;-webkit-user-select:none;user-select:none}
+body.editing .win::after{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(to bottom,transparent,var(--paper));pointer-events:none}
+body.editing .win.off,body.editing .win.empty{max-height:none}
+body.editing .win.off>:not(.winbar){display:none}
+body.editing .win.off::after,body.editing .win.empty::after{display:none}
+body.editing .win.off .winbar{opacity:.65;border-style:dashed}
+body.editing .winbar{transition:opacity .3s,border-color .3s}
+.wswl{transition:color .2s}
+body.editing .win.lifted{z-index:25;outline-color:var(--blue);box-shadow:0 22px 50px rgba(0,0,0,.35)}
+body.editing .winbar{display:flex;position:relative;z-index:2;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;background:var(--card);border:1px solid var(--line);cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
+body.editing .win.lifted .winbar{cursor:grabbing;border-color:var(--blue)}
+.winbar:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.winbar .grip{color:var(--muted);font-size:16px;line-height:1}
+.winbar b{flex:1;font-size:14px}
+.wfix,.wswl{font-size:12px;color:var(--muted)}
+.wsw{position:relative;width:40px;height:22px;border-radius:99px;border:1px solid var(--line);background:var(--paper);cursor:pointer;padding:0;flex:none}
+.wsw span{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:transform .25s cubic-bezier(.3,.7,.25,1.15),background-color .2s}
+.wsw[aria-checked="true"]{background:var(--ok-soft);border-color:color-mix(in srgb,var(--ok) 50%,var(--line))}
+.wsw[aria-checked="true"] span{transform:translateX(18px);background:var(--ok)}
+.edbar{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:40;width:min(680px,calc(100% - 24px));display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 14px;
+  padding:10px 12px 10px 16px;border-radius:14px;background:var(--card);border:1px solid var(--blue);box-shadow:0 12px 34px rgba(0,0,0,.3)}
+.edtxt{display:grid;gap:1px;min-width:0}
+.edtxt b{font-size:14px}
+.edtxt span{font-size:12px;color:var(--muted)}
+.edacts{display:flex;gap:6px}
+.edacts .btn{padding:7px 14px}
+body.editing .bbar{display:none}
 /* backup buttons in Settings */
 .bkbtns{display:flex;gap:6px;flex-wrap:wrap}
 .bkbtns .btn{padding:6px 12px}
@@ -231,6 +266,9 @@ body.dragging,body.dragging *{cursor:grabbing!important}
 .gear{width:32px;height:32px;display:grid;place-items:center;padding:0;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;transition:border-color .2s,background-color .2s}
 .gear svg{width:19px;height:19px;transition:transform .45s cubic-bezier(.3,.7,.25,1.2)}
 .gear:hover{border-color:var(--blue);background:var(--blue-soft)}
+.gear.exitb:hover{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.gear.exitb:hover svg{transform:translateX(-2px)}
+#reset-btn{padding:6px 12px}
 .gear:hover svg,.gear[aria-expanded="true"] svg{transform:rotate(60deg)}
 .mbox.sets{max-width:440px;text-align:left;gap:0;padding:18px 20px 16px;border-color:var(--line);box-shadow:0 24px 70px rgba(0,0,0,.35)}
 .sethead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
@@ -539,14 +577,22 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
     <div class="tools">
       <span class="chip" id="savechip"><span class="dot"></span><span id="savetxt">Saved on this device</span></span>
       <button class="gear" id="set-btn" type="button" aria-label="Settings" title="Settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.4h-4l-.4 2.5A7.5 7.5 0 0 0 7 6.4l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
+      <button class="gear exitb" id="exit-btn" type="button" aria-label="Exit" title="Exit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 8l-4 4 4 4M6 12h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
   </header>
-  <section class="summary" id="summary"></section>
-  <section class="upnext" id="upnext" hidden></section>
-  <nav class="picker" id="picker" aria-label="Semester"></nav>
-  <main id="sems" style="display:grid;gap:32px"></main>
-  <section class="hist" id="hist"></section>
+  <div class="win" data-win="summary"><section class="summary" id="summary"></section></div>
+  <div class="win" data-win="upnext"><section class="upnext" id="upnext" hidden></section></div>
+  <div class="win" data-win="plan"><div id="planbox"></div></div>
+  <div class="win" data-win="courses"><nav class="picker" id="picker" aria-label="Semester"></nav>
+    <main id="sems" style="display:grid;gap:32px"></main></div>
+  <div class="win" data-win="chart"><section class="panel" id="chartbox"></section></div>
+  <div class="win" data-win="ms"><section class="panel" id="msbox"></section></div>
+  <div class="win" data-win="hist"><section class="hist" id="hist"></section></div>
   <footer class="foot" id="foot"></footer>
+  <div class="edbar" id="edbar" role="toolbar" aria-label="Layout" hidden>
+    <div class="edtxt"><b id="ed-title">Editing layout</b><span id="ed-hint"></span></div>
+    <div class="edacts"><button type="button" class="btn plain" id="ed-reset">Reset</button><button type="button" class="btn" id="ed-done">Done</button></div>
+  </div>
   <nav class="bbar" id="bbar" aria-label="Sections">
     <button type="button" data-jump="summary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V11M10 19V5M16 19v-6M22 19H2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span data-bb="bbProg">Progress</span></button>
     <button type="button" data-jump="sems"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="13" y="4" width="8" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="3" y="13" width="8" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="13" y="13" width="8" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/></svg><span data-bb="bbCourses">Courses</span></button>
@@ -573,10 +619,14 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
         <button type="button" data-perf="balanced" data-t="perfBal">Balanced</button>
         <button type="button" data-perf="low" data-t="perfLow">Low</button>
       </div></div>
+    <div class="setrow"><span class="setk"><span data-t="layT">Layout</span><small data-t="layDesc"></small></span>
+      <button type="button" class="btn plain" id="lay-edit" data-t="layEdit">Edit layout</button></div>
     <div class="setrow"><span class="setk"><span data-t="bkTitle">Backup</span><small data-t="bkDesc"></small></span>
       <div class="bkbtns"><button type="button" class="btn plain" id="bk-save" data-t="bkSave">Download</button><button type="button" class="btn plain" id="bk-load" data-t="bkLoad">Load file</button>
       <input type="file" id="bk-file" accept=".json,application/json" hidden></div></div>
     <p class="setnote" id="bk-msg" hidden></p>
+    <div class="setrow"><span class="setk"><span data-t="resetT">Reset</span><small data-t="resetDesc"></small></span>
+      <button type="button" class="btn danger-outline" id="reset-btn" data-t="resetBtn">Reset all data</button></div>
     <p class="setnote" data-t="setSaved">Saved on this device.</p>
   </div>
 </div>
@@ -777,7 +827,11 @@ Object.assign(T.en,{
   msT:"Milestones",msToast:n=>`🏆 Milestone: ${n}!`,
   ms:{pass1:"First course passed",firstA:"First A",clean:"Clean semester",half:"Halfway · 90 credits",all:"All 180 credits"},
   msD:{pass1:"Pass any course",firstA:"Get an A in any course",clean:"Pass every course of a semester without a failed exam term",half:"Pass 90 credits",all:"Pass 180 credits"},
-  ccT:"Credits per semester",ccPass:"Passed",ccProg:"In progress",ccPace:"30 a semester",ccTip:(s,p,g)=>`${s}: ${p} passed · ${g} in progress`,semAb:{W:"W",S:"S"}
+  ccT:"Credits per semester",ccPass:"Passed",ccProg:"In progress",ccPace:"30 a semester",ccTip:(s,p,g)=>`${s}: ${p} passed · ${g} in progress`,semAb:{W:"W",S:"S"},
+  winT:{summary:"Progress",upnext:"Up next",plan:"Year plan",courses:"Courses",chart:"Credits chart",ms:"Milestones",hist:"History"},
+  layT:"Layout",layDesc:"Move the windows around and hide the ones you don't need.",layEdit:"Edit layout",layBarT:"Editing layout",
+  resetT:"Reset",resetDesc:"Delete all points, statuses and settings in this tracker.",
+  layBarHint:"Drag a window by its bar · switch windows on or off",layReset:"Reset",layDone:"Done",layOn:"Shown",layOff:"Hidden",layFixed:"Always shown",layMove:"Move · Alt + ↑ / ↓"
 });
 Object.assign(T.sk,{
   wiLbl:"Čo ak zo skúšky dostanem",wiOut:(v,tot,g)=>`${v} b → spolu ${tot} · ${g}`,
@@ -797,7 +851,11 @@ Object.assign(T.sk,{
   msT:"Míľniky",msToast:n=>`🏆 Míľnik: ${n}!`,
   ms:{pass1:"Prvý absolvovaný predmet",firstA:"Prvé A",clean:"Čistý semester",half:"Polovica · 90 kreditov",all:"Všetkých 180 kreditov"},
   msD:{pass1:"Absolvuj ľubovoľný predmet",firstA:"Získaj A z ľubovoľného predmetu",clean:"Absolvuj všetky predmety semestra bez neúspešného termínu skúšky",half:"Získaj 90 kreditov",all:"Získaj 180 kreditov"},
-  ccT:"Kredity za semester",ccPass:"Získané",ccProg:"Prebieha",ccPace:"30 za semester",ccTip:(s,p,g)=>`${s}: ${p} získaných · ${g} prebieha`,semAb:{W:"Z",S:"L"}
+  ccT:"Kredity za semester",ccPass:"Získané",ccProg:"Prebieha",ccPace:"30 za semester",ccTip:(s,p,g)=>`${s}: ${p} získaných · ${g} prebieha`,semAb:{W:"Z",S:"L"},
+  winT:{summary:"Postup",upnext:"Čo ďalej",plan:"Plán ročníka",courses:"Predmety",chart:"Graf kreditov",ms:"Míľniky",hist:"História"},
+  layT:"Rozloženie",layDesc:"Presúvaj okná a skry tie, ktoré nepotrebuješ.",layEdit:"Upraviť rozloženie",layBarT:"Úprava rozloženia",
+  resetT:"Vymazanie",resetDesc:"Vymaže všetky body, stavy a nastavenia v tomto trackeri.",
+  layBarHint:"Okno potiahni za jeho lištu · okná zapni alebo vypni",layReset:"Pôvodné",layDone:"Hotovo",layOn:"Zobrazené",layOff:"Skryté",layFixed:"Vždy zobrazené",layMove:"Presunúť · Alt + ↑ / ↓"
 });
 const TYPE={en:{"Cr+Ex":"Course credit + exam","Ex":"Exam","Cr":"Course credit","ClCr":"Graded course credit"},sk:{"Cr+Ex":"Zápočet + skúška","Ex":"Skúška","Cr":"Zápočet","ClCr":"Klasifikovaný zápočet"}};
 
@@ -1046,7 +1104,7 @@ function renderSummary(){
   const avAll=avgOf(st.list);
   h+=req("",t.rAvg,avAll?avgFmt(avAll.v):"–",t.rAvgS(avAll?avAll.cr:0)).replace('<div class="req ','<div title="'+t.avgTip+'" class="req ');
   h+=req(tecR&&tecR.status==="passed"?"ok":"",t.rTech,tecD?`${tecD.c} · ${tecR.status==="passed"?t.passedW:t.st[tecR.status]}`:t.notChosen,t.rTechS);
-  h+=`</div>`+chartHtml()+badgesHtml();
+  h+=`</div>`;
   document.getElementById("summary").innerHTML=h;
   animateBars("all");
 }
@@ -1285,7 +1343,8 @@ function render(){
   document.getElementById("t-unoff").textContent=t.unoff;
   renderSettings();
   document.querySelectorAll("[data-bb]").forEach(el=>el.textContent=t[el.dataset.bb]);
-  checkMilestones();renderSummary();renderUpNext();renderPicker();queueMicrotask(syncSegs);
+  applyLayout();
+  checkMilestones();renderSummary();renderUpNext();renderSide();renderPicker();queueMicrotask(syncSegs);
   const list=allCourses();
   let h="";
   for(const s of [cur()]){
@@ -1294,7 +1353,7 @@ function render(){
     const comp=inSlot.filter(d=>d.k==="C"),opt=inSlot.filter(d=>d.k!=="C");
     const have=new Set(list.map(d=>d.c)),avail=(CAT[s]||[]).filter(x=>!have.has(x[0]));
     const grp=(g,lbl)=>{const xs=avail.filter(x=>x[5]===g);return xs.length?`<optgroup label="${lbl}">${xs.map(x=>`<option value="${x[0]}">${x[0]} · ${esc(S.lang==="sk"?x[2]:x[1])} (${x[3]} ${t.cr})</option>`).join("")}</optgroup>`:""};
-    h+=`<section class="sem" id="sem-${s}">${planStrip(s)}<h3 class="grouph">${t.compH}${reorderLink(s+":C")}</h3>${cardCols(comp,s+":C")}
+    h+=`<section class="sem" id="sem-${s}"><h3 class="grouph">${t.compH}${reorderLink(s+":C")}</h3>${cardCols(comp,s+":C")}
       <h3 class="grouph">${t.optH}${opt.length?reorderLink(s+":O"):""}</h3>${opt.length?cardCols(opt,s+":O"):`<p class="emptyopt">${t.optEmpty}</p>`}
       <details class="addel" id="more-${s}"><summary class="addbtn">+ ${t.addOpt}</summary><div class="cbody addbody">
       ${avail.length?`<div class="addrow"><select id="opt-pick-${s}" aria-label="${t.addOpt}" style="flex:1 1 220px"><option value="">${t.optPick}</option>${grp("A",t.grpA)}${grp("T",t.grpT)}${grp("E",t.grpE)}</select><button class="btn" type="button" data-addopt="${s}">${t.add}</button></div>`:""}
@@ -1304,7 +1363,7 @@ function render(){
   document.getElementById("sems").innerHTML=h;
   alignRows();syncPulses();requestAnimationFrame(syncPulses);
   renderHistory();
-  document.getElementById("foot").innerHTML=`<h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div><div class="footacts"><button class="btn danger-outline" type="button" id="reset-btn">${t.resetBtn}</button><button class="btn plain" type="button" id="exit-btn">${t.exitBtn}</button></div><p class="madeby">Made by Filipko &amp; Claude ❤️</p>`;
+  document.getElementById("foot").innerHTML=`<h3>${t.gradesH}</h3><div class="grades"><span>A 90–100</span><span>B 80–89</span><span>C 70–79</span><span>D 60–69</span><span>E 50–59</span><span>F &lt;50</span></div><p class="madeby">Made by Filipko &amp; Claude ❤️</p>`;
   animateChanges();
 }
 
@@ -1369,6 +1428,7 @@ function unlock(){
   swap("gate","app");
 }
 function lockAgain(){
+  exitEdit(true);
   try{localStorage.removeItem(GATE)}catch(e){}
   const i=document.getElementById("g-input");i.value="";i.classList.remove("nope");
   // Exit button and auto-exit share one look: the tracker shrinks into the secret box
@@ -1507,6 +1567,7 @@ function renderSettings(){
   document.getElementById("perf-desc").textContent=t.perfDesc[perf];
   document.getElementById("set-close").setAttribute("aria-label",t.close);
   const g=document.getElementById("set-btn");g.setAttribute("aria-label",t.settings);g.title=t.settings;
+  const x=document.getElementById("exit-btn");x.setAttribute("aria-label",t.exitBtn);x.title=t.exitBtn;
 }
 function setPerf(p){
   perf=p;try{localStorage.setItem(PERF_KEY,p)}catch(e){}
@@ -1696,6 +1757,140 @@ function chartHtml(){
     <table class="sr-only"><tr><th>${t.semLbl}</th><th>${t.ccPass}</th><th>${t.ccProg}</th></tr>${data.map(x=>`<tr><td>${slotName(x.sl)}</td><td>${x.p}</td><td>${x.g}</td></tr>`).join("")}</table></figure>`;
 }
 
+/* ---------- Windows: the plan, chart and milestones each have their own window ---------- */
+function renderSide(){
+  document.getElementById("planbox").innerHTML=planStrip(cur());
+  document.getElementById("chartbox").innerHTML=chartHtml();
+  document.getElementById("msbox").innerHTML=badgesHtml();
+}
+
+/* ---------- Layout: the order of the windows and which are shown, edited in "Edit layout" ---------- */
+// S.layout = {order:[window ids], off:{id:true}}; Progress and Courses can be moved but never hidden
+const WINS=["summary","upnext","plan","courses","chart","ms","hist"],WIN_FIXED=["summary","courses"];
+let editing=false;
+const lay=()=>{const l=S.layout||{};return {order:[...(l.order||[]).filter(w=>WINS.includes(w)),...WINS.filter(w=>!(l.order||[]).includes(w))],off:l.off||{}}};
+const winEl=id=>document.querySelector(`.win[data-win="${id}"]`);
+function applyLayout(){
+  const L0=lay(),wrap=document.getElementById("app"),foot=document.getElementById("foot");
+  // windows are only moved when the order really differs, so a box you are typing in keeps its focus
+  const now=[...wrap.querySelectorAll(":scope>.win")].map(w=>w.dataset.win).join();
+  if(now!==L0.order.join())L0.order.forEach(id=>wrap.insertBefore(winEl(id),foot));
+  L0.order.forEach(id=>winEl(id).classList.toggle("off",!WIN_FIXED.includes(id)&&!!L0.off[id]));
+}
+function winBar(id){
+  const t=L(),fixed=WIN_FIXED.includes(id),on=fixed||!lay().off[id];
+  return `<div class="winbar" tabindex="0" title="${t.layMove}" aria-label="${esc(t.winT[id])} · ${t.layMove}"><span class="grip" aria-hidden="true">⠿</span><b>${t.winT[id]}</b>
+    ${fixed?`<span class="wfix">${t.layFixed}</span>`:`<span class="wswl">${on?t.layOn:t.layOff}</span><button type="button" class="wsw" role="switch" aria-checked="${on}" aria-label="${esc(t.winT[id])}" data-wsw="${id}"><span></span></button>`}</div>`;
+}
+function drawBars(){
+  document.querySelectorAll(".winbar").forEach(b=>b.remove());
+  if(!editing)return;
+  WINS.forEach(id=>winEl(id).insertAdjacentHTML("afterbegin",winBar(id)));
+  const t=L();document.getElementById("ed-title").textContent=t.layBarT;document.getElementById("ed-hint").textContent=t.layBarHint;
+  document.getElementById("ed-reset").textContent=t.layReset;document.getElementById("ed-done").textContent=t.layDone;
+}
+// entering: the toolbar drops in from the top and the windows settle into their previews one after another;
+// leaving: the toolbar lifts away, the windows dip, then grow back to full size in the same rolling order
+const winsShown=()=>[...document.querySelectorAll("#app>.win")].filter(w=>w.offsetHeight);
+function winsIn(from){
+  const an=winsShown().map((w,i)=>w.animate([{opacity:0,transform:from},{opacity:1,transform:"none"}],{duration:340,delay:Math.min(i,8)*45,easing:"cubic-bezier(.2,.8,.2,1)",fill:"backwards"}));
+  // if the browser pauses the animations (a background tab), never leave a window invisible
+  setTimeout(()=>an.forEach(a=>{try{a.finish()}catch(e){}}),1500);
+}
+let edBusy=false;
+function enterEdit(){
+  if(editing||edBusy)return;
+  closeSettings(true);editing=true;document.body.classList.add("editing");const bar=document.getElementById("edbar");bar.hidden=false;
+  applyLayout();drawBars();edRoom();scrollTo({top:0});
+  if(!noMotion()){
+    bar.animate([{opacity:0,transform:"translate(-50%,-130%)"},{opacity:1,transform:"translate(-50%,0)"}],{duration:380,easing:"cubic-bezier(.2,.9,.3,1.15)"});
+    document.querySelector(".top").animate([{transform:"translateY(-60px)"},{transform:"none"}],{duration:380,easing:"cubic-bezier(.2,.8,.2,1)"});
+    winsIn("scale(.94) translateY(14px)");
+  }
+  document.querySelector(".winbar").focus({preventScroll:true});
+}
+function exitEdit(now){
+  if(!editing||edBusy)return;
+  const finish=()=>{
+    editing=false;edBusy=false;document.body.classList.remove("editing");document.getElementById("edbar").hidden=true;
+    document.getElementById("app").style.paddingTop="";
+    drawBars();applyLayout();alignRows();
+    if(!now&&!noMotion()){winsIn("scale(.97) translateY(-10px)");document.querySelector(".top").animate([{transform:"translateY(40px)"},{transform:"none"}],{duration:340,easing:"cubic-bezier(.2,.8,.2,1)"})}
+  };
+  if(now||noMotion())return finish();
+  edBusy=true;
+  document.getElementById("edbar").animate([{opacity:1,transform:"translate(-50%,0)"},{opacity:0,transform:"translate(-50%,-130%)"}],{duration:220,easing:"ease-in",fill:"forwards"});
+  winsShown().forEach(w=>w.animate([{opacity:1,transform:"none"},{opacity:0,transform:"scale(.97)"}],{duration:200,easing:"ease-in",fill:"forwards"}));
+  setTimeout(()=>{document.querySelectorAll("#app>.win,#edbar").forEach(el=>el.getAnimations().forEach(a=>a.cancel()));finish()},230);
+}
+// switching a window on / off in edit mode: the switch knob slides (the switch is updated, not redrawn) and the
+// window folds up to just its bar, or unfolds back to its preview
+function toggleWin(id,sw){
+  const l=lay(),off=!l.off[id],w=winEl(id),t=L();
+  l.off[id]=off;S.layout={order:lay().order,off:l.off};changed();
+  sw.setAttribute("aria-checked",String(!off));sw.previousElementSibling.textContent=off?t.layOff:t.layOn;
+  if(noMotion()){w.classList.toggle("off",off);return}
+  const h0=w.offsetHeight,bar=w.querySelector(".winbar").offsetHeight;
+  w.getAnimations().forEach(a=>a.cancel());
+  if(off){
+    // fold: the preview shrinks under the bar first, then the window really switches off
+    const a=w.animate([{height:h0+"px"},{height:bar+"px"}],{duration:300,easing:"cubic-bezier(.4,0,.2,1)"});
+    [...w.children].filter(c=>!c.classList.contains("winbar")).forEach(c=>c.animate([{opacity:1},{opacity:0}],{duration:220,fill:"forwards"}));
+    let done=false;const end=()=>{if(done)return;done=true;a.cancel();w.classList.add("off");[...w.children].forEach(c=>c.getAnimations().forEach(x=>x.cancel()))};
+    a.onfinish=end;setTimeout(end,380);
+  }else{
+    // unfold: the window switches on, then grows from its bar to the full preview while the content fades in
+    w.classList.remove("off");const h1=w.offsetHeight;
+    w.animate([{height:h0+"px"},{height:h1+"px"}],{duration:340,easing:"cubic-bezier(.2,.8,.2,1)"});
+    [...w.children].filter(c=>!c.classList.contains("winbar")).forEach(c=>c.animate([{opacity:0},{opacity:1}],{duration:300,delay:80,fill:"backwards"}));
+  }
+}
+// the toolbar floats over the top of the page, so the page starts below it (its height differs on a phone)
+function edRoom(){if(editing)document.getElementById("app").style.paddingTop=(document.getElementById("edbar").offsetHeight+24)+"px"}
+addEventListener("resize",edRoom);
+function saveLayout(){S.layout={order:[...document.querySelectorAll("#app>.win")].map(w=>w.dataset.win),off:lay().off};changed()}
+// dragging a window by its bar: it follows the pointer, the others slide out of its way
+let wdrag=null;
+function wplace(){
+  const d=wdrag,win=d.win,want=d.top0+(d.y+scrollY-d.y0);
+  let r=win.getBoundingClientRect(),base=r.top+scrollY-d.tx;
+  const vis=[...document.querySelectorAll("#app>.win")].filter(w=>w!==win&&w.offsetHeight);
+  const mid=want+r.height/2,i=vis.findIndex(w=>{const b=w.getBoundingClientRect();return b.top+scrollY+b.height/2>mid});
+  const before=i<0?document.getElementById("foot"):vis[i];
+  if(win.nextElementSibling!==before){
+    const rects=new Map(vis.map(w=>[w,w.getBoundingClientRect().top]));
+    win.parentNode.insertBefore(win,before);
+    if(!noMotion())vis.forEach(w=>{const dy=rects.get(w)-w.getBoundingClientRect().top;if(dy)w.animate([{transform:`translateY(${dy}px)`},{transform:"none"}],{duration:200,easing:"cubic-bezier(.2,.8,.2,1)"})});
+    r=win.getBoundingClientRect();base=r.top+scrollY-d.tx;
+  }
+  d.tx=want-base;win.style.transform=`translateY(${d.tx}px)`;
+}
+document.addEventListener("pointerdown",e=>{
+  if(!editing||wdrag)return;const bar=e.target.closest(".winbar");if(!bar||e.target.closest(".wsw"))return;
+  e.preventDefault();const win=bar.parentElement,r=win.getBoundingClientRect();
+  wdrag={win,pid:e.pointerId,y0:e.clientY+scrollY,y:e.clientY,top0:r.top+scrollY,tx:0};
+  win.classList.add("lifted");
+  wdrag.timer=setInterval(()=>{if(!wdrag)return;const y=wdrag.y,m=70;if(y<m){scrollBy(0,-14);wplace()}else if(y>innerHeight-m){scrollBy(0,14);wplace()}},16);
+});
+addEventListener("pointermove",e=>{if(wdrag&&e.pointerId===wdrag.pid){wdrag.y=e.clientY;wplace()}});
+function wdrop(){
+  if(!wdrag)return;const d=wdrag;wdrag=null;clearInterval(d.timer);
+  const w=d.win,tx=d.tx;w.style.transform="";w.classList.remove("lifted");
+  if(tx&&!noMotion())w.animate([{transform:`translateY(${tx}px)`},{transform:"none"}],{duration:180,easing:"ease-out"});
+  saveLayout();
+}
+addEventListener("pointerup",wdrop);addEventListener("pointercancel",wdrop);
+// keyboard: Alt + ↑ / ↓ on a window bar moves the window one place
+document.addEventListener("keydown",e=>{
+  if(!editing)return;
+  if(e.key==="Escape"&&!document.getElementById("modal")){exitEdit();return}
+  const bar=e.target.closest&&e.target.closest(".winbar");if(!bar||!e.altKey||(e.key!=="ArrowUp"&&e.key!=="ArrowDown"))return;
+  e.preventDefault();const win=bar.parentElement,sib=e.key==="ArrowUp"?win.previousElementSibling:win.nextElementSibling;
+  if(!sib||!sib.classList.contains("win"))return;
+  e.key==="ArrowUp"?win.parentNode.insertBefore(win,sib):win.parentNode.insertBefore(sib,win);
+  saveLayout();bar.focus();
+});
+
 /* ---------- Up next: the next step of every running course, most urgent first ---------- */
 let upAll=false;
 function urgency(d,k,r){
@@ -1717,6 +1912,7 @@ function renderUpNext(){
     items.push({d,n,du,u,hot:(du!=null&&du<=3)||k.fails>=2||(d.zeroMax!=null&&k.zeros===d.zeroMax),vs});
   }
   items.sort((a,b)=>b.u-a.u);
+  box.parentElement.classList.toggle("empty",!items.length);
   if(!items.length){box.hidden=true;box.innerHTML="";return}
   const shown=upAll?items:items.slice(0,4);
   box.hidden=false;
@@ -1865,7 +2061,7 @@ function refreshCard(c){
   keepFocus(()=>{
     S.open=S.open||{};if(old.open)S.open[c]=1;
     const tmp=document.createElement("div");tmp.innerHTML=courseCard(d);old.replaceWith(tmp.firstElementChild);
-    checkMilestones();renderSummary();renderUpNext();queueMicrotask(syncSegs);alignRows();animateChanges();syncPulses();requestAnimationFrame(syncPulses);
+    checkMilestones();renderSummary();renderUpNext();renderSide();queueMicrotask(syncSegs);alignRows();animateChanges();syncPulses();requestAnimationFrame(syncPulses);
   });
 }
 document.addEventListener("input",e=>{
@@ -1947,11 +2143,15 @@ document.addEventListener("click",e=>{
   if(b.dataset.histclear){S.log=[];renderHistory();changed();return}
   if(b.dataset.upmore){upAll=!upAll;renderUpNext();return}
   if(b.dataset.reorder){const key=b.dataset.reorder;delete S.order[key];rerender();changed();return}
-  if(b.id==="reset-btn"){openReset(1);return}
+  if(b.id==="reset-btn"){closeSettings(true);openReset(1);return}
   if(b.id==="exit-btn"){openReset("exit");return}
   if(b.id==="set-btn"){openSettings();return}
   if(b.id==="set-close"){closeSettings();return}
   if(b.id==="bk-save"){saveBackup();return}
+  if(b.id==="lay-edit"){enterEdit();return}
+  if(b.id==="ed-done"){exitEdit();return}
+  if(b.id==="ed-reset"){delete S.layout;applyLayout();drawBars();changed();return}
+  if(b.dataset.wsw){toggleWin(b.dataset.wsw,b);return}
   if(b.id==="bk-load"){bkMsg("");document.getElementById("bk-file").click();return}
   if(b.dataset.perf){setPerf(b.dataset.perf);return}
   if(b.id==="th-light"||b.id==="th-dark"){try{localStorage.setItem("fit-theme",b.id.slice(3))}catch(e){}applyTheme();return}
