@@ -1,6 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>[hidden]{display:none!important}</style></head><body><title>FIT Study Index</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: a student's "index" — summary band with the 180-credit bar, then one ledger section per semester */
@@ -56,6 +57,8 @@ button,select,input{font:inherit;color:inherit}
 .confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:51;background:var(--ok);color:var(--card);font-weight:600;padding:10px 18px;border-radius:99px;box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){.bar.pulse{animation:none}}
+.toast.undo{background:var(--ink);color:var(--paper);display:flex;align-items:center;gap:14px;padding:8px 8px 8px 18px}
+.toast.undo button{border:0;border-radius:99px;padding:5px 14px;background:var(--paper);color:var(--ink);font-weight:600;cursor:pointer}
 /* sliding two-option toggles (theme, language) */
 .seg.slide{position:relative;display:inline-grid;grid-template-columns:repeat(var(--n,2),1fr);padding:2px}
 .seg.slide .thumb{position:absolute;top:2px;bottom:2px;left:2px;width:calc((100% - 4px) / var(--n,2));border-radius:6px;background:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.2);transform:translateX(calc(var(--pos,0) * 100%))}
@@ -133,6 +136,30 @@ button,select,input{font:inherit;color:inherit}
 .seg button{border:0;background:none;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 10px;border-radius:99px;background:var(--card);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+/* gear next to the save chip, and the settings pop-up it opens (same blurred backdrop, neutral instead of red) */
+.gear{width:32px;height:32px;display:grid;place-items:center;padding:0;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;transition:border-color .2s,background-color .2s}
+.gear svg{width:19px;height:19px;transition:transform .45s cubic-bezier(.3,.7,.25,1.2)}
+.gear:hover{border-color:var(--blue);background:var(--blue-soft)}
+.gear:hover svg,.gear[aria-expanded="true"] svg{transform:rotate(60deg)}
+.mbox.sets{max-width:440px;text-align:left;gap:0;padding:18px 20px 16px;border-color:var(--line);box-shadow:0 24px 70px rgba(0,0,0,.35)}
+.sethead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+.sethead h2{font-size:20px}
+.setx{font-size:16px;width:32px;height:32px;border-radius:50%}
+.setx:hover{background:var(--paper);color:var(--ink)}
+.setrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;padding:12px 0;border-bottom:1px solid var(--line)}
+.setk{font-size:14px;font-weight:600;display:grid;gap:2px;min-width:0;flex:1 1 140px}
+.setk small{font-size:12px;font-weight:400;color:var(--muted);line-height:1.35}
+.mbox .setnote{margin:10px 0 0;font-size:12px}
+/* performance setting (Settings › Animations & effects), kept per device as data-perf on <html>
+   balanced: no blur, glows, drop shadows or confetti; low: also no animations or transitions at all */
+:root[data-perf="low"] *,:root[data-perf="low"] *::before,:root[data-perf="low"] *::after{animation:none!important;transition:none!important}
+:root[data-perf="low"] .bar .reaper svg,:root[data-perf="low"] .bar .rider svg,:root[data-perf="low"] .bar.danger::after{will-change:auto}
+:root[data-perf="balanced"] .modal,:root[data-perf="low"] .modal{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(8,10,14,.62)}
+:root[data-perf="balanced"] .bar.danger::after,:root[data-perf="low"] .bar.danger::after{box-shadow:none}
+:root[data-perf="balanced"] .mbox,:root[data-perf="low"] .mbox{box-shadow:0 10px 30px rgba(0,0,0,.3)}
+:root[data-perf="balanced"] .mbox.lvl2,:root[data-perf="low"] .mbox.lvl2{animation:none}
+:root[data-perf="balanced"] .mbox .tri,:root[data-perf="low"] .mbox .tri,:root[data-perf="balanced"] .bigx svg,:root[data-perf="low"] .bigx svg{filter:none}
+:root[data-perf="balanced"] .failstamp,:root[data-perf="low"] .failstamp{text-shadow:none}
 .chip .dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
 .chip .dot{width:10px;height:10px;flex:none}
 .chip.saved .dot{background:var(--ok)} .chip.err .dot{background:var(--bad)}
@@ -166,6 +193,8 @@ button,select,input{font:inherit;color:inherit}
 .bar svg{display:block;width:100%;height:100%;overflow:visible}
 .bar .reaper{position:absolute;bottom:calc(100% + 1px);width:32px;height:32px;margin-left:-16px;color:var(--bad);z-index:1}
 .bar.caught .rider{color:var(--bad)}
+.bar .reaper.idle{opacity:.4}
+.bar .reaper.idle svg{animation:none!important}
 /* a new ✕ drops in; a course that just failed shakes, flashes red and gets a big ✕ stamp */
 details.course{position:relative}
 .failstamp{position:absolute;inset:0;display:grid;place-items:center;font-size:84px;font-weight:700;line-height:1;color:var(--bad);pointer-events:none;opacity:0;text-shadow:0 0 24px color-mix(in srgb,var(--bad) 60%,transparent)}
@@ -196,6 +225,10 @@ details.course{position:relative}
   .bar .reaper svg{transform-origin:50% 100%;animation:sway 1.6s ease-in-out infinite alternate}
 }
 @keyframes sway{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
+/* the looping figures and the aura run on the GPU, and stop while the progress box is scrolled out of view */
+.bar .reaper svg,.bar .rider svg{will-change:transform}
+.bar.danger::after{will-change:opacity}
+.summary.offscreen *,.summary.offscreen *::after{animation-play-state:paused!important}
 .bar.met{--fill:var(--ok)}
 .bar.met .done{border-radius:99px;background:var(--fill)}
 .bar.met .goal{display:none}
@@ -248,6 +281,12 @@ details.course[open] .next{display:none}
 /* closed cards in one row share the tallest one's height (set by alignRows), so the rows line up across the columns */
 details.course:not([open])>summary{min-height:var(--rowh,0)}
 details.course.measure[open] .next{display:block}
+/* while a card rolls up its header already takes the closed size and the next-step line fades in,
+   so the height animation ends exactly where the closed card sits and nothing snaps afterwards */
+details.course.closing>summary{min-height:var(--rowh,0)}
+details.course.closing[open] .next{display:block}
+@media (prefers-reduced-motion:no-preference){details.course.closing .next{animation:nextin .3s ease both}}
+@keyframes nextin{from{opacity:0;transform:translateY(-4px)}}
 .course summary::-webkit-details-marker{display:none}
 .code{font-family:var(--f-mono);font-weight:500;font-size:14px;background:var(--blue-soft);color:var(--blue);border-radius:6px;padding:2px 7px}
 .cname{font-weight:600;font-size:14px;line-height:1.3;min-width:0}
@@ -337,14 +376,7 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
     </div>
     <div class="tools">
       <span class="chip" id="savechip"><span class="dot"></span><span id="savetxt">Saved on this device</span></span>
-      <div class="seg slide" data-key="theme" role="group" aria-label="Theme"><span class="thumb" aria-hidden="true"></span>
-        <button id="th-light" type="button" aria-pressed="false">Light</button>
-        <button id="th-dark" type="button" aria-pressed="false">Dark</button>
-      </div>
-      <div class="seg slide" data-key="lang" role="group" aria-label="Language"><span class="thumb" aria-hidden="true"></span>
-        <button id="lang-en" type="button" aria-pressed="true">EN</button>
-        <button id="lang-sk" type="button" aria-pressed="false">SK</button>
-      </div>
+      <button class="gear" id="set-btn" type="button" aria-label="Settings" title="Settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.4h-4l-.4 2.5A7.5 7.5 0 0 0 7 6.4l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
     </div>
   </header>
   <section class="summary" id="summary"></section>
@@ -352,8 +384,38 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
   <main id="sems" style="display:grid;gap:32px"></main>
   <footer class="foot" id="foot"></footer>
 </div>
+<!-- settings pop-up: stays in the page (hidden) so the language and theme buttons always exist -->
+<div class="modal" id="settings" hidden>
+  <div class="mbox sets" role="dialog" aria-modal="true" aria-labelledby="set-title">
+    <div class="sethead"><h2 id="set-title" data-t="settings">Settings</h2><button class="x setx" id="set-close" type="button" aria-label="Close">✕</button></div>
+    <div class="setrow"><span class="setk" data-t="setLang">Language</span>
+      <div class="seg slide" data-key="lang" role="group" aria-label="Language"><span class="thumb" aria-hidden="true"></span>
+        <button id="lang-en" type="button" aria-pressed="true">EN</button>
+        <button id="lang-sk" type="button" aria-pressed="false">SK</button>
+      </div></div>
+    <div class="setrow"><span class="setk" data-t="setTheme">Theme</span>
+      <div class="seg slide" data-key="theme" role="group" aria-label="Theme"><span class="thumb" aria-hidden="true"></span>
+        <button id="th-light" type="button" aria-pressed="false">Light</button>
+        <button id="th-dark" type="button" aria-pressed="false">Dark</button>
+      </div></div>
+    <div class="setrow"><span class="setk"><span data-t="setPerf">Animations &amp; effects</span><small id="perf-desc"></small></span>
+      <div class="seg slide" data-key="perf" role="group" aria-label="Animations and effects"><span class="thumb" aria-hidden="true"></span>
+        <button type="button" data-perf="full" data-t="perfFull">Full</button>
+        <button type="button" data-perf="balanced" data-t="perfBal">Balanced</button>
+        <button type="button" data-perf="low" data-t="perfLow">Low</button>
+      </div></div>
+    <p class="setnote" data-t="setSaved">Saved on this device.</p>
+  </div>
+</div>
 
 <script>
+/* ---------- Performance setting: full / balanced (no effects) / low (no effects, no motion), per device ---------- */
+const PERF_KEY="fit-perf";
+let perf="full";try{perf=localStorage.getItem(PERF_KEY)||"full"}catch(e){}
+document.documentElement.setAttribute("data-perf",perf);
+const noMotion=()=>perf==="low"||matchMedia("(prefers-reduced-motion: reduce)").matches;
+const noFx=()=>perf!=="full";
+
 /* ---------- Curriculum: BIT 2019-2029, plan for ac. y. 2026/27 (fit.vut.cz/study/program/9865) ---------- */
 const SLOTS=["1W","1S","2W","2S","3W","3S","4W","4S"];
 const P=(en,sk,max,min)=>({en,sk,max,min});
@@ -397,7 +459,7 @@ const COURSES=[
 // [code, English name, Czech name, credits, ends with, group (A = English B1+, T = technical, E = elective), course id]
 const CAT={"1W":[["GEN","General English Exam B1","Zkouška z obecné angličtiny B1",1,"Ex","A",313957],["ZAN4","B1 level (CEFR) English exam","Zkouška z angličtiny na úrovni B1",1,"Ex","A",314668],["0MS","Mathematical Software","Matematický software",3,"Cr","E",312306],["1AHS-L","Applied game studies – research and design","Aplikovaná herní studia – výzkum a design",3,"Ex","E",312715],["1DS-Z","3D Printing and Digital Fabrication for Creative Industries 1","3D tisk a digitální výroba pro kreativní obory 1",2,"Cr","E",313145],["1HERDES-ZS","Game Design – Board Games","Herní design – Deskové hry",2,"Cr","E",312834],["1ODI-Z","3D Optical digitalization 1","3D optická digitalizace 1",2,"Cr","E",313143],["ACHE20","Architecture of the 20th century","Architektura 20. století",3,"Ex","E",312720],["ATGD","(Graphic) Design Topics of Today","Aktuální témata (grafického) designu",2,"Cr","E",312702],["BPC-DSY","Tax System of the Czech Republic","Daňový systém ČR",2,"ClCr","E",314873],["BPC-ELSA","Electrical Engineering Tutorial","Elektrotechnický seminář",2,"Cr","E",315131],["BPC-FY1B","Physics 1","Fyzika 1",6,"Cr+Ex","E",314776],["BPC-FYE","Physics in Electrical Engineering","Fyzika v elektrotechnice",5,"Cr+Ex","E",314800],["BRA012-A","GIS","GIS",2,"Cr","E",310340],["DKFI-Z","The History and Context of Photography 1","Dějiny a kontexty fotografie 1",3,"Ex","E",312780],["FIT","History and Philosophy of Technology","Dějiny a filozofie techniky",2,"ClCr","E",309439],["HKO","Communication and Presentation Skills","Manažerská komunikace a prezentace",3,"Cr","E",313969],["HVR","Leadership and Time Management","Manažerské vedení lidí a řízení času",3,"Cr","E",313982],["IFS","Seminar of Physics","Fyzikální seminář",2,"Cr","E",314027],["IKK","Circle Consultations","Kruhové konzultace",0,"Cr","E",314052],["ISC","PC Seminar","Počítačový seminář",2,"Cr","E",314186],["ISM","Seminar of Mathematics","Matematický seminář",2,"Cr","E",314198],["IVG","Information Education and Literacy","Informační výchova a gramotnost",1,"Cr","E",314259],["KPO-Z","Porn studies","Kurz pornostudií",3,"Ex","E",312863],["PRM","Fundamentals of Law","Právní minimum",2,"ClCr","E",309442],["RET","Rhetoric","Rétorika",2,"ClCr","E",309444],["VSDH1","Visual Digital Game Styles 1","Vizuální styly digitálních her 1",2,"Cr","E",313084],["XPC-POM","Management Minimum","Podnikatelské minimum",4,"Cr","E",315009]],"1S":[["0AX","English C1-2","Angličtina C1-2",3,"Cr+Ex","A",312268],["AIT","English for IT","Angličtina pro IT",3,"Cr+Ex","A",313897],["BAN1","English for bachelors - Pre-Intermediate 1","Angličtina 1: mírně pokročilí 1",3,"Cr+Ex","A",313905],["BAN2","English for bachelors - Pre-Intermediate 2","Angličtina 2: mírně pokročilí 2",3,"Cr+Ex","A",313907],["BAN3","English for bachelors - Intermediate 1","Angličtina 3: středně pokročilí 1",3,"Cr+Ex","A",313909],["BAN4","English for Bachelors - Intermediate 2","Angličtina 4: středně pokročilí 2",3,"Cr+Ex","A",313910],["GEN","General English Exam B1","Zkouška z obecné angličtiny B1",1,"Ex","A",313956],["XPC-FCE2","English for FCE 2","Angličtina pro FCE 2",3,"ClCr","A",314854],["IVH","VHDL Seminar","Seminář VHDL",4,"ClCr","T",314261],["0MV","Calculus with MAPLE","Matematické výpočty pomocí MAPLE",2,"Cr","E",312308],["1CNCO","CNC Machining – Robots in Artistic Practice","CNC obrábění – Roboti v umělecké praxi",2,"Cr","E",312769],["1DS-2","3D Printing and Digital Fabrication for Creative Industries 2","3D tisk a digitální výroba pro kreativní obory 2",2,"Cr","E",313146],["1HERDES","Game Design – Digital Games","Herní design – Digitální hry",2,"Cr","E",312835],["1HS-Z","Game Studies","Herní studia",3,"Ex","E",312836],["1KADH-L","Digital Games Critical Analyses","Kritická analýza digitálních her",3,"Ex","E",312860],["1ODI-L","3D Optical digitalization 2","3D optická digitalizace 2",2,"Cr","E",313144],["AUP-L","Copyright","Autorská práva",2,"Cr","E",312759],["DKFII-L","The History and Context of Photography 2","Dějiny a kontexty fotografie 2",3,"Ex","E",312781],["FIK","Philosophy and the Culture","Filozofie a kultura",2,"Cr","E",309438],["FIT","History and Philosophy of Technology","Dějiny a filozofie techniky",2,"ClCr","E",309440],["HKO","Communication and Presentation Skills","Manažerská komunikace a prezentace",3,"Cr","E",313971],["HLS-KE","Earthen Architecture","Hliněné stavitelství",3,"ClCr","E",315562],["HVR","Leadership and Time Management","Manažerské vedení lidí a řízení času",3,"Cr","E",313985],["IJC","The C Programming Language","Jazyk C",5,"Ex","E",314049],["IMK","Mechanics and Acoustics","Mechanika a akustika",6,"ClCr","E",314080],["IPZ","Peripheral Devices","Periferní zařízení",4,"Ex","E",314157],["ISJ","Scripting Languages","Skriptovací jazyky",5,"Ex","E",314195],["ITW","Web Design","Tvorba webových stránek",5,"ClCr","E",314241],["ITY","Typography and Publishing","Typografie a publikování",4,"ClCr","E",314249],["IVS","Practical Aspects of Software Design","Praktické aspekty vývoje software",5,"ClCr","E",314263],["N2","German 2","Němčina 2",3,"Cr+Ex","E",311674],["PRM","Fundamentals of Law","Právní minimum",2,"ClCr","E",309441],["RET","Rhetoric","Rétorika",2,"ClCr","E",309443],["SESP","Ergonomics of Sport and Physical Activities","Ergonomie sportu a pohybových aktivit",3,"Cr","E",308645],["SFR","Fundraising","Sport a nová média",3,"Cr","E",308650],["T1F","Computer Physics I","Počítačová fyzika I",3,"ClCr","E",312059],["VSDH2","Visual Digital Game Styles 2","Vizuální styly digitálních her 2",2,"Cr","E",313085],["XPC-BEN","Business English","Obchodní angličtina",3,"Cr+Ex","E",314857],["plaP","Business Laboratory","Podnikatelská laboratoř",5,"ClCr","E",313600]],"2W":[["0A7","English B2-1","Angličtina B2-1",2,"Cr","A",312272],["0A9","English C1-1","Angličtina C1-1",3,"Cr+Ex","A",312274],["AIT","English for IT","Angličtina pro IT",3,"Cr+Ex","A",313898],["BAN1","English for bachelors - Pre-Intermediate 1","Angličtina 1: mírně pokročilí 1",3,"Cr+Ex","A",313904],["BAN2","English for bachelors - Pre-Intermediate 2","Angličtina 2: mírně pokročilí 2",3,"Cr+Ex","A",313906],["BAN3","English for bachelors - Intermediate 1","Angličtina 3: středně pokročilí 1",3,"Cr+Ex","A",313908],["BAN4","English for Bachelors - Intermediate 2","Angličtina 4: středně pokročilí 2",3,"Cr+Ex","A",313911],["XPC-FCE1","English for FCE 1","Angličtina pro FCE 1",3,"ClCr","A",314855],["0SE1","English Skills for Workplace Communication I","English Skills for Workplace Communication I",3,"Cr+Ex","E",312338],["1ZHERV","Introduction to Game Development","Základy herního vývoje",4,"ClCr","E",313126],["AEU","English for Europe","Angličtina pro Evropu",3,"Cr+Ex","E",313893],["BPC-AE1","Analog Electronics 1","Analogová elektronika 1",7,"Cr+Ex","E",315074],["BPC-ANA","Analog Technology","Analogová technika",6,"Cr+Ex","E",315324],["BPC-ELA","Electroacoustics 1","Elektroakustika 1",6,"Cr+Ex","E",315281],["BPC-NRP","Design and Fabrication of Electronic Instruments","Návrh a realizace elektronických přístrojů",6,"Cr+Ex","E",314981],["BPC-RBM","Robotics and Robotic Manipulators","Robotika a manipulátory",4,"Cr+Ex","E",314210],["BPC-VPA","Selected parts from mathematics I.","Vybrané partie z matematiky I.",5,"Ex","E",314918],["BPC-ZSY","Security Systems","Zabezpečovací systémy",5,"Cr+Ex","E",315193],["DMSM","Digital Marketing and Social Media","Digital Marketing and Social Media",5,"ClCr","E",313311],["EC","E-commerce","E-commerce",6,"ClCr","E",313335],["EPO","Business Economics","Podniková ekonomika",5,"Cr+Ex","E",313602],["F1","French 1","Francouzština 1",2,"Cr","E",311450],["I1C","CCNA: Routing Basics and VLAN Technology","CCNA: základy směrování a technologie VLAN",4,"ClCr","E",314307],["ILI","Advanced Topics of Linux Administration","Pokročilá témata administrace operačního systému Linux",4,"ClCr","E",314059],["INI","IT Service Design and Implementation","Návrh a implementace IT služeb",4,"ClCr","E",314116],["IP1","Project Practice 1","Projektová praxe 1",5,"ClCr","E",314163],["IPS","Programming Seminar","Programovací seminář",2,"Cr","E",314150],["ISM2","Seminar of Mathematics 2","Matematický seminář 2",2,"Cr","E",314201],["IW1","Microsoft Windows Desktop Systems","Desktop systémy Microsoft Windows",5,"Cr+Ex","E",314270],["IW5","Programming .NET and C#","Programování v .NET a C#",5,"ClCr","E",314277],["JA3","Conversation through Hot Current Issues","Anglická konverzace na aktuální témata",3,"Cr+Ex","E",314319],["KdasP","Tax System","Daňová soustava",5,"Cr+Ex","E",313302],["N1","German 1","Němčina 1",2,"Cr","E",311673],["N3","German 3","Němčina 3",2,"Cr","E",311675],["N5","German 5","Němčina 5",2,"Cr","E",311677],["N7","German for Specific Purposes I","Deutsch für Studium und Beruf I",4,"Cr+Ex","E",311679],["NNA008","Geographic Information Systems","Geografické informační systémy",2,"Cr","E",310916],["NUA026","Smart Cities and Regions","Smart city, region",3,"Cr+Ex","E",311000],["PKA","Practical conversation, presenting and business communication in English","Praktická konverzace, prezentování a firemní komunikace v Angličtině",3,"Cr","E",314466],["R1","Russian 1","Ruština 1",2,"Cr","E",311878],["SORS","Personality Development and Self-knowledge","Osobností rozvoj a sebepoznání",3,"Cr","E",308662],["STD","Team Skills","Týmové dovednosti",3,"Cr","E",308678],["T2F","Computer Physics II","Počítačová fyzika II",3,"ClCr","E",312062],["VUC007","Additive technologies","Aditivní technologie",2,"Cr","E",311139],["XPC-ESP1","Spanish for Beginners 1","Španělština pro začátečníky 1",3,"ClCr","E",314875],["XPC-FR1","French for Beginners 1","Francouzština pro začátečníky 1",3,"ClCr","E",314811],["XPC-FR3","French for pre-intermediate","Francouzština pro mírně pokročilé",3,"ClCr","E",314812],["XPC-IPD","Engineering Pedagogy and Didactics","Inženýrská pedagogika a didaktika",5,"Ex","E",314882],["XPC-ITA1","Italian for Beginners 1","Italština pro začátečníky 1",3,"ClCr","E",314860],["XPC-KPT","Culture of Speech and the Generation of Texts","Kultura projevu a tvorba textů",5,"Cr","E",314871],["XPC-NE1","German for Beginners 1","Němčina pro začátečníky 1",3,"ClCr","E",314830],["XPC-NE3","German for Lower-Intermediate 1","Němčina pro mírně pokročilé 1",3,"ClCr","E",314829],["XPC-PEP","Pedagogical Psychology","Pedagogická psychologie",5,"Cr+Ex","E",314878],["ZPX","Professional Practice, Abroad","Zahraniční odborná praxe",5,"Cr","E",314691],["frpP","Financing Business Development","Financování rozvoje podniku",4,"ClCr","E",313376],["mak1P","Macroeconomics 1","Makroekonomie 1",6,"Cr+Ex","E",313457],["manP","Management","Management",6,"Cr+Ex","E",313465],["marP","Marketing","Marketing",5,"Cr+Ex","E",313506]],"2S":[["0A8","English B2-2","Angličtina B2-2",3,"Cr+Ex","A",312273],["ICP","The C++ Programming Language","Seminář C++",4,"ClCr","T",313995],["ICS","The C# Programming Language","Seminář C#",4,"ClCr","T",313996],["IJA","Java Programming Language","Seminář Java",4,"ClCr","T",314040],["IVH","VHDL Seminar","Seminář VHDL",4,"ClCr","T",314261],["0MR","Mobile Robots","Mobilní roboty",5,"Cr","E",312305],["0PZ","Writing Final Theses","Základy psaní závěrečných prací",3,"Cr+Ex","E",312336],["0SE2","English Skills for Workplace Communication II","English Skills for Workplace Communication II",3,"Cr+Ex","E",312339],["AEU","English for Europe","Angličtina pro Evropu",3,"Cr+Ex","E",313894],["BPC-AE2","Analog Electronics 2","Analogová elektronika 2",6,"Cr+Ex","E",315052],["BPC-AUD","Audio Electronics","Audio elektronika",5,"Cr+Ex","E",315089],["BPC-IOT","Communication Systems for IoT","Komunikační systémy pro IoT",5,"Cr+Ex","E",315338],["BPC-MA2","Mathematics 2","Matematika 2",6,"Cr+Ex","E",314895],["BPC-OZU","Selected Topics in Renewable Energy Sources and Energy Storage","Vybrané partie z obnovitelných zdrojů a ukládání energie",5,"Cr+Ex","E",314676],["BPC-PPK","Computer aided Design","Počítačová podpora konstruování",6,"ClCr","E",315417],["BPC-PRP","Robotics and Computer Vision","Robotika a zpracování obrazu",7,"Cr+Ex","E",314213],["BPC-PSM","Printed Circuits and Surface Mount Technology","Plošné spoje a povrchová montáž",5,"Cr+Ex","E",314646],["BPC-RR1","Control Theory 1","Řízení a regulace 1",7,"Cr+Ex","E",314174],["BPC-ZSL","Medical Imaging Systems","Zobrazovací systémy v lékařství",5,"Cr+Ex","E",314378],["BPC-ZSW","Audio Software","Zvukový software",2,"Cr","E",314083],["F2","French 2","Francouzština 2",3,"Cr+Ex","E",311451],["I2C","CCNA: LAN and WAN Technologies","CCNA: technologie sítí LAN a WAN",4,"ClCr","E",314311],["IAM","Advanced Mathematics","Pokročilá matematika",5,"ClCr","E",313988],["IAN","Binary Code Analysis","Analýza binárního kódu",4,"ClCr","E",313989],["IBS","Security and Computer Networks","Bezpečnost a počítačové sítě",4,"Cr+Ex","E",313990],["IIZ","IBM zSeries Servers","Správa serverů IBM zSeries",5,"ClCr","E",314035],["IMF","Mathematical Foundations of Fuzzy Logic","Matematické základy fuzzy logiky",5,"ClCr","E",314072],["IMHa","Science of happiness","Výpočetní metody v duševním zdraví",5,"ClCr","E",314076],["INAa","Introduction to Neural Models for AI","Introduction to Neural Models for AI",5,"Ex","E",314103],["IP2","Project Practice 2","Projektová praxe 2",5,"ClCr","E",314173],["IPA","Advanced Assembly Languages","Pokročilé asemblery",5,"Ex","E",314131],["ITP","Personal Computers","Technika personálních počítačů",4,"Ex","E",314221],["ITS","Testing and Dynamic Analysis","Testování a dynamická analýza",5,"Cr+Ex","E",314224],["IW2","Microsoft Windows Server Systems","Serverové systémy Microsoft Windows",5,"Cr+Ex","E",314273],["IZA","Programming Apple Devices","Programování zařízení Apple",5,"Ex","E",314281],["JA3","Conversation through Hot Current Issues","Anglická konverzace na aktuální témata",3,"Cr+Ex","E",314322],["N4","German 4","Němčina 4",3,"Cr+Ex","E",311676],["N6","German 6","Němčina 6",4,"Cr+Ex","E",311678],["N8","German for Specific Purposes II","Deutsch für Studium und Beruf II",4,"Cr+Ex","E",311680],["PKA","Practical conversation, presenting and business communication in English","Praktická konverzace, prezentování a firemní komunikace v Angličtině",3,"Cr","E",314464],["R2","Russian 2","Ruština 2",3,"Cr+Ex","E",311879],["XPC-EIC","Electrical Installations","Elektrické instalace",5,"ClCr","E",315143],["XPC-ELB","Safety in Electrical Engineering","Bezpečná elektrotechnika",2,"Ex","E",315144],["XPC-ESP2","Spanish for Beginners 2","Španělština pro začátečníky 2",3,"ClCr","E",314874],["XPC-FR2","French for Beginners 2","Francouzština pro začátečníky 2",3,"ClCr","E",314809],["XPC-FR4","French for pre-intermediate","Francouzština pro mírně pokročilé",3,"ClCr","E",314810],["XPC-IPD","Engineering Pedagogy and Didactics","Inženýrská pedagogika a didaktika",5,"Ex","E",314880],["XPC-ITA2","Italian for Beginners 2","Italština pro začátečníky 2",3,"ClCr","E",314859],["XPC-KPT","Culture of Speech and the Generation of Texts","Kultura projevu a tvorba textů",5,"Cr","E",314867],["XPC-NE2","German for Beginners 2","Němčina pro začátečníky 2",3,"ClCr","E",314894],["XPC-NE4","German for Lower-Intermediate 2","Němčina pro mírně pokročilé 2",3,"ClCr","E",314893],["XPC-PEP","Pedagogical Psychology","Pedagogická psychologie",5,"Cr+Ex","E",314876],["XPC-VPM","Selected parts from mathematics II.","Vybrané partie z matematiky II.",5,"Ex","E",314916],["ZFI","Basic Elements of Financing","Základy financování",6,"Cr+Ex","E",313792],["ZPX","Professional Practice, Abroad","Zahraniční odborná praxe",5,"Cr","E",314689],["faP","Financial Analysis","Finanční analýza",5,"Cr+Ex","E",313377],["ftP","Financial Markets","Finanční trhy",5,"Cr+Ex","E",313385],["mik1P","Microeconomics 1","Mikroekonomie 1",6,"Cr+Ex","E",313556],["uceP","Accounting","Účetnictví",6,"Cr+Ex","E",313771]],"3W":[["0PZ","Writing Final Theses","Základy psaní závěrečných prací",3,"Cr+Ex","E",312335],["BPC-RR2","Control Theory 2","Řízení a regulace 2",6,"Cr+Ex","E",314160],["IBbiP","Business Intelligence","Business Intelligence",5,"Cr+Ex","E",313268],["IP3","Project Practice 3","Projektová praxe 3",5,"ClCr","E",314178],["IZV","Data Analysis and Visualization in Python","Zpracování a vizualizace dat v prostředí Python",4,"ClCr","E",314304]],"3S":[["IMU","Multimedia Transmission over IP Networks","Multimédia v počítačových sítích",4,"ClCr","E",314100]]};
 // optional courses that have a known point layout
-const RICH={ISM:{creditUnknown:true,parts:[P("Test 1","Písomka 1",10),P("Test 2","Písomka 2",10),P("Examples at the board (bonus)","Príklady pri tabuli (bonus)",3)]}};
+const RICH={ISM:{creditUnknown:true,parts:[P("Test 1","Písomka 1",10),P("Test 2","Písomka 2",10),{...P("Examples at the board (bonus)","Príklady pri tabuli (bonus)",3),bonus:1}]}};
 function catFind(code,slot){
   for(const s of [slot,...SLOTS]){const x=(CAT[s]||[]).find(r=>r[0]===code);if(x)return x}
   return null;
@@ -435,7 +497,8 @@ const T={
   lastTry:"This is your last exam attempt in this enrolment.",
   noTriesLeft1:"3 ✕: all exam terms failed. You must take the course again next year, and that is your last chance.",
   noTriesLeft2:"3 ✕ in your repeated enrolment: you cannot continue your studies. Contact the study office right away.",
-  repeatWarn:"Repeated enrolment: this is the last chance to pass the course.",
+  repeatWarn:"Repeated enrolment: this is the last chance to pass the course.",undoRetake:"Undo retake (back to the first attempt)",settings:"Settings",setLang:"Language",setTheme:"Theme",setPerf:"Animations & effects",perfFull:"Full",perfBal:"Balanced",perfLow:"Low",close:"Close",setSaved:"Saved on this device.",
+  perfDesc:{full:"Everything on: animations, confetti, glows and blur.",balanced:"Animations stay; confetti, glows and blur are off.",low:"No animations or effects. Best for slower computers."},undo:"Undo",movedTo:(c,s)=>`${c} moved to ${s}`,
   crOnly:"This course ends with a course credit only. Mark it as Passed once you get it.",
   noPts:"No points are tracked for this course. Change the status when it is done.",
   ccNote:"Graded course credit: the total from 100 points sets your grade.",
@@ -450,7 +513,7 @@ const T={
   ns:{credit:n=>`${n} pts to the course credit`,part:(p,n)=>`${p}: ${n} more pts needed`,zeros:(l,z,m)=>`${l} test${l===1?"":"s"} left · ${z} of ${m} zero allowed used`,
     setThr:"Set the points needed for the course credit",exam:n=>`Exam: you need ${n} pts`,resits:(n,l)=>`Resit: you need ${n} pts · ${l} tries left`,
     lastTry:n=>`Last resit: you need ${n} pts`,toPass:n=>`${n} pts to pass`,waitCr:"Waiting for the course credit",done:g=>g?`Done · grade ${g}`:"Done",
-    retake:"Failed · retake it next year",last:"Failed again · contact the study office"},compH:"Compulsory courses",optH:"Optional courses",optEmpty:"No optional courses in this semester yet.",addOpt:"Add an optional course",
+    retake:"Failed · retake it next year",last:"Failed again · contact the study office",optFail:"Failed · optional course, no retake needed"},compH:"Compulsory courses",optH:"Optional courses",optEmpty:"No optional courses in this semester yet.",addOpt:"Add an optional course",
   optPick:"Choose a course…",grpA:"English (one course, B1 or higher)",grpT:"Technical (one of these)",grpE:"Other electives",ownH:"Not on the list? Add your own",
   kind:{E:"optional",A:"English",T:"technical"},exTitle:"Exit the tracker?",exBody:"You will need the secret word to get back in. Your data stays saved.",exYes:"Yes, exit",exitBtn:"Exit",secretPh:"Type the secret word",resetBtn:"Reset all data",cancel:"Cancel",
   r1Title:"Reset everything?",r1Body:"This deletes all your points, exam scores, course statuses, electives and failed-course marks.",r1Yes:"Yes, reset",
@@ -490,7 +553,8 @@ const T={
   lastTry:"Toto je tvoj posledný termín v tomto zápise.",
   noTriesLeft1:"3 ✕: všetky termíny skúšky neúspešné. Predmet si musíš zapísať znova budúci rok a to je posledná šanca.",
   noTriesLeft2:"3 ✕ v opakovanom zápise: v štúdiu nemôžeš pokračovať. Hneď kontaktuj študijné oddelenie.",
-  repeatWarn:"Opakovaný zápis: je to posledná šanca predmet splniť.",
+  repeatWarn:"Opakovaný zápis: je to posledná šanca predmet splniť.",undoRetake:"Zrušiť opakovanie (späť na prvý pokus)",settings:"Nastavenia",setLang:"Jazyk",setTheme:"Vzhľad",setPerf:"Animácie a efekty",perfFull:"Plné",perfBal:"Vyvážené",perfLow:"Nízke",close:"Zavrieť",setSaved:"Uložené v tomto zariadení.",
+  perfDesc:{full:"Všetko zapnuté: animácie, konfety, žiara a rozmazanie.",balanced:"Animácie ostávajú; konfety, žiara a rozmazanie sú vypnuté.",low:"Bez animácií a efektov. Najlepšie pre slabšie počítače."},undo:"Späť",movedTo:(c,s)=>`${c} presunutý do: ${s}`,
   crOnly:"Predmet končí len zápočtom. Keď ho dostaneš, označ ho ako Absolvované.",
   noPts:"Pri tomto predmete sa body nesledujú. Po splnení zmeň stav.",
   ccNote:"Klasifikovaný zápočet: známku určuje súčet zo 100 bodov.",
@@ -505,7 +569,7 @@ const T={
   ns:{credit:n=>`Do zápočtu chýba ${n} b`,part:(p,n)=>`${p}: ešte ${n} b`,zeros:(l,z,m)=>`${l===1?"Zostáva 1 písomka":l<5?`Zostávajú ${l} písomky`:`Zostáva ${l} písomiek`} · nuly ${z} z ${m}`,
     setThr:"Nastav body potrebné na zápočet",exam:n=>`Skúška: potrebuješ ${n} b`,resits:(n,l)=>`Opravný termín: potrebuješ ${n} b · zostávajú ${l} pokusy`,
     lastTry:n=>`Posledný termín: potrebuješ ${n} b`,toPass:n=>`Do splnenia chýba ${n} b`,waitCr:"Čaká sa na zápočet",done:g=>g?`Hotovo · známka ${g}`:"Hotovo",
-    retake:"Neúspešné · zopakuj budúci rok",last:"Opäť neúspešné · kontaktuj študijné oddelenie"},compH:"Povinné predmety",optH:"Voliteľné predmety",optEmpty:"V tomto semestri zatiaľ nemáš voliteľné predmety.",addOpt:"Pridať voliteľný predmet",
+    retake:"Neúspešné · zopakuj budúci rok",last:"Opäť neúspešné · kontaktuj študijné oddelenie",optFail:"Neúspešné · voliteľný predmet, opakovať netreba"},compH:"Povinné predmety",optH:"Voliteľné predmety",optEmpty:"V tomto semestri zatiaľ nemáš voliteľné predmety.",addOpt:"Pridať voliteľný predmet",
   optPick:"Vyber predmet…",grpA:"Angličtina (jeden predmet, B1 alebo vyššie)",grpT:"Technický (jeden z nich)",grpE:"Ostatné voliteľné",ownH:"Nie je v zozname? Pridaj vlastný",
   kind:{E:"voliteľný",A:"angličtina",T:"technický"},exTitle:"Odísť z trackera?",exBody:"Na návrat budeš potrebovať tajné slovo. Tvoje údaje ostanú uložené.",exYes:"Áno, odísť",exitBtn:"Odísť",secretPh:"Zadaj tajné slovo",resetBtn:"Vymazať všetky údaje",cancel:"Zrušiť",
   r1Title:"Vymazať všetko?",r1Body:"Vymažú sa všetky tvoje body, výsledky skúšok, stavy predmetov, voliteľné predmety aj značky neúspešných predmetov.",r1Yes:"Áno, vymazať",
@@ -578,7 +642,7 @@ const nm=o=>o[S.lang]||o.en;
 function grade(p){return p>=90?"A":p>=80?"B":p>=70?"C":p>=60?"D":p>=50?"E":"F"}
 function partsOf(d){
   const r=cs(d.c);
-  const base=(d.parts||[]).map((p,i)=>({key:"p"+i,n:nm(p),max:r.maxOv["p"+i]!=null?r.maxOv["p"+i]:p.max,min:p.min,val:r.pts["p"+i]}));
+  const base=(d.parts||[]).map((p,i)=>({key:"p"+i,n:nm(p),max:r.maxOv["p"+i]!=null?r.maxOv["p"+i]:p.max,min:p.min,bonus:p.bonus,val:r.pts["p"+i]}));
   const extra=r.extra.map(x=>({key:x.id,n:x.n,max:x.max,val:x.val,custom:true}));
   return [...base,...extra];
 }
@@ -593,6 +657,11 @@ function calc(d){
   // zeroMax: course credit needs every test written and at most N of them with 0 points
   let zeros=0,missing=0;
   if(d.zeroMax!=null){const base=parts.filter(p=>!p.custom);zeros=base.filter(p=>num(p.val)===0).length;missing=base.filter(p=>num(p.val)==null).length;creditOk=zeros<=d.zeroMax&&missing===0}
+  // course credit out of reach: every regular part is filled in and even the full points of the parts still open
+  // (bonus or own extra parts) would not reach the threshold
+  const open=parts.filter(p=>num(p.val)==null);
+  const creditLost=hasCreditStep&&threshold!=null&&d.zeroMax==null&&parts.length>0&&!open.some(p=>!p.bonus&&!p.custom)
+    &&semPts+open.reduce((a,p)=>a+(num(p.max)||0),0)<threshold;
   const tries=r.exam.map(num);
   const used=tries.filter(x=>x!=null).length;
   const lastExam=[...tries].reverse().find(x=>x!=null);
@@ -607,7 +676,7 @@ function calc(d){
   // one box per exam term: X = failed attempt, ✓ = passed
   const marks=tries.map(x=>x==null?"":(x>=exMin&&semPts+x>=50?"ok":"x"));
   const fails=marks.filter(m=>m==="x").length;
-  return {r,parts,semPts,anyPts,threshold,partFails,creditOk,tries,used,lastExam,exMin,examOk,total,zeros,missing,passedPts,marks,fails};
+  return {r,parts,semPts,anyPts,threshold,partFails,creditOk,creditLost,tries,used,lastExam,exMin,examOk,total,zeros,missing,passedPts,marks,fails};
 }
 function stats(){
   const list=allCourses();let passed=0,prog=0,comp=0,elec=0;
@@ -629,7 +698,7 @@ const SVG_RUN=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const SVG_YAY=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="3.8" r="2.4" fill="currentColor" stroke="none"/><path d="M12 8v7M12 15l-3 7M12 15l3 7M12 9.5 7.5 5M12 9.5 16.5 5"/></svg>`;
 const GOAL_FLAG=`<span class="goal" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 22V3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6 3.5h12l-3 4 3 4H6z" fill="currentColor"/></svg></span>`;
 const GOAL_CAP=`<span class="goal" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4 1.5 9 12 14l10.5-5z" fill="currentColor"/><path d="M6 11.5V16c0 2 12 2 12 0v-4.5M21 9.5V15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>`;
-const rider=(met,pos)=>`<span class="rider" aria-hidden="true" style="left:${met?100:pos}%">${met?SVG_YAY:SVG_RUN}</span>`;
+const rider=(met,left)=>`<span class="rider" aria-hidden="true" style="left:${left}">${met?SVG_YAY:SVG_RUN}</span>`;
 // how far a course is on its way to being passed (0..1), from the points entered so far; passed = 1, failed / planned = 0
 function courseShare(d){
   const r=cs(d.c);if(r.status==="passed")return 1;if(r.status!=="enrolled"&&r.status!=="credit")return 0;
@@ -665,7 +734,15 @@ function reaperBits(view,slot,studentPct,met,track,target){
   else if(now<w.a)cap=t.dlBefore(Math.ceil((w.a-now)/day));
   else if(now>=w.b)cap=t.dlOver;
   else cap=(caught?t.dlCaught:danger?t.dlClose:t.dlLeft(Math.ceil((w.b-now)/day)))+" · "+tr;
-  return {caught,aura,html:`<span class="reaper" aria-hidden="true" style="left:${tp}%">${SVG_REAPER}</span>`,cap:`<p class="dlcap${caught?" caught":""}"><span class="dl">Dead<b>line</b></span> · ${cap}</p>`};
+  // keep the two figures from standing on each other: when they are close, the one in front keeps a 28px lead
+  // (in the first half of the bar), or the one behind waits 28px back (in the second half, so nobody runs off the end)
+  const G=28,sp=met?100:studentPct,lead=Math.max(sp,tp),back=Math.min(sp,tp);
+  let rL=tp+"%",sL=sp+"%";
+  const fwd=`max(${lead}%, calc(${back}% + ${G}px))`,bwd=`min(${back}%, calc(${lead}% - ${G}px))`;
+  if(sp>=tp){if(lead<50)sL=fwd;else rL=bwd}else{if(lead<50)rL=fwd;else sL=bwd}
+  // outside the semester (not started yet, or already over) the reaper only waits, faded and still
+  const idle=now<w.a||now>=w.b;
+  return {caught,aura,sLeft:sL,html:`<span class="reaper${idle?" idle":""}" aria-hidden="true" style="left:${rL}">${SVG_REAPER}</span>`,cap:`<p class="dlcap${caught?" caught":""}"><span class="dl">Dead<b>line</b></span> · ${cap}</p>`};
 }
 let metPrev=null,barPrev={};
 // grow the bar from its last width (or from 0 on first view) to the new one
@@ -674,7 +751,7 @@ function animateBars(key){
   const done=bar.querySelector(".done"),prog=bar.querySelector(".prog"),rp=bar.querySelector(".reaper"),rd=bar.querySelector(".rider");
   const to={d:done.style.width,p:prog.style.width,r:rp?rp.style.left:"",s:rd?rd.style.left:""},from=barPrev[key]||{d:"0%",p:"0%",r:"0%",s:"0%"};
   barPrev[key]=to;
-  if(matchMedia("(prefers-reduced-motion: reduce)").matches||(from.d===to.d&&from.p===to.p&&from.r===to.r&&from.s===to.s))return;
+  if(noMotion()||(from.d===to.d&&from.p===to.p&&from.r===to.r&&from.s===to.s))return;
   done.style.width=from.d;prog.style.width=from.p;if(rp)rp.style.left=from.r;if(rd)rd.style.left=from.s;
   getComputedStyle(done).width;getComputedStyle(prog).width;if(rp)getComputedStyle(rp).left;if(rd)getComputedStyle(rd).left;
   done.style.width=to.d;prog.style.width=to.p;if(rp)rp.style.left=to.r;if(rd)rd.style.left=to.s;
@@ -683,7 +760,7 @@ function celebrate(msg){
   const toast=document.createElement("div");toast.className="toast";toast.textContent=msg;document.body.append(toast);
   setTimeout(()=>toast.remove(),3200);
   const bar=document.querySelector("#summary .bar");if(bar){bar.classList.add("pulse")}
-  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  if(noMotion()||noFx())return;
   const cv=document.createElement("canvas");cv.className="confetti";document.body.append(cv);
   const ctx=cv.getContext("2d"),dpr=devicePixelRatio||1,W=innerWidth,H=innerHeight;
   cv.width=W*dpr;cv.height=H*dpr;ctx.scale(dpr,dpr);
@@ -706,8 +783,9 @@ function renderSummary(){
   const req=(cls,k,v,s)=>`<div class="req ${cls}"><span class="k">${k}</span><span class="v">${v}</span><span class="s">${s}</span></div>`;
   const mode=S.view||"sem";
   let h=`<div class="sumhead"><h2 class="sumtitle">${t.viewLbl}</h2><div class="seg slide" data-key="view" role="group" aria-label="${t.viewLbl}"><button type="button" data-view="sem" aria-pressed="${mode==="sem"}">${t.viewSem}</button><button type="button" data-view="all" aria-pressed="${mode==="all"}">${t.viewAll}</button></div></div>`;
-  // failed-course counter: every failed course (now or before a retake) adds one ✕
-  const nf=st.list.reduce((a,d)=>{const r=cs(d.c);return a+(r.enroll===2?1:0)+(r.status!=="passed"&&(r.status==="failed"||(d.exam&&calc(d).fails>=3))?1:0)},0);
+  // failed-course counter: every failed course (now or before a retake) adds one ✕; a failed optional (E) course
+  // does not, since the BUT rules (čl. 10 odst. 2) only make compulsory courses be retaken
+  const nf=st.list.reduce((a,d)=>{const r=cs(d.c);return d.k==="E"?a:a+(r.enroll===2?1:0)+(r.status!=="passed"&&(r.status==="failed"||(d.exam&&calc(d).fails>=3))?1:0)},0);
   h+=`<div class="failrow"><span class="k">${t.failLbl}</span><span class="strikes big3" data-x="sum">${[0,1,2].map(i=>`<i class="sb ${i<nf?"x":""}">${i<nf?"✕":""}</i>`).join("")}</span>${nf>=3?`<span class="note"><b style="color:var(--bad)">${t.fail3}</b></span>`:""}</div>`;
   if(mode==="sem"){
     // Study rule: at least 15 credits in the 1st semester, at least 30 credits in every year
@@ -716,7 +794,7 @@ function renderSummary(){
     const track=onTrack(inWin),pS=Math.min(100,val/target*100),tS=Math.max(pS,Math.min(100,track/target*100)),left=Math.max(0,target-val);
     const met=left===0;
     h+=`<div class="big${met?" met":""}"><span class="pct mono">${val} / ${target}</span><span class="of">${isFirst?t.minFirst:t.minYear(c[0])}</span></div>
-    ${(()=>{const R=reaperBits("sem",c,tS,met,track,target);return `<div class="track"><div class="bar${met?" met":""}${R.caught?" caught":""}${R.aura}" role="img" aria-label="${val} / ${target}"><div class="prog" style="width:${tS}%"></div>${GOAL_FLAG}${R.html}<div class="done" style="width:${pS}%"></div>${rider(met,tS)}</div>${R.cap}</div>`})()}    ${isFirst?"":`<p class="note">${c==="1S"?t.note1S:t.noteY}</p>`}${met?`<p class="metmsg">${t.minOkShort}</p>`:""}`;
+    ${(()=>{const R=reaperBits("sem",c,tS,met,track,target);return `<div class="track"><div class="bar${met?" met":""}${R.caught?" caught":""}${R.aura}" role="img" aria-label="${val} / ${target}"><div class="prog" style="width:${tS}%"></div>${GOAL_FLAG}${R.html}<div class="done" style="width:${pS}%"></div>${rider(met,R.sLeft)}</div>${R.cap}</div>`})()}    ${isFirst?"":`<p class="note">${c==="1S"?t.note1S:t.noteY}</p>`}${met?`<p class="metmsg">${t.minOkShort}</p>`:""}`;
     document.getElementById("summary").innerHTML=h;
     // celebrate only when the minimum is crossed while looking at the same semester, not on load
     if(metPrev&&metPrev.key===c&&!metPrev.met&&met)celebrate(t.minOkToast);
@@ -727,7 +805,7 @@ function renderSummary(){
   const trackAll=onTrack(st.list),tA=Math.max(pct,Math.min(100,trackAll/180*100));
   const RA=reaperBits("all","",tA,st.passed>=180,trackAll,180);
   h+=`<div class="big"><span class="pct mono">${fmt(pct)}%</span><span class="of">${t.done} · <b class="mono">${st.passed}</b> ${t.of}</span><span class="of">· <b class="mono">${st.prog}</b> ${t.credits} ${t.inprog}</span></div>
-  <div class="track"><div class="bar${st.passed>=180?" met":""}${RA.caught?" caught":""}${RA.aura}" role="img" aria-label="${st.passed} / 180"><div class="prog" style="width:${tA}%"></div>${GOAL_CAP}${RA.html}<div class="done" style="width:${pct}%"></div>${rider(st.passed>=180,tA)}${[60,120].map(x=>`<div class="tick" style="left:${x/180*100}%"></div>`).join("")}</div>
+  <div class="track"><div class="bar${st.passed>=180?" met":""}${RA.caught?" caught":""}${RA.aura}" role="img" aria-label="${st.passed} / 180"><div class="prog" style="width:${tA}%"></div>${GOAL_CAP}${RA.html}<div class="done" style="width:${pct}%"></div>${rider(st.passed>=180,RA.sLeft)}${[60,120].map(x=>`<div class="tick" style="left:${x/180*100}%"></div>`).join("")}</div>
   <div class="scale mono"><span style="left:0">0</span><span style="left:33.33%">60 · ${t.yearN(1)}</span><span style="left:66.67%">120 · ${t.yearN(2)}</span><span style="left:100%">180</span></div>${RA.cap}</div>
   <div class="reqs">`;
   h+=req(st.comp>=146?"ok":"",t.rComp,`${st.comp} / 146`,t.rCompS);
@@ -750,7 +828,7 @@ function renderPicker(){
 function nextStep(d,k,r,vs){
   const t=L().ns,cc=d.t==="ClCr";
   if(vs==="planned")return "";
-  if(vs==="failed")return r.enroll===2?t.last:t.retake;
+  if(vs==="failed")return d.k==="E"?t.optFail:r.enroll===2?t.last:t.retake;
   if(vs==="passed"){
     const g=d.exam&&k.lastExam!=null&&k.examOk?grade(k.total):cc&&k.anyPts?grade(k.semPts):"";
     return t.done(g);
@@ -795,6 +873,7 @@ function courseCard(d){
    ${r.status==="failed"&&r.enroll===1&&SLOTS.indexOf(r.taken)+2<SLOTS.length?`<button class="btn" type="button" data-retake="${id}" style="align-self:end">${t.retake}</button>`:""}
   </div>`;
   if(r.enroll===2&&r.status!=="passed") h+=`<div class="verdict warn">${t.repeatWarn}</div>`;
+  if(r.enroll===2) h+=`<button class="linkbtn" type="button" data-unretake="${id}" style="justify-self:start">↶ ${t.undoRetake}</button>`;
   const hasPts=k.parts.length>0||!crOnly||d.creditUnknown;
   if(k.parts.length||!d.free){
     h+=`<div><table class="pts"><tbody>`;
@@ -858,7 +937,7 @@ function animateChanges(){
   document.querySelectorAll("[data-x]").forEach(el=>snap.x[el.dataset.x]=[...el.querySelectorAll(".sb")].map(b=>b.classList.contains("x")?"x":b.classList.contains("ok")?"ok":""));
   document.querySelectorAll("details.course").forEach(d=>snap.st[d.id]=d.dataset.st);
   const prev=snapPrev;snapPrev=snap;
-  if(!prev||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  if(!prev||noMotion())return;
   for(const key in snap.x){const was=prev.x[key];if(!was)continue;
     const boxes=document.querySelectorAll(`[data-x="${key}"] .sb`);
     snap.x[key].forEach((m,i)=>{if(m&&m!==was[i]){const c=m==="x"?"newx":"newok";boxes[i].classList.add(c);boxes[i].addEventListener("animationend",()=>boxes[i].classList.remove(c),{once:true})}});
@@ -874,6 +953,7 @@ function animateChanges(){
 }
 // small confetti burst out of one course card when it is passed
 function burst(el){
+  if(noFx())return;
   const r=el.getBoundingClientRect(),cv=document.createElement("canvas");cv.className="confetti";document.body.append(cv);
   const ctx=cv.getContext("2d"),dpr=devicePixelRatio||1,W=innerWidth,H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;ctx.scale(dpr,dpr);
   const css=getComputedStyle(document.documentElement),cols=["--ok","--ok","--blue","--warn","--accent"].map(v=>css.getPropertyValue(v).trim());
@@ -912,8 +992,9 @@ function render(){
   document.getElementById("th-light").textContent=t.light;
   document.getElementById("th-dark").textContent=t.dark;
   applyTheme();
-  const lg=document.getElementById("logo");lg.src=S.lang==="sk"?"logo-cz.webp":"logo-en.webp";lg.alt=t.logoAlt;
+  const lg=document.getElementById("logo"),src=S.lang==="sk"?"logo-cz.webp":"logo-en.webp";if(lg.getAttribute("src")!==src)lg.src=src;lg.alt=t.logoAlt;
   document.getElementById("t-unoff").textContent=t.unoff;
+  renderSettings();
   renderSummary();renderPicker();queueMicrotask(syncSegs);
   const list=allCourses();
   let h="";
@@ -940,7 +1021,7 @@ function render(){
 // every .seg.slide gets a marker that slides from the previous choice to the new one, also after a re-render
 const segPrev={};
 function syncSegs(){
-  const still=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const still=noMotion();
   document.querySelectorAll(".seg.slide").forEach(el=>{
     let th=el.querySelector(".thumb");if(!th){th=document.createElement("span");th.className="thumb";th.setAttribute("aria-hidden","true");el.prepend(th)}
     const bs=[...el.querySelectorAll("button")],idx=Math.max(0,bs.findIndex(b=>b.getAttribute("aria-pressed")==="true"));
@@ -966,7 +1047,7 @@ function autoStatus(code){
   const d=allCourses().find(x=>x.c===code);if(!d)return;
   const r=cs(code),k=calc(d);
   if(r.autoFail){r.auto=1;delete r.autoFail}
-  const fail=(d.zeroMax!=null&&k.zeros>d.zeroMax)||(d.exam&&k.fails>=3&&!k.passedPts);
+  const fail=(d.zeroMax!=null&&k.zeros>d.zeroMax)||(d.exam&&k.fails>=3&&!k.passedPts)||k.creditLost;
   if(fail){if(r.status!=="failed"){r.status="failed";r.auto=1}}
   else if(k.passedPts){if(r.status!=="passed"){r.status="passed";r.auto=1}}
   else if(r.auto){r.status="enrolled";delete r.auto}
@@ -980,7 +1061,7 @@ const okWord=v=>v.trim().toLowerCase()==="hulo";
 function swap(from,to,after){
   const a=document.getElementById(from),b=document.getElementById(to);
   if(a.hidden||a.dataset.busy)return;
-  if(matchMedia("(prefers-reduced-motion: reduce)").matches){a.hidden=true;b.hidden=false;after&&after();return}
+  if(noMotion()){a.hidden=true;b.hidden=false;after&&after();return}
   a.dataset.busy=1;let done=false;
   const out=a.animate([{opacity:1,transform:"none",filter:"blur(0)"},{opacity:0,transform:"scale(.97)",filter:"blur(6px)"}],{duration:260,easing:"ease-in",fill:"forwards"});
   const finish=()=>{if(done)return;done=true;out.cancel();
@@ -1006,6 +1087,8 @@ let lastAct=Date.now(),lastStored=0,locking=false;
 // browsers pause or slow timers while the page is in the background, so the first movement after coming back
 // must check the idle time before it counts as new activity; otherwise it would reset the 15 minutes
 function touchAct(){
+  // mouse moves fire many times a second; within a second of the last one there is nothing new to record
+  if(Date.now()-lastAct<1000)return;
   if(checkIdle())return;
   lastAct=Date.now();if(lastAct-lastStored>20000){lastStored=lastAct;try{localStorage.setItem(LAST,lastAct)}catch(e){}}
 }
@@ -1014,7 +1097,7 @@ function checkIdle(){
   if(locking)return true;
   if(document.getElementById("app").hidden||Date.now()-lastAct<IDLE)return false;
   locking=true;setTimeout(()=>locking=false,1200);
-  closeModal();try{localStorage.removeItem(GATE)}catch(e){}
+  closeModal();closeSettings(true);try{localStorage.removeItem(GATE)}catch(e){}
   const i=document.getElementById("g-input");i.value="";i.classList.remove("nope");
   hideMark();renderGate();morphToGate(()=>i.focus());
   return true;
@@ -1024,7 +1107,7 @@ document.addEventListener("visibilitychange",checkIdle);addEventListener("focus"
 // auto-exit: the whole tracker shrinks into the shape of the secret box, then the lock screen takes over
 function morphToGate(after){
   const a=document.getElementById("app"),b=document.getElementById("gate");
-  if(matchMedia("(prefers-reduced-motion: reduce)").matches){a.hidden=true;b.hidden=false;after&&after();return}
+  if(noMotion()){a.hidden=true;b.hidden=false;after&&after();return}
   const W=a.offsetWidth,H=a.offsetHeight,vy=scrollY,vh=innerHeight,bw=Math.min(320,W-32),bh=52,top=vy+vh/2-bh/2,left=(W-bw)/2;
   const from=`inset(${vy}px 0px ${Math.max(0,H-vy-vh)}px 0px round 0px)`,to=`inset(${top}px ${left}px ${Math.max(0,H-top-bh)}px ${left}px round 12px)`;
   const anim=a.animate([{clipPath:from,filter:"blur(0)",opacity:1},{clipPath:to,filter:"blur(3px)",opacity:1,offset:.75},{clipPath:to,filter:"blur(3px)",opacity:0}],
@@ -1047,7 +1130,7 @@ let markTimer=null,markType=null,markRun=0;
 function setLines(c){document.querySelectorAll("#bigx line").forEach((l,i)=>["x1","y1","x2","y2"].forEach((k,j)=>l.setAttribute(k,c[i][j])))}
 function hideMark(){const el=document.getElementById("bigx");clearTimeout(markTimer);el.hidden=true;el.classList.remove("out","pop","morph");markType=null}
 function showMark(type,life){
-  const el=document.getElementById("bigx"),still=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const el=document.getElementById("bigx"),still=noMotion();
   clearTimeout(markTimer);el.classList.remove("out");
   const run=++markRun,to=MARK[type];
   if(!el.hidden&&markType&&markType!==type&&!still){
@@ -1085,7 +1168,7 @@ document.getElementById("gate-form").addEventListener("submit",e=>{
 const TRI=`<svg class="tri" viewBox="0 0 64 58" aria-hidden="true"><path d="M32 4 L60 54 H4 Z" fill="#e0182f" stroke="#ff6b7d" stroke-width="3" stroke-linejoin="round"/><rect x="29" y="20" width="6" height="19" rx="3" fill="#fff"/><circle cx="32" cy="46" r="3.6" fill="#fff"/></svg>`;
 function closeModal(fall){
   const m=document.getElementById("modal");document.removeEventListener("keydown",modalKey);if(!m)return;
-  if(!fall||matchMedia("(prefers-reduced-motion: reduce)").matches){m.remove();return}
+  if(!fall||noMotion()){m.remove();return}
   if(m.dataset.closing)return;m.dataset.closing=1;m.id="";
   if(m.dataset.kind==="exit"){fadeOut(m);return}
   shatter(m);
@@ -1120,6 +1203,43 @@ function shatter(m){
   setTimeout(()=>{layer.remove();m.remove()},longest+50);
 }
 function modalKey(e){if(e.key==="Escape")closeModal(true)}
+
+/* ---------- Settings pop-up (gear): language, theme, animations & effects ---------- */
+function renderSettings(){
+  const t=L(),box=document.getElementById("settings");
+  box.querySelectorAll("[data-t]").forEach(el=>el.textContent=t[el.dataset.t]);
+  box.querySelectorAll("[data-perf]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.perf===perf));
+  document.getElementById("perf-desc").textContent=t.perfDesc[perf];
+  document.getElementById("set-close").setAttribute("aria-label",t.close);
+  const g=document.getElementById("set-btn");g.setAttribute("aria-label",t.settings);g.title=t.settings;
+}
+function setPerf(p){
+  perf=p;try{localStorage.setItem(PERF_KEY,p)}catch(e){}
+  document.documentElement.setAttribute("data-perf",p);
+  renderSettings();syncSegs();
+}
+function settingsKey(e){if(e.key==="Escape")closeSettings()}
+function openSettings(){
+  const m=document.getElementById("settings");if(!m.hidden&&!m.dataset.closing)return;
+  m.getAnimations().forEach(a=>a.cancel());delete m.dataset.closing;
+  renderSettings();m.hidden=false;syncSegs();
+  document.getElementById("set-btn").setAttribute("aria-expanded","true");
+  document.addEventListener("keydown",settingsKey);
+  document.getElementById("set-close").focus();
+}
+// fades out like the exit pop-up; instant when animations are off (or when the page locks)
+function closeSettings(now){
+  const m=document.getElementById("settings");if(m.hidden||m.dataset.closing)return;
+  document.removeEventListener("keydown",settingsKey);
+  document.getElementById("set-btn").setAttribute("aria-expanded","false");
+  const end=()=>{m.hidden=true;delete m.dataset.closing;m.getAnimations().forEach(a=>a.cancel())};
+  if(now||noMotion())return end();
+  m.dataset.closing=1;
+  m.animate([{opacity:1},{opacity:0}],{duration:220,easing:"ease-out",fill:"forwards"});
+  m.querySelector(".mbox").animate([{transform:"none"},{transform:"scale(.96)"}],{duration:220,easing:"ease-out",fill:"forwards"});
+  setTimeout(end,240);
+}
+document.getElementById("settings").addEventListener("click",e=>{if(e.target.id==="settings")closeSettings()});
 function openReset(step){
   closeModal();const t=L();
   const m=document.createElement("div");m.className="modal";m.id="modal";if(step==="exit")m.dataset.kind="exit";
@@ -1141,15 +1261,45 @@ function resetAll(){
   const toast=document.createElement("div");toast.className="toast";toast.style.background="var(--bad)";toast.textContent=L().resetDone;document.body.append(toast);setTimeout(()=>toast.remove(),2800);
 }
 
+// undo a retake: bring back the first attempt (a retake made before copies were kept goes back as failed, without its points)
+function unretake(c,follow){
+  const r=cs(c),p=r.prev;if(r.enroll!==2)return;
+  if(p){Object.assign(r,p);if(p.auto==null)delete r.auto}else{r.taken=SLOTS[Math.max(0,SLOTS.indexOf(r.taken)-2)];r.status="failed"}
+  r.enroll=1;delete r.prev;
+  if(follow)S.current=r.taken;
+  rerender();changed();
+}
+function undoToast(msg,fn){
+  document.querySelectorAll(".toast.undo").forEach(x=>x.remove());
+  const toast=document.createElement("div");toast.className="toast undo";toast.innerHTML=`<span>${esc(msg)}</span><button type="button">${L().undo}</button>`;
+  toast.querySelector("button").onclick=()=>{toast.remove();fn()};
+  document.body.append(toast);setTimeout(()=>toast.remove(),7000);
+}
+
 /* ---------- Events ---------- */
 let focusId=null,caret=null;
-function rerender(){
+function keepFocus(fn){
   const a=document.activeElement;focusId=a&&a.id;caret=a&&a.selectionStart;
-  S.open=S.open||{};document.querySelectorAll("details.course[open]").forEach(d=>S.open[d.id.slice(2)]=1);
-  const openX=[...document.querySelectorAll("details.addel[open],details.addt[open]")].map(d=>d.id);
-  render();
-  openX.forEach(i=>{const d=document.getElementById(i);if(d)d.open=true});
-  if(focusId){const el=document.getElementById(focusId);if(el){el.focus();try{if(caret!=null)el.setSelectionRange(caret,caret)}catch(e){}}}
+  fn();
+  if(focusId){const el=document.getElementById(focusId);if(el&&el!==document.activeElement){el.focus();try{if(caret!=null)el.setSelectionRange(caret,caret)}catch(e){}}}
+}
+function rerender(){
+  keepFocus(()=>{
+    S.open=S.open||{};document.querySelectorAll("details.course[open]").forEach(d=>S.open[d.id.slice(2)]=1);
+    const openX=[...document.querySelectorAll("details.addel[open],details.addt[open]")].map(d=>d.id);
+    render();
+    openX.forEach(i=>{const d=document.getElementById(i);if(d)d.open=true});
+  });
+}
+// typing points changes only one card and the progress box, so redraw just those instead of the whole page
+function refreshCard(c){
+  const old=document.getElementById("c-"+c),d=allCourses().find(x=>x.c===c);
+  if(!old||!d||cs(c).taken!==cur())return rerender();
+  keepFocus(()=>{
+    S.open=S.open||{};if(old.open)S.open[c]=1;
+    const tmp=document.createElement("div");tmp.innerHTML=courseCard(d);old.replaceWith(tmp.firstElementChild);
+    renderSummary();queueMicrotask(syncSegs);alignRows();animateChanges();
+  });
 }
 document.addEventListener("input",e=>{
   const el=e.target,f=el.dataset.f,c=el.dataset.c;if(!f)return;
@@ -1161,7 +1311,7 @@ document.addEventListener("input",e=>{
   else return;
   if(f==="pt"){const x=r.extra.find(x=>x.id===el.dataset.k);if(x)x.val=el.value}
   autoStatus(c);
-  rerender();changed();
+  refreshCard(c);changed();
 });
 document.addEventListener("change",e=>{
   const el=e.target,f=el.dataset.f,c=el.dataset.c;if(!f)return;
@@ -1173,6 +1323,7 @@ document.addEventListener("change",e=>{
 });
 // re-deal the cards when the window gets wide or narrow enough for a different number of columns,
 // otherwise just re-measure the rows, since names wrap differently at another width
+if(window.IntersectionObserver)new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle("offscreen",!e.isIntersecting))).observe(document.getElementById("summary"));
 let semsW=0;
 new ResizeObserver(()=>{const w=document.getElementById("sems").clientWidth;if(w===semsW)return;semsW=w;
   if(colsNow&&colCount()!==colsNow)rerender();else alignRows()}).observe(document.getElementById("sems"));
@@ -1184,12 +1335,21 @@ document.addEventListener("toggle",e=>{
 document.addEventListener("click",e=>{
   const sm=e.target.closest("details.course > summary, details.addel > summary");
   if(sm){const d=sm.parentElement;
-    if(!d.open){d.classList.remove("closing");d.classList.add("anim");d.addEventListener("animationend",()=>d.classList.remove("anim"),{once:true})}
+    if(!d.open){d.classList.remove("closing");d.classList.add("anim");d.addEventListener("animationend",()=>d.classList.remove("anim"),{once:true});
+      // opening: grow the card's height smoothly, the mirror of the roll-up below
+      if(!noMotion()){
+        e.preventDefault();const from=d.offsetHeight;d.open=true;const to=d.offsetHeight;
+        d.style.overflow="hidden";
+        const ga=d.animate([{height:from+"px"},{height:to+"px"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"});
+        const done=()=>{if(!d.classList.contains("closing"))d.style.overflow=""};
+        ga.onfinish=done;setTimeout(done,480);
+      }
+    }
     // closing: play the roll backwards first, then really close
-    else if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&!d.classList.contains("closing")){
-      e.preventDefault();d.classList.remove("anim");d.classList.add("closing");
+    else if(!noMotion()&&!d.classList.contains("closing")){
+      e.preventDefault();d.classList.remove("anim");const full=d.offsetHeight;d.classList.add("closing");
       // shrink the card's height smoothly too, so the page gets shorter gradually instead of jumping
-      const full=d.offsetHeight,target=sm.offsetHeight+(d.offsetHeight-d.clientHeight);
+      const target=sm.offsetHeight+(d.offsetHeight-d.clientHeight);
       d.style.overflow="hidden";
       const ha=d.animate([{height:full+"px"},{height:target+"px"}],{duration:300,easing:"cubic-bezier(.4,0,.2,1)",fill:"forwards"});
       const done=()=>{if(d.classList.contains("closing")){d.classList.remove("closing");d.open=false;ha.cancel();d.style.overflow=""}};
@@ -1201,10 +1361,17 @@ document.addEventListener("click",e=>{
   if(b.id==="lang-en"||b.id==="lang-sk"){S.lang=b.id.slice(5);rerender();changed();return}
   if(b.id==="reset-btn"){openReset(1);return}
   if(b.id==="exit-btn"){openReset("exit");return}
+  if(b.id==="set-btn"){openSettings();return}
+  if(b.id==="set-close"){closeSettings();return}
+  if(b.dataset.perf){setPerf(b.dataset.perf);return}
   if(b.id==="th-light"||b.id==="th-dark"){try{localStorage.setItem("fit-theme",b.id.slice(3))}catch(e){}applyTheme();return}
   if(b.dataset.view){S.view=b.dataset.view;render();changed();return}
   if(b.dataset.year||b.dataset.half){const c=cur();S.current=(b.dataset.year||c[0])+(b.dataset.half||c[1]);render();changed();return}
-  if(b.dataset.retake){const r=cs(b.dataset.retake);r.taken=SLOTS[SLOTS.indexOf(r.taken)+2];r.enroll=2;r.status="planned";r.exam=["","",""];r.pts={};r.extra=[];rerender();changed();return}
+  // retake keeps a copy of the first attempt, so "Undo" (toast now, or the button on the moved card later) can put it back
+  if(b.dataset.retake){const c=b.dataset.retake,r=cs(c);r.prev={taken:r.taken,status:r.status,auto:r.auto,pts:r.pts,extra:r.extra,exam:r.exam};
+    r.taken=SLOTS[SLOTS.indexOf(r.taken)+2];r.enroll=2;r.status="planned";r.exam=["","",""];r.pts={};r.extra=[];delete r.auto;rerender();changed();
+    undoToast(L().movedTo(c,slotName(r.taken)),()=>unretake(c,false));return}
+  if(b.dataset.unretake){unretake(b.dataset.unretake,true);return}
   if(b.dataset.add){const c=b.dataset.add,n=document.getElementById("an-"+c).value.trim(),m=num(document.getElementById("am-"+c).value);if(!n)return document.getElementById("an-"+c).focus();
     cs(c).extra.push({id:"x"+Date.now().toString(36),n,max:m==null?"":m,val:""});rerender();changed();return}
   if(b.dataset.del){const r=cs(b.dataset.del);r.extra=r.extra.filter(x=>x.id!==b.dataset.k);rerender();changed();return}
