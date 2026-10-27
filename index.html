@@ -296,7 +296,8 @@ details.course.ghost{position:fixed;z-index:70;margin:0;pointer-events:none;box-
 details.course.ghost>.cbody{display:none}
 body.dragging,body.dragging *{cursor:grabbing!important}
 .emptyopt{margin:0;font-size:13px;color:var(--muted)}
-.unoff{margin:0;font-size:12px;color:var(--warn)}
+.subline{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.unoff{font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:1px 8px;cursor:help}
 /* entry notice: shown until the viewer types the accept word */
 .gate{min-height:100vh;min-height:100dvh;display:grid;place-items:center;align-content:center;gap:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .gate form{width:min(320px,100%)}
@@ -521,6 +522,21 @@ table.pts input{width:56px;text-align:right;font-family:var(--f-mono);padding:3p
 table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
 .minnote{font-size:11px;color:var(--warn)}
 .x{border:0;background:none;color:var(--muted);cursor:pointer;padding:0 4px;font-size:14px}
+.isbtn{display:inline-flex;align-items:center;gap:6px;justify-self:start;font-size:12.5px}
+.isbtn svg{width:15px;height:15px;flex:none}
+.mbox.imp{max-width:560px;text-align:left;gap:10px;padding:18px 20px 16px;border-color:var(--line);box-shadow:0 24px 70px rgba(0,0,0,.35);max-height:calc(100dvh - 56px);overflow:auto}
+.mbox.imp h2{font-size:18px}
+.mbox.imp p{font-size:13px}
+.mbox.imp textarea{width:100%;min-height:74px;resize:vertical;font:inherit;font-size:13px;padding:8px 10px;border-radius:8px;border:1px dashed var(--line);background:var(--paper);color:var(--ink)}
+.mbox.imp textarea:focus{outline:2px solid var(--blue);outline-offset:1px;border-style:solid}
+.impt{width:100%;border-collapse:collapse;font-size:13px}
+.impt td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:top}
+.impt td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.impt .to{color:var(--muted);font-size:12px}
+.impt tr.ch td.n b{color:var(--ok)}
+.impt tr.nc td{color:var(--muted)}
+.impt .newr{color:var(--blue);font-size:11px;font-weight:600}
+.mbox.imp .acts{justify-content:flex-end}
 .linkbtn{border:0;background:none;color:var(--blue);cursor:pointer;padding:0;font-size:12px;font-weight:500;text-align:left}
 .addrow{display:flex;gap:6px;flex-wrap:wrap}
 .addrow input{flex:1 1 120px}
@@ -661,8 +677,7 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
           <img id="logo" class="logo" src="logo-en.webp" alt="Brno University of Technology, Faculty of Information Technology">
           <h1 id="t-title">FIT Study Index</h1>
         </div>
-        <p id="t-sub">Bachelor · Information Technology (BIT) · Faculty of Information Technology, BUT Brno</p>
-        <p class="unoff" id="t-unoff">Unofficial student tool, not run by VUT or FIT.</p>
+        <p class="subline"><span id="t-sub">Bachelor's in Information Technology · BIT</span><span class="unoff" id="t-unoff" title="Not made or run by VUT or FIT">Unofficial</span></p>
       </div>
     </div>
     <div class="tools">
@@ -770,7 +785,7 @@ const COURSES=[
  {c:"IEL",id:302517,en:"Electronics for Information Technology",sk:"Elektronika pre informačné technológie",cr:6,t:"Cr+Ex",k:"C",s:"1W",parts:[P("Labs (6 × 3 pts)","Laboratóriá (6 × 3 b)",18,9),P("Semester project","Semestrálny projekt",12,3),P("Mid-term test","Polsemestrálna písomka",15)],exam:EX(55,27)},
  {c:"ILG",id:302528,en:"Linear Algebra",sk:"Lineárna algebra",cr:5,t:"Cr+Ex",k:"C",s:"1W",zeroMax:1,parts:[1,2,3,4,5].map(i=>P("Test "+i,"Písomka "+i,4)),exam:EX(80)},
  {c:"IUS",id:302578,en:"Introduction to Software Engineering",sk:"Úvod do softvérového inžinierstva",cr:5,t:"Cr+Ex",k:"C",s:"1W",credit:18,parts:[P("Exercises (4 × 3 pts)","Cvičenia (4 × 3 b)",12),P("Homework (ER diagram)","Domáca úloha (ER diagram)",12),P("Team project + defence","Tímový projekt + obhajoba",16)],exam:EX(60)},
- {c:"IZP",id:302589,en:"Introduction to Programming Systems",sk:"Základy programovania",cr:7,t:"Cr+Ex",k:"C",s:"1W",credit:25,parts:[P("Computer labs","Počítačové cvičenia",20,12),P("Project 1","Projekt 1",7.5,1),P("Project 2","Projekt 2",7.5,1),P("Mid-term test","Polsemestrálna písomka",12)],exam:EX(53)},
+ {c:"IZP",id:302589,en:"Introduction to Programming Systems",sk:"Základy programovania",cr:7,t:"Cr+Ex",k:"C",s:"1W",credit:25,parts:[P("Computer labs","Počítačové cvičenia",20,12),P("Project 1","Projekt 1",6,1),P("Project 2","Projekt 2",6,1),P("Mid-term test","Polsemestrálna písomka",12)],exam:EX(53)},
  // 1st year, summer
  {c:"IMA1",id:302530,en:"Mathematical Analysis 1",sk:"Matematická analýza 1",cr:4,t:"Cr+Ex",k:"C",s:"1S",parts:[P("Written tests","Písomky",20)],exam:EX(80)},
  {c:"INC",id:302539,en:"Digital Systems Design",sk:"Návrh číslicových systémov",cr:5,t:"Cr+Ex",k:"C",s:"1S",parts:[P("Mid-term test","Polsemestrálna písomka",25),P("Homework + lab evaluation","Domáce úlohy + laboratóriá",20)],exam:EX(55)},
@@ -816,7 +831,7 @@ function addOptional(code,slot){
 
 /* ---------- Strings ---------- */
 const T={
- en:{title:"FIT Study Index",sub:"Bachelor · Information Technology (BIT) · Faculty of Information Technology, BUT Brno",
+ en:{title:"FIT Study Index",sub:"Bachelor's in Information Technology · BIT",
   done:"done",of:"of 180 credits",earned:"credits earned",inprog:"in progress this term",
   lgPassed:"Passed",lgProg:"Enrolled now",lgLeft:"Still ahead",
   rComp:"Compulsory courses",rCompS:"146 credits must all be passed",rEng:"English (PVA)",rTech:"Technical elective (PVT)",rTechS:"one of IVH, ICP, ICS, IJA",
@@ -828,6 +843,13 @@ const T={
   st:{planned:"Planned",enrolled:"In progress",risk:"At risk",credit:"Credit ✓",passed:"Passed",failed:"Failed"},
   status:"Status",taken:"Taken in",enroll:"Enrolment",e1:"1st time",e2:"Repeated (2nd)",
   partsH:"Points during the semester",sem_total:"Semester total",addItem:"Add a test or item",itemName:"Name, e.g. Test 3",max:"max",add:"Add",
+  isBtn:"Paste points from Studis",isTitle:c=>`Points from Studis · ${c}`,
+  isHow:"In Studis open Electronic index → click the course name. Select the “Dílčí hodnocení” table (or the whole page with Cmd/Ctrl+A), copy it and paste it here.",
+  isPh:"Paste here (Cmd/Ctrl+V)",isNone:"No points table found. Copy the “Dílčí hodnocení” table from the course detail in Studis.",
+  isOther:(a,b)=>`This is ${a}, not ${b}, so the points will go into ${a}.`,isUnknown:c=>`This is ${c}, which isn't in your tracker. Add it first.`,
+  isNew:"new row",isSame:"no change",isEmpty:"no points yet",isExamN:i=>["Exam · regular","Exam · 1st resit","Exam · 2nd resit"][i],
+  isApply:n=>n?`Fill in ${n} change${n>1?"s":""}`:"Nothing to change",isDone:(n,c)=>`${n} change${n>1?"s":""} from Studis in ${c}`,
+  isNote:"Only rows with points are filled in. Each change goes to History.",
   min:"min",exam:"Exam",examAttempts:"Exam attempts",regular:"Regular",resit1:"1st resit",resit2:"2nd resit",
   needCredit:(n,t)=>`<b>${n} more pts</b> for the course credit`,
   creditOk:t=>`<b>Course credit ✓</b>`,
@@ -861,7 +883,7 @@ const T={
   optPick:"Choose a course…",grpA:"English (one course, B1 or higher)",grpT:"Technical (one of these)",grpE:"Other electives",ownH:"Not on the list? Add your own",
   kind:{E:"optional",A:"English",T:"technical"},exTitle:"Exit the tracker?",exBody:"You will need the secret word to get back in. Your data stays saved.",exYes:"Yes, exit",exitBtn:"Exit",secretPh:"Type the secret word",resetBtn:"Reset all data",cancel:"Cancel",
   r1Title:"Reset everything?",r1Body:"This deletes all your points, exam scores, course statuses, electives and failed-course marks.",r1Yes:"Yes, reset",
-  r2Title:"Are you absolutely sure?",r2Body:"All your data will be deleted for good. This cannot be undone.",r2Yes:"Delete everything",resetDone:"All data was reset.",minOkShort:"✓ Minimum reached. You can continue your studies.",minOkToast:"🎉 You reached the minimum credits!",unoff:"Unofficial student tool, not run by VUT or FIT.",logoAlt:"Brno University of Technology, Faculty of Information Technology",
+  r2Title:"Are you absolutely sure?",r2Body:"All your data will be deleted for good. This cannot be undone.",r2Yes:"Delete everything",resetDone:"All data was reset.",minOkShort:"✓ Minimum reached. You can continue your studies.",minOkToast:"🎉 You reached the minimum credits!",unoff:"Unofficial",unoffTip:"Not made or run by VUT or FIT",logoAlt:"Brno University of Technology, Faculty of Information Technology",
   zeroLbl:"Tests with 0 points",failLbl:"Failed courses",fail3:"3 ✕: you cannot continue your studies.",
   zeroBad:(z,m)=>`<b>${z} zeros</b> (max ${m}) · no course credit`,
   zeroInfo:(z,m,left)=>`Tests with 0 points: <b>${z} of ${m} allowed</b>. ${left} test${left>1?"s":""} still to write.`,
@@ -872,7 +894,7 @@ const T={
   minOk:"<b>Minimum reached.</b> You can continue your study.",
   note1S:"Year 1 needs 30 credits in total. If you passed 15 in winter, you need 15 more this summer.",
   noteY:"From year 2 the minimum is 30 credits per year. Winter and summer count together."},
- sk:{title:"FIT študijný index",sub:"Bakalár · Informačné technológie (BIT) · Fakulta informačných technológií VUT v Brne",
+ sk:{title:"FIT študijný index",sub:"Bakalársky program Informačné technológie · BIT",
   done:"hotovo",of:"zo 180 kreditov",earned:"získaných kreditov",inprog:"prebieha tento semester",
   lgPassed:"Absolvované",lgProg:"Zapísané teraz",lgLeft:"Ešte pred tebou",
   rComp:"Povinné predmety",rCompS:"všetkých 146 kreditov treba splniť",rEng:"Angličtina (PVA)",rTech:"Technický PV predmet (PVT)",rTechS:"jeden z IVH, ICP, ICS, IJA",
@@ -884,6 +906,13 @@ const T={
   st:{planned:"Plánované",enrolled:"Prebieha",risk:"Ohrozené",credit:"Zápočet ✓",passed:"Absolvované",failed:"Neúspešné"},
   status:"Stav",taken:"Zapísané v",enroll:"Zápis",e1:"1. zápis",e2:"Opakovaný (2.)",
   partsH:"Body počas semestra",sem_total:"Spolu za semester",addItem:"Pridať písomku alebo položku",itemName:"Názov, napr. Písomka 3",max:"max",add:"Pridať",
+  isBtn:"Vložiť body zo Studisu",isTitle:c=>`Body zo Studisu · ${c}`,
+  isHow:"V Studise otvor Elektronický index → klikni na názov predmetu. Označ tabuľku „Dílčí hodnocení“ (alebo celú stránku cez Cmd/Ctrl+A), skopíruj ju a vlož sem.",
+  isPh:"Vlož sem (Cmd/Ctrl+V)",isNone:"Nenašla sa tabuľka s bodmi. Skopíruj tabuľku „Dílčí hodnocení“ z detailu predmetu v Studise.",
+  isOther:(a,b)=>`Toto je ${a}, nie ${b}, body pôjdu do ${a}.`,isUnknown:c=>`Toto je ${c}, ktorý v trackeri nemáš. Najprv ho pridaj.`,
+  isNew:"nový riadok",isSame:"bez zmeny",isEmpty:"zatiaľ bez bodov",isExamN:i=>["Skúška · riadny","Skúška · 1. opravný","Skúška · 2. opravný"][i],
+  isApply:n=>n?`Doplniť ${n} ${n===1?"zmenu":n<5?"zmeny":"zmien"}`:"Nie je čo meniť",isDone:(n,c)=>`${n} ${n===1?"zmena":n<5?"zmeny":"zmien"} zo Studisu v ${c}`,
+  isNote:"Doplnia sa len riadky s bodmi. Každá zmena sa zapíše do Histórie.",
   min:"min",exam:"Skúška",examAttempts:"Termíny skúšky",regular:"Riadny",resit1:"1. opravný",resit2:"2. opravný",
   needCredit:(n,t)=>`Na zápočet chýba <b>${n} b</b>`,
   creditOk:t=>`<b>Zápočet ✓</b>`,
@@ -917,7 +946,7 @@ const T={
   optPick:"Vyber predmet…",grpA:"Angličtina (jeden predmet, B1 alebo vyššie)",grpT:"Technický (jeden z nich)",grpE:"Ostatné voliteľné",ownH:"Nie je v zozname? Pridaj vlastný",
   kind:{E:"voliteľný",A:"angličtina",T:"technický"},exTitle:"Odísť z trackera?",exBody:"Na návrat budeš potrebovať tajné slovo. Tvoje údaje ostanú uložené.",exYes:"Áno, odísť",exitBtn:"Odísť",secretPh:"Zadaj tajné slovo",resetBtn:"Vymazať všetky údaje",cancel:"Zrušiť",
   r1Title:"Vymazať všetko?",r1Body:"Vymažú sa všetky tvoje body, výsledky skúšok, stavy predmetov, voliteľné predmety aj značky neúspešných predmetov.",r1Yes:"Áno, vymazať",
-  r2Title:"Naozaj to chceš urobiť?",r2Body:"Všetky údaje sa natrvalo vymažú. Nedá sa to vrátiť späť.",r2Yes:"Vymazať všetko",resetDone:"Všetky údaje boli vymazané.",minOkShort:"✓ Minimum splnené. Môžeš pokračovať v štúdiu.",minOkToast:"🎉 Máš minimum kreditov!",unoff:"Neoficiálny študentský nástroj, VUT ani FIT ho neprevádzkujú.",logoAlt:"Vysoké učení technické v Brně, Fakulta informačních technologií",
+  r2Title:"Naozaj to chceš urobiť?",r2Body:"Všetky údaje sa natrvalo vymažú. Nedá sa to vrátiť späť.",r2Yes:"Vymazať všetko",resetDone:"Všetky údaje boli vymazané.",minOkShort:"✓ Minimum splnené. Môžeš pokračovať v štúdiu.",minOkToast:"🎉 Máš minimum kreditov!",unoff:"Neoficiálne",unoffTip:"Nevytvorilo ani neprevádzkuje VUT ani FIT",logoAlt:"Vysoké učení technické v Brně, Fakulta informačních technologií",
   zeroLbl:"Písomky za 0 bodov",failLbl:"Neúspešné predmety",fail3:"3 ✕: v štúdiu nemôžeš pokračovať.",
   zeroBad:(z,m)=>`<b>${z} nuly</b> (max ${m}) · bez zápočtu`,
   zeroInfo:(z,m,left)=>`Písomky za 0 bodov: <b>${z} z ${m} povolenej</b>. Ešte ťa čaká ${left} ${left===1?"písomka":left<5?"písomky":"písomiek"}.`,
@@ -956,7 +985,7 @@ Object.assign(T.en,{
   winT:{summary:"Progress",upnext:"Up next",plan:"Year plan",courses:"Courses",chart:"Credits chart",ms:"Milestones",hist:"History"},
   layT:"Layout",layDesc:"Move the windows around and hide the ones you don't need.",layEdit:"Edit layout",layBarT:"Editing layout",
   resetT:"Reset",resetDesc:"Delete all points, statuses and settings in this tracker.",verLbl:(v,d)=>`Version ${v} · updated ${d}`,logT:"Version history",logDesc:"What changed in every version of the tracker.",logOpen:"See what's new",logBack:"Back",
-  logUp:v=>`Up to date · ${v}`,logUpTip:"You are on the newest version",logVers:"Versions",logCat:{n:"New",i:"Improved",f:"Fixed"},logRange:(a,b)=>a===b?`Update ${a}`:`Updates ${a} – ${b}`,verTip:"Counts the updates to the tracker itself, not the automatic saves of your data",
+  logUp:v=>`Up to date · ${v}`,logUpTip:"You are on the newest version",logVers:"Versions",logCat:{n:"New",i:"Improved",f:"Fixed"},verTip:"The version of the tracker itself; saving your data doesn't change it",
   layBarHint:"Drag a window by its bar · switch windows on or off",layReset:"Reset",layDone:"Done",layOn:"Shown",layOff:"Hidden",layFixed:"Always shown",layMove:"Move · Alt + ↑ / ↓"
 });
 Object.assign(T.sk,{
@@ -985,26 +1014,32 @@ Object.assign(T.sk,{
   winT:{summary:"Postup",upnext:"Čo ďalej",plan:"Plán ročníka",courses:"Predmety",chart:"Graf kreditov",ms:"Míľniky",hist:"História"},
   layT:"Rozloženie",layDesc:"Presúvaj okná a skry tie, ktoré nepotrebuješ.",layEdit:"Upraviť rozloženie",layBarT:"Úprava rozloženia",
   resetT:"Vymazanie",resetDesc:"Vymaže všetky body, stavy a nastavenia v tomto trackeri.",verLbl:(v,d)=>`Verzia ${v} · aktualizované ${d}`,logT:"História verzií",logDesc:"Čo sa zmenilo v každej verzii trackera.",logOpen:"Pozrieť novinky",logBack:"Späť",
-  logUp:v=>`Aktuálna verzia · ${v}`,logUpTip:"Máš najnovšiu verziu",logVers:"Verzie",logCat:{n:"Nové",i:"Vylepšené",f:"Opravené"},logRange:(a,b)=>a===b?`Aktualizácia ${a}`:`Aktualizácie ${a} – ${b}`,verTip:"Počíta aktualizácie samotného trackera, nie automatické ukladanie tvojich údajov",
+  logUp:v=>`Aktuálna verzia · ${v}`,logUpTip:"Máš najnovšiu verziu",logVers:"Verzie",logCat:{n:"Nové",i:"Vylepšené",f:"Opravené"},verTip:"Verzia samotného trackera; ukladanie tvojich údajov ju nemení",
   layBarHint:"Okno potiahni za jeho lištu · okná zapni alebo vypni",layReset:"Pôvodné",layDone:"Hotovo",layOn:"Zobrazené",layOff:"Skryté",layFixed:"Vždy zobrazené",layMove:"Presunúť · Alt + ↑ / ↓"
 });
 const TYPE={en:{"Cr+Ex":"Course credit + exam","Ex":"Exam","Cr":"Course credit","ClCr":"Graded course credit"},sk:{"Cr+Ex":"Zápočet + skúška","Ex":"Skúška","Cr":"Zápočet","ClCr":"Klasifikovaný zápočet"}};
 
-/* ---------- App version: one step per published update of the tracker (data auto-saves do not count) ---------- */
-// shown as X.X: every update adds 0.1, so the 79th update is 7.9 and the 80th becomes 8.0
-const APP_VER=84,APP_DATE="2026-10-26";
-const verTxt=n=>`${Math.floor(n/10)}.${n%10}`;
+/* ---------- App version: the newest entry of the version log (data auto-saves do not count) ---------- */
+// like an app release: small fixes go into the current version, a new feature set gets the next number (3.5 → 3.6),
+// a big change starts a new major (3.x → 4.0)
+const APP_VER="3.5",APP_DATE="2026-10-27";
 
-/* ---------- Version log: the 80 updates so far, related small ones merged into one version each ----------
-   r = [first, last] update number (shown as X.X); n / i / f = new / improved / fixed, each item [English, Slovak] */
+/* ---------- Version log: one entry per version, newest first ----------
+   v = version; n / i / f = new / improved / fixed, each item [English, Slovak] */
 const CHANGELOG=[
- {r:[84,84],d:"2026-10-26",t:["Failed courses, calmer","Neúspešné predmety, pokojnejšie"],
+ {v:"3.5",d:"2026-10-27",t:["Points from Studis","Body zo Studisu"],
+  n:[["Paste points from Studis: copy the “Dílčí hodnocení” table of a course and the tracker fills in the matching rows, after a preview","Vloženie bodov zo Studisu: skopíruj tabuľku „Dílčí hodnocení“ predmetu a tracker po náhľade doplní zodpovedajúce riadky"],
+     ["Exam terms from Studis go into the right attempt, with their dates","Termíny skúšky zo Studisu idú do správneho pokusu aj s dátumom"]],
+  i:[["New users start without optional courses: ISM is no longer added for you","Noví používatelia začínajú bez voliteľných predmetov: ISM sa už nepridáva automaticky"],
+     ["IZP projects are worth 6 points each","Projekty z IZP majú po 6 bodov"],
+     ["Cleaner header: one short line under the logo and a small “Unofficial” tag (hover for details)","Čistejšia hlavička: jeden krátky riadok pod logom a malý štítok „Neoficiálne“ (podrobnosti po prejdení myšou)"]]},
+ {v:"3.4",d:"2026-10-26",t:["Failed courses, calmer","Neúspešné predmety, pokojnejšie"],
   n:[["A failed course folds into a short panel with two choices: retake next year, or undo a misclick","Neúspešný predmet sa zbalí do krátkeho panelu s dvoma voľbami: opakovať budúci rok alebo vrátiť omyl"],
      ["Undo puts the course back exactly as it was before the change that failed it","Vrátenie obnoví predmet presne do stavu pred zmenou, ktorá ho zhodila"]],
   i:[["The ✕ marks pop in first, then the card changes to the panel","Najprv vyskočia ✕, potom sa karta zmení na panel"],
      ["The year / semester bar turns to frosted glass while it sticks to the top","Lišta ročníka a semestra sa pri prilepení hore zmení na matné sklo"],
      ["Settings are grouped: Appearance, Courses & layout, Your data, About","Nastavenia sú v skupinách: Zobrazenie, Predmety a rozloženie, Tvoje údaje, O aplikácii"]]},
- {r:[81,83],d:"2026-10-26",t:["Clearer plan and chart","Prehľadnejší plán a graf"],
+ {v:"3.3",d:"2026-10-26",t:["Clearer plan and chart","Prehľadnejší plán a graf"],
   n:[["Grade scale in colour: each mark has its own colour and the marks you got are filled in with a count","Farebná stupnica: každá známka má svoju farbu a tie, ktoré si dostal, sú vyplnené aj s počtom"],
      ["The grade on a finished course wears its mark's colour","Známka pri ukončenom predmete má farbu svojej známky"],
      ["Failed credits in red in the year plan and the credits chart: credits you can no longer earn that semester","Neúspešné kredity načerveno v pláne ročníka aj v grafe kreditov: kredity, ktoré už v tom semestri nezískaš"],
@@ -1017,15 +1052,15 @@ const CHANGELOG=[
   f:[["The chart's tooltip no longer runs off the page on a narrow window","Popis v grafe už na úzkom okne nevybieha mimo stránky"],
      ["More room between the exam ✕ boxes and the exam rows, with Points / Date headings","Viac miesta medzi políčkami ✕ a riadkami skúšky, s nadpismi Body / Dátum"],
      ["Grade marks on the what-if slider no longer overlap at the exam minimum","Známky na posuvníku „čo ak“ sa pri minime skúšky už neprekrývajú"]]},
- {r:[78,80],d:"2026-10-26",t:["Version history","História verzií"],
+ {v:"3.2",d:"2026-10-26",t:["Version history","História verzií"],
   n:[["This page: every version of the tracker and what changed in it","Táto stránka: každá verzia trackera a čo sa v nej zmenilo"],
-     ["Version number at the bottom of the tracker, counted in steps of 0.1","Číslo verzie na spodku trackera, počítané po 0,1"]]},
- {r:[74,77],d:"2026-10-26",t:["Your own layout","Vlastné rozloženie"],
+     ["Version number at the bottom of the tracker","Číslo verzie na spodku trackera"]]},
+ {v:"3.1",d:"2026-10-26",t:["Your own layout","Vlastné rozloženie"],
   n:[["Edit layout in Settings: drag the windows into any order","Upraviť rozloženie v Nastaveniach: okná presunieš v ľubovoľnom poradí"],
      ["Switch Up next, Year plan, Credits chart, Milestones and History on or off","Okná Čo ďalej, Plán ročníka, Graf kreditov, Míľniky a História sa dajú zapnúť a vypnúť"],
      ["Animations when the editor opens and closes and when a window folds away","Animácie pri otvorení a zatvorení editora a pri skladaní okna"]],
   i:[["Exit is now a button next to the gear","Odísť je teraz tlačidlo vedľa ozubeného kolieska"],["Reset all data moved into Settings","Vymazanie všetkých údajov sa presunulo do Nastavení"]]},
- {r:[70,73],d:"2026-10-26",t:["Big feature update","Veľká aktualizácia funkcií"],
+ {v:"3.0",d:"2026-10-26",t:["Big feature update","Veľká aktualizácia funkcií"],
   n:[["What-if slider: try an exam score and see the grade","Posuvník „čo ak“: skús body zo skúšky a uvidíš známku"],
      ["Weighted average by the BUT formula","Vážený priemer podľa vzorca VUT"],
      ["Notes on every course and explanations on the ✕ / ✓ boxes","Poznámky ku každému predmetu a vysvetlivky pri políčkach ✕ / ✓"],
@@ -1035,53 +1070,53 @@ const CHANGELOG=[
      ["Year plan check (30–65 credits a year) and a history of changes","Kontrola plánu ročníka (30–65 kreditov) a história zmien"],
      ["Backup to a file, phone bottom bar and swipe between semesters","Záloha do súboru, spodná lišta na mobile a prechod medzi semestrami potiahnutím"],
      ["Milestones and a credits-per-semester chart","Míľniky a graf kreditov za semester"]]},
- {r:[67,69],d:"2026-10-26",t:["Danger levels","Úrovne nebezpečenstva"],
+ {v:"2.3",d:"2026-10-26",t:["Danger levels","Úrovne nebezpečenstva"],
   n:[["The ✕ boxes get redder and pulse more as failures add up","Políčka ✕ sú červenšie a pulzujú viac, keď pribúdajú neúspechy"],
      ["At 3 failed courses the whole Progress box glows red","Pri 3 neúspešných predmetoch celé okno Postup žiari načerveno"]],
   i:[["All pulses run in sync","Všetky pulzy bežia naraz"],["Calmer pulse around the progress bar","Pokojnejší pulz okolo lišty postupu"]]},
- {r:[60,66],d:"2026-10-26",t:["Cleaner course cards","Prehľadnejšie karty predmetov"],
+ {v:"2.2",d:"2026-10-26",t:["Cleaner course cards","Prehľadnejšie karty predmetov"],
   n:[["A failed course is locked: fields greyed out, exam boxes ✕","Neúspešný predmet sa zamkne: polia sú sivé, políčka skúšky ✕"]],
   i:[["Shorter, clearer messages on the cards","Kratšie a jasnejšie správy na kartách"],["Status picker and Retake button share one size","Výber stavu a tlačidlo Opakovať majú rovnakú veľkosť"],
      ["Add a test or item: a compact button that rolls down","Pridať písomku: kompaktné tlačidlo s rozbaľovaním"],["Exit and auto-exit use the same shrink animation","Odchod aj automatický odchod majú rovnakú animáciu"]],
   f:[["A course no longer fails while you are still typing a score","Predmet už nezlyhá, kým ešte píšeš body"],["The status picker no longer looks bigger after a change","Výber stavu už po zmene nevyzerá väčší"]]},
- {r:[55,59],d:"2026-10-26",t:["Settings and smarter rules","Nastavenia a presnejšie pravidlá"],
+ {v:"2.1",d:"2026-10-26",t:["Settings and smarter rules","Nastavenia a presnejšie pravidlá"],
   n:[["Settings with language, theme and Full / Balanced / Low performance","Nastavenia s jazykom, vzhľadom a výkonom Plné / Vyvážené / Nízke"],["Undo for Retake next year","Možnosť vrátiť Opakovať budúci rok"]],
   i:[["A course fails on its own once the course credit is out of reach","Predmet zlyhá sám, keď zápočet už nie je dosiahnuteľný"],
      ["A failed optional course needs no retake (BUT rules)","Neúspešný voliteľný predmet netreba opakovať (pravidlá VUT)"],
      ["Faster typing: only the changed card is redrawn","Rýchlejšie písanie: prekreslí sa len zmenená karta"],["The reaper and the student no longer overlap","Smrtka a študent sa už neprekrývajú"]]},
- {r:[52,54],d:"2026-10-26",t:["Card layout","Rozloženie kariet"],
+ {v:"2.0",d:"2026-10-26",t:["Card layout","Rozloženie kariet"],
   i:[["Cards sit in columns, so an open card leaves no gaps","Karty sú v stĺpcoch, otvorená karta nenechá medzery"],["Rows of cards line up","Riadky kariet sú zarovnané"],["Cards roll down smoothly when opened","Karty sa pri otvorení plynulo rozbalia"]]},
- {r:[48,51],d:"2026-10-24",t:["Polish","Doladenie"],
+ {v:"1.9",d:"2026-10-24",t:["Polish","Doladenie"],
   i:[["Centered add-course button with a roll-down panel","Vycentrované tlačidlo na pridanie predmetu s rozbaľovacím panelom"],["More space above the grade scale","Viac miesta nad stupnicou známok"]],
   f:[["Auto-exit now works after the tab was in the background","Automatický odchod funguje aj po čase na pozadí"]]},
- {r:[41,47],d:"2026-10-24",t:["The deadline reaper","Smrtka termínov"],
+ {v:"1.8",d:"2026-10-24",t:["The deadline reaper","Smrtka termínov"],
   n:[["Next-step line on every closed card","Riadok s ďalším krokom na každej zatvorenej karte"],["New progress bar with a running student and a goal flag","Nová lišta postupu s bežiacim študentom a cieľom"],
      ["A reaper that walks with the semester and a red aura when it leads","Smrtka, ktorá kráča so semestrom, a červená žiara, keď vedie"],["Fail and pass animations","Animácie pri neúspechu a úspechu"]],
   i:[["The student moves by the credits your points are on track for","Študent sa posúva podľa kreditov, na ktoré smerujú tvoje body"]]},
- {r:[37,40],d:"2026-10-24",t:["Optional courses","Voliteľné predmety"],
+ {v:"1.7",d:"2026-10-24",t:["Optional courses","Voliteľné predmety"],
   n:[["Optional courses in their own section, picked from the FIT study plan","Voliteľné predmety vo vlastnej časti, vyberané zo študijného plánu FIT"],["Each card shows its status in colour and a points bar","Každá karta ukazuje stav farbou a lištu bodov"]],
   i:[["Optional courses can be removed","Voliteľné predmety sa dajú odstrániť"]]},
- {r:[26,36],d:"2026-10-24",t:["Secret word and auto-exit","Tajné slovo a automatický odchod"],
+ {v:"1.6",d:"2026-10-24",t:["Secret word and auto-exit","Tajné slovo a automatický odchod"],
   n:[["Secret word screen with ✕ / ✓ marks and EN / SK","Obrazovka s tajným slovom, značkami ✕ / ✓ a EN / SK"],["Exit with a confirmation","Odchod s potvrdením"],
      ["Auto-exit after 15 minutes without activity","Automatický odchod po 15 minútach nečinnosti"],["Saving indicator: orange ring, green dot","Indikátor ukladania: oranžový krúžok, zelená bodka"]],
   i:[["Transitions between the screens","Prechody medzi obrazovkami"]],
   f:[["The page no longer jumps when a card closes","Stránka už neskáče pri zatváraní karty"]]},
- {r:[22,25],d:"2026-10-23",t:["Reset all data","Vymazanie údajov"],
+ {v:"1.5",d:"2026-10-23",t:["Reset all data","Vymazanie údajov"],
   n:[["Reset all data with two warnings","Vymazanie všetkých údajov s dvoma upozorneniami"],["A cancelled warning shatters and falls away","Zrušené upozornenie sa rozbije a spadne"]],
   i:[["Footer credits Filipko & Claude","Pätička uvádza Filipka a Clauda"]]},
- {r:[17,21],d:"2026-10-23",t:["Automatic credits and animations","Automatické kredity a animácie"],
+ {v:"1.4",d:"2026-10-23",t:["Automatic credits and animations","Automatické kredity a animácie"],
   n:[["The bar turns green with confetti at the minimum","Lišta zozelenie a padnú konfety pri minime"],["Sliding toggles and rolling course cards","Posuvné prepínače a rozbaľovacie karty"]],
   i:[["Credits count automatically from your points","Kredity sa počítajú automaticky z bodov"],["Bigger Progress title, less clutter","Väčší nadpis Postup, menej neporiadku"]]},
- {r:[13,16],d:"2026-10-23",t:["Faculty look","Vzhľad fakulty"],
+ {v:"1.3",d:"2026-10-23",t:["Faculty look","Vzhľad fakulty"],
   n:[["Faculty logos in English and Slovak","Logá fakulty v angličtine a slovenčine"],["Unofficial notice and “Made by Filipko” footer","Upozornenie o neoficiálnosti a pätička „Made by Filipko“"]],
   i:[["Title beside the logo, centered footer","Nadpis vedľa loga, vycentrovaná pätička"]]},
- {r:[4,12],d:"2026-10-23",t:["Course credit and failures","Zápočet a neúspechy"],
+ {v:"1.2",d:"2026-10-23",t:["Course credit and failures","Zápočet a neúspechy"],
   n:[["Failed-course counter: 3 ✕ ends the studies","Počítadlo neúspechov: 3 ✕ ukončia štúdium"],["IDM and ILG: five tests, one 0 allowed, with ✕ boxes","IDM a ILG: päť písomiek, jedna 0 povolená, s políčkami ✕"],
      ["Exam term boxes and automatic fail on a second 0","Políčka termínov skúšky a automatický neúspech pri druhej 0"]],
   i:[["Semester bar matches light and dark mode","Lišta semestrov ladí so svetlým aj tmavým režimom"],["Less text on screen","Menej textu na obrazovke"]]},
- {r:[2,3],d:"2026-10-23",t:["Semesters and themes","Semestre a vzhľad"],
+ {v:"1.1",d:"2026-10-23",t:["Semesters and themes","Semestre a vzhľad"],
   n:[["Year and semester picker","Výber ročníka a semestra"],["Light and dark mode","Svetlý a tmavý režim"],["Semester minimum or whole study view","Pohľad na minimum semestra alebo celé štúdium"]]},
- {r:[1,1],d:"2026-10-23",t:["First version","Prvá verzia"],
+ {v:"1.0",d:"2026-10-23",t:["First version","Prvá verzia"],
   n:[["Tracker for the BIT courses: points, course credit, exams and retakes","Tracker pre predmety BIT: body, zápočty, skúšky a opakovanie"],["Progress towards 180 credits, in English and Slovak","Postup k 180 kreditom, po anglicky aj po slovensky"]]}
 ];
 
@@ -1415,6 +1450,7 @@ function courseCard(d){
     if(k.parts.length) h+=`<tr class="sum"><td>${t.sem_total}</td><td class="n mono" style="color:var(--ink)">${fmt(k.semPts)} / ${fmt(k.parts.reduce((a,p)=>a+(num(p.max)||0),0))}</td><td></td></tr>`;
     h+=`</tbody></table></div>`;
   }
+  if(!lock&&(k.parts.length||d.exam))h+=`<button class="linkbtn isbtn" type="button" data-isimp="${id}">${SVG_PASTE}${t.isBtn}</button>`;
   h+=`<details class="addt${lock?" off":""}" id="ad-${id}" ${S.addOpen===id&&!lock?"open":""}><summary class="addbtn"${lock?' tabindex="-1" aria-disabled="true"':""}>+ ${t.addItem}</summary><div class="addbody"><div class="addrow"><input type="text" id="an-${id}" placeholder="${t.itemName}" aria-label="${t.itemName}"><input type="text" class="sm" inputmode="decimal" id="am-${id}" placeholder="${t.max}" aria-label="${t.max}"><button class="btn" type="button" data-add="${id}">${t.add}</button></div></div></details>`;
   // zápočet
   if(d.t==="Cr+Ex"||(crOnly&&k.parts.length)){
@@ -1622,7 +1658,7 @@ function render(){
   document.getElementById("th-dark").textContent=t.dark;
   applyTheme();
   const lg=document.getElementById("logo"),src=S.lang==="sk"?"logo-cz.webp":"logo-en.webp";if(lg.getAttribute("src")!==src)lg.src=src;lg.alt=t.logoAlt;
-  document.getElementById("t-unoff").textContent=t.unoff;
+  document.getElementById("t-unoff").textContent=t.unoff;document.getElementById("t-unoff").title=t.unoffTip;
   renderSettings();
   document.querySelectorAll("[data-bb]").forEach(el=>el.textContent=t[el.dataset.bb]);
   applyLayout();
@@ -1645,7 +1681,7 @@ function render(){
   document.getElementById("sems").innerHTML=h;
   alignRows();syncPulses();requestAnimationFrame(syncPulses);
   renderHistory();
-  document.getElementById("foot").innerHTML=`<h3>${t.gradesH}</h3><div class="grades">${gradeChips()}</div><p class="madeby">Made by Filipko &amp; Claude ❤️</p><p class="appver mono" title="${t.verTip}">${t.verLbl(verTxt(APP_VER),new Date(APP_DATE+"T12:00:00").toLocaleDateString(S.lang==="sk"?"sk-SK":"en-GB",{day:"numeric",month:"short",year:"numeric"}))}</p>`;
+  document.getElementById("foot").innerHTML=`<h3>${t.gradesH}</h3><div class="grades">${gradeChips()}</div><p class="madeby">Made by Filipko &amp; Claude ❤️</p><p class="appver mono" title="${t.verTip}">${t.verLbl(APP_VER,new Date(APP_DATE+"T12:00:00").toLocaleDateString(S.lang==="sk"?"sk-SK":"en-GB",{day:"numeric",month:"short",year:"numeric"}))}</p>`;
   animateChanges();
 }
 
@@ -1923,7 +1959,7 @@ document.getElementById("bk-file").addEventListener("change",e=>{const f=e.targe
 
 function resetAll(){
   const lang=S.lang;closeModal();
-  S=defaults();S.lang=lang;S.idm5=1;S.optV2=1;addOptional("ISM","1W");cs("ISM").status="enrolled";
+  S=defaults();S.lang=lang;S.idm5=1;S.optV2=1;
   metPrev=null;
   rerender();changed();
   const toast=document.createElement("div");toast.className="toast";toast.style.background="var(--bad)";toast.textContent=L().resetDone;document.body.append(toast);setTimeout(()=>toast.remove(),2800);
@@ -1953,6 +1989,139 @@ function syncPulses(){
 // also when a pulse begins later on its own: after a ✕ pops in, or inside a card that was closed until now
 document.addEventListener("animationstart",e=>{if(e.animationName==="heat"||e.animationName==="doom")syncPulses()});
 document.addEventListener("animationend",e=>{if(e.animationName==="xin")requestAnimationFrame(syncPulses)});
+
+/* ---------- Paste from Studis: read the "Dílčí hodnocení" table of a course detail and fill in the matching rows ---------- */
+// the table has one row per activity (name, min, max, points) and, under it, a row per written attempt (order no., points, date);
+// it is read from the copied HTML, or from the tab-separated text a browser puts on the clipboard with a copied table
+const SVG_PASTE=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.8h6V4M9 11h6M9 15h4"/></svg>`;
+const fold=s=>String(s==null?"":s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/\s+/g," ").trim();
+// what kind of item a row is, from its Czech, Slovak or English name; rows are matched kind by kind, in order
+function itemKind(n){const x=fold(n);
+  if(/pulsemestr|polsemestr|mid-?term/.test(x))return "mid";
+  if(/zkousk|skusk|\bexam/.test(x))return "exam";
+  if(/projekt|project/.test(x))return "proj";
+  if(/domac|homework|ukol/.test(x))return "hw";
+  if(/samostatn|independent/.test(x))return "self";
+  if(/pisem|pisom|test|kontroln/.test(x))return "test";
+  if(/cvicen|labor|\blab|exercis/.test(x))return "lab";
+  return "other";
+}
+const IS_COLS={name:/^(nazev|name|title)/,ord:/^(por|order|no\b|#)/,min:/^min/,max:/^max/,pts:/^(body|points|pts|score)$/,date:/^(datum|date)/};
+function isGrid(g){
+  for(let i=0;i<g.length;i++){const col={};g[i].forEach((c,j)=>{const x=fold(c);for(const k in IS_COLS)if(col[k]==null&&IS_COLS[k].test(x))col[k]=j});
+    if(col.name!=null&&col.max!=null&&col.pts!=null)return {i,col}}
+  return null;
+}
+function isParse(html,text){
+  let g=null,h=null,body=text||"";
+  if(html){const doc=new DOMParser().parseFromString(html,"text/html");body=doc.body.textContent||body;
+    for(const tb of doc.querySelectorAll("table")){const x=[...tb.rows].map(tr=>[...tr.cells].map(c=>c.textContent.replace(/\s+/g," ").trim()));const y=isGrid(x);if(y){g=x;h=y;break}}}
+  if(!g&&text){const x=text.split(/\r?\n/).map(l=>l.split("\t").map(c=>c.replace(/\s+/g," ").trim()));const y=isGrid(x);if(y){g=x;h=y}}
+  // the course: "ILG - LINEÁRNÍ ALGEBRA (A.R. 2026/2027)" at the top of the detail
+  const m=/\b([A-Z][A-Z0-9]{1,5}) - [^\n]{2,90}?\([^)\n]{0,12}\d{4}\/\d{4}\)/.exec(body);
+  if(!g)return {code:m?m[1]:null,rows:[]};
+  const cell=(row,k)=>h.col[k]!=null&&row[h.col[k]]!=null?row[h.col[k]]:"";
+  const rows=[];let last=null;
+  for(const row of g.slice(h.i+1)){
+    const n=cell(row,"name");if(!n)continue;
+    const ord=cell(row,"ord"),mx=cell(row,"max"),dm=/(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})/.exec(cell(row,"date"));
+    const date=dm?`${dm[3]}-${dm[2].padStart(2,"0")}-${dm[1].padStart(2,"0")}`:"";
+    if(mx===""&&ord!==""&&last){last.kids.push({ord:num(ord),pts:num(cell(row,"pts")),date});continue}
+    last={n,max:num(mx),min:num(cell(row,"min")),pts:num(cell(row,"pts")),kids:[]};rows.push(last);
+  }
+  return {code:m?m[1]:null,rows};
+}
+// what the paste would change: one line per Studis row, each with the tracker row it goes to
+function isPlan(d,rows){
+  const r=cs(d.c),parts=partsOf(d),plan=[],taken=new Set();
+  const base=parts.filter(p=>!p.custom).map(p=>({...p,kind:itemKind(d.parts[+p.key.slice(1)].en)}));
+  const by={};rows.forEach(x=>{const k=itemKind(x.n);(by[k]=by[k]||[]).push(x)});
+  const line=(src,p,pts,max)=>{const mxCh=max>0&&p&&num(p.max)!==max,ptCh=pts!=null&&(!p||num(p.val)!==pts);
+    plan.push({src,key:p?p.key:null,to:p?p.n:null,a:p?p.val:"",b:pts,am:p?p.max:"",bm:max,mxCh,ptCh:ptCh,ch:!p?(max>0||pts!=null):mxCh||ptCh})};
+  for(const kind in by){const list=by[kind];
+    if(kind==="exam"){
+      if(!d.exam){list.forEach(x=>line(x.n,null,x.pts,x.max));continue}
+      for(const x of list){
+        const tries=x.kids.filter(y=>y.ord>=1&&y.ord<=3&&y.pts!=null);
+        if(!tries.length&&x.pts!=null)tries.push({ord:Math.max(1,r.exam.filter(v=>num(v)!=null).length),pts:x.pts,date:""});
+        if(!tries.length)plan.push({src:x.n,exam:-1,b:null,ch:false});
+        for(const y of tries){const i=y.ord-1,dt=(r.examDate||[])[i]||"";
+          const ch=num(r.exam[i])!==y.pts||(!!y.date&&!S.noDates&&dt!==y.date);
+          plan.push({src:x.n,exam:i,a:r.exam[i],b:y.pts,date:y.date,ch})}
+      }
+      continue;
+    }
+    const mine=base.filter(p=>p.kind===kind&&!taken.has(p.key));
+    // several Studis rows into one tracker row (e.g. 6 labs into "Labs (6 × 3 pts)"): add them up
+    if(mine.length===1&&list.length>1){const p=mine[0];taken.add(p.key);
+      // the max is left alone here: Studis may not list every lab yet
+      const got=list.filter(x=>x.pts!=null);
+      line(list.map(x=>x.n).join(" + "),p,got.length?fmt(got.reduce((a,x)=>a+x.pts,0)):null,0);continue}
+    list.forEach((x,i)=>{
+      let p=mine[i];if(p)taken.add(p.key);
+      // no regular row left: an own row with the same name (from an earlier paste), or a new one
+      if(!p)p=parts.find(q=>q.custom&&fold(q.n)===fold(x.n));
+      line(x.n,p,x.pts,x.max);
+    });
+  }
+  return plan;
+}
+let isState=null;
+function openImport(code){
+  closeModal();const t=L();
+  const m=document.createElement("div");m.className="modal";m.id="modal";m.dataset.kind="exit";
+  m.innerHTML=`<div class="mbox imp" role="dialog" aria-modal="true" aria-labelledby="m-title"><h2 id="m-title">${t.isTitle(esc(code))}</h2>
+    <p>${t.isHow}</p><textarea id="is-in" placeholder="${t.isPh}" aria-label="${t.isPh}"></textarea><div id="is-out"></div>
+    <div class="acts"><button class="btn plain" type="button" id="m-cancel">${t.cancel}</button><button class="btn" type="button" id="is-go" disabled>${t.isApply(0)}</button></div></div>`;
+  document.body.append(m);isState={code,target:null,plan:[]};
+  m.addEventListener("click",e=>{if(e.target===m)closeModal(true)});
+  m.querySelector("#m-cancel").onclick=()=>closeModal(true);
+  m.querySelector("#is-go").onclick=applyImport;
+  const ta=m.querySelector("#is-in");
+  ta.addEventListener("paste",e=>{const cd=e.clipboardData;if(!cd)return;e.preventDefault();
+    const html=cd.getData("text/html"),text=cd.getData("text/plain");ta.value=text.slice(0,4000);showImport(isParse(html,text))});
+  ta.addEventListener("input",()=>showImport(isParse("",ta.value)));
+  document.addEventListener("keydown",modalKey);ta.focus();
+}
+function showImport(res){
+  const t=L(),out=document.getElementById("is-out"),go=document.getElementById("is-go");if(!out)return;
+  isState.plan=[];isState.target=null;
+  const fail=msg=>{out.innerHTML=msg?`<div class="verdict warn">${msg}</div>`:"";go.disabled=true;go.textContent=t.isApply(0)};
+  if(!res.rows.length)return fail(document.getElementById("is-in").value.trim()?t.isNone:"");
+  let code=isState.code,note="";
+  if(res.code&&res.code!==code){if(!allCourses().some(x=>x.c===res.code))return fail(t.isUnknown(esc(res.code)));note=t.isOther(esc(res.code),esc(code));code=res.code}
+  const d=allCourses().find(x=>x.c===code),plan=isPlan(d,res.rows),n=plan.filter(x=>x.ch).length;
+  isState.target=code;isState.plan=plan;
+  const v=x=>x==null||x===""?"–":esc(String(x));
+  out.innerHTML=(note?`<div class="verdict info">${note}</div>`:"")+`<table class="impt"><tbody>${plan.map(x=>{
+    const to=x.exam!=null?(x.exam<0?"":t.isExamN(x.exam)):x.key?esc(x.to):`<span class="newr">+ ${t.isNew}</span>`;
+    const val=x.b==null&&!x.ch?`<span class="to">${t.isEmpty}</span>`:!x.ch?`<span class="to">${v(x.b)} · ${t.isSame}</span>`
+      :(x.exam!=null?`${v(x.a)} → <b>${v(x.b)}</b>${x.date&&!S.noDates?` <span class="to">· ${fmtDate(x.date)}</span>`:""}`
+      :`${x.ptCh||!x.key?`${x.key?v(x.a)+" → ":""}<b>${v(x.b)}</b>`:v(x.a)} <span class="to">/ ${x.mxCh?`${x.key?v(x.am)+" → ":""}<b>${v(x.bm)}</b>`:v(x.key?x.am:x.bm)}</span>`);
+    return `<tr class="${x.ch?"ch":"nc"}"><td>${esc(x.src)}${to?`<div class="to">→ ${to}</div>`:""}</td><td class="n">${val}</td></tr>`}).join("")}</tbody></table><p class="setnote">${t.isNote}</p>`;
+  go.disabled=!n;go.textContent=t.isApply(n);if(n)go.focus();
+}
+function applyImport(){
+  if(!isState||!isState.target)return;
+  const c=isState.target,r=cs(c),t=L(),todo=isState.plan.filter(x=>x.ch);if(!todo.length)return;
+  const pre=preSnap(r),before=r.status;let i=0;
+  for(const x of todo){
+    if(x.exam!=null){
+      if(num(r.exam[x.exam])!==x.b){logIt({c,f:"exam",k:x.exam,a:r.exam[x.exam],b:String(x.b)});r.exam[x.exam]=String(x.b)}
+      if(x.date&&!S.noDates){r.examDate=r.examDate||["","",""];if(r.examDate[x.exam]!==x.date){logIt({c,f:"edate",k:x.exam,a:r.examDate[x.exam],b:x.date});r.examDate[x.exam]=x.date}}
+    }else if(!x.key){
+      r.extra.push({id:"x"+Date.now().toString(36)+(i++),n:x.src,max:x.bm>0?x.bm:"",val:x.b==null?"":String(x.b)});logIt({c,f:"additem",n:x.src});
+    }else{
+      const own=r.extra.find(y=>y.id===x.key);
+      if(x.mxCh){logIt({c,f:"max",k:x.key,n:x.to,a:x.am,b:String(x.bm)});if(own)own.max=x.bm;else r.maxOv[x.key]=x.bm}
+      if(x.ptCh){logIt({c,f:"pt",k:x.key,n:x.to,a:x.a==null?"":x.a,b:String(x.b)});if(own)own.val=String(x.b);else r.pts[x.key]=String(x.b)}
+    }
+  }
+  delete r.keep;preNow=pre;autoStatus(c);preNow=null;
+  if(r.status!==before)logIt({c,f:"status",a:before,b:r.status,auto:1});
+  closeModal();rerender();renderHistory();changed();
+  const toast=document.createElement("div");toast.className="toast";toast.textContent=t.isDone(todo.length,c);document.body.append(toast);setTimeout(()=>toast.remove(),2800);
+}
 
 /* ---------- History: a log of changes to points, exam terms, dates, statuses and courses ---------- */
 // entries: {t:time, c:course, f:what (pt/max/exam/edate/credit/status/…), k:key, n:name at that time, a:before, b:after}
@@ -2196,22 +2365,21 @@ document.addEventListener("keydown",e=>{
 
 /* ---------- Version history page ---------- */
 let logSel=0;
-const verOf=n=>verTxt(n);
 const logDate=iso=>new Date(iso+"T12:00:00").toLocaleDateString(S.lang==="sk"?"sk-SK":"en-GB",{day:"numeric",month:"short",year:"numeric"});
 function renderLog(anim){
   const t=L(),k=S.lang==="sk"?1:0,e=CHANGELOG[logSel];
   document.getElementById("lg-title").textContent=t.logT;document.getElementById("lg-desc").textContent=t.logDesc;
   const lg=document.getElementById("logo2");lg.src=S.lang==="sk"?"logo-cz.webp":"logo-en.webp";lg.alt=t.logoAlt;
-  document.getElementById("lg-uptxt").textContent=t.logUp(verOf(APP_VER));document.getElementById("lg-up").title=t.logUpTip;
+  document.getElementById("lg-uptxt").textContent=t.logUp(APP_VER);document.getElementById("lg-up").title=t.logUpTip;
   const sb=document.getElementById("set-btn2");sb.setAttribute("aria-label",t.settings);sb.title=t.settings;
   const bb=document.getElementById("log-back");bb.setAttribute("aria-label",t.logBack);bb.title=t.logBack;
   document.getElementById("loglist").setAttribute("aria-label",t.logVers);
-  document.getElementById("lg-ver").textContent=t.verLbl(verOf(APP_VER),logDate(APP_DATE));
+  document.getElementById("lg-ver").textContent=t.verLbl(APP_VER,logDate(APP_DATE));
   document.getElementById("loglist").innerHTML=`<h2 class="grouph">${t.logVers}</h2><ol>${CHANGELOG.map((x,i)=>`<li><button type="button" class="logitem${i===logSel?" on":""}" data-logv="${i}"${i===logSel?' aria-current="true"':""}>
-    <span class="lv mono">${verOf(x.r[1])}</span><span class="lt">${esc(x.t[k])}</span><span class="ld">${logDate(x.d)}</span></button></li>`).join("")}</ol>`;
+    <span class="lv mono">${x.v}</span><span class="lt">${esc(x.t[k])}</span><span class="ld">${logDate(x.d)}</span></button></li>`).join("")}</ol>`;
   const sec=(key,cls)=>e[key]&&e[key].length?`<section class="logcat ${cls}"><h3><span class="tag">${t.logCat[key]}</span></h3><ul>${e[key].map(x=>`<li>${esc(x[k])}</li>`).join("")}</ul></section>`:"";
   const m=document.getElementById("logmain");
-  m.innerHTML=`<p class="logkicker mono">${t.logRange(verOf(e.r[0]),verOf(e.r[1]))} · ${logDate(e.d)}</p><h2 class="logtitle"><span class="mono">${verOf(e.r[1])}</span> ${esc(e.t[k])}</h2>${sec("n","n")}${sec("i","i")}${sec("f","f")}`;
+  m.innerHTML=`<p class="logkicker mono">${logDate(e.d)}</p><h2 class="logtitle"><span class="mono">${e.v}</span> ${esc(e.t[k])}</h2>${sec("n","n")}${sec("i","i")}${sec("f","f")}`;
   if(anim&&!noMotion())m.animate([{opacity:0,transform:"translateY(8px)"},{opacity:1,transform:"none"}],{duration:260,easing:"cubic-bezier(.2,.8,.2,1)"});
 }
 function openLog(){
@@ -2505,6 +2673,7 @@ document.addEventListener("click",e=>{
     r.taken=SLOTS[SLOTS.indexOf(r.taken)+2];r.enroll=2;r.status="planned";r.exam=["","",""];r.examDate=["","",""];r.pts={};r.extra=[];delete r.auto;rerender();changed();
     undoToast(L().movedTo(c,slotName(r.taken)),()=>unretake(c,false));return}
   if(b.dataset.unretake){unretake(b.dataset.unretake,true);return}
+  if(b.dataset.isimp){openImport(b.dataset.isimp);return}
   if(b.dataset.add){const c=b.dataset.add,n=document.getElementById("an-"+c).value.trim(),m=num(document.getElementById("am-"+c).value);if(!n)return document.getElementById("an-"+c).focus();
     cs(c).extra.push({id:"x"+Date.now().toString(36),n,max:m==null?"":m,val:""});logIt({c,f:"additem",n});rerender();changed();return}
   if(b.dataset.del){const r=cs(b.dataset.del),x=r.extra.find(x=>x.id===b.dataset.k);if(x)logIt({c:b.dataset.del,f:"delitem",n:x.n});r.extra=r.extra.filter(x=>x.id!==b.dataset.k);rerender();changed();return}
@@ -2554,6 +2723,8 @@ function migrate(){
   const local=localLoad();
   const serverHasData=server&&server.courses&&Object.keys(server.courses).length;
   load(serverHasData?server:(local&&local.s)||server||null);
+  // a brand-new user starts with no optional courses (ISM is only added when moving old saves)
+  if(!serverHasData&&!(local&&local.s))S.optV2=1;
   migrate();
   showGate();
   allCourses().forEach(d=>autoStatus(d.c));

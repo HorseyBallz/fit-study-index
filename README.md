@@ -35,7 +35,7 @@ It's a single file. Download `index.html` (and the two logo images next to it) a
 
 ## Versions
 
-Every version is its own commit and tag, from `v0.1` to the newest. See the [tags](../../tags) or the [commit history](../../commits/main).
+Every version is its own commit and tag, from `v1.0` to the newest. See the [tags](../../tags) or the [commit history](../../commits/main).
 
 ## Credits
 
@@ -80,7 +80,7 @@ Je to jeden súbor. Stiahni `index.html` (a dva obrázky loga vedľa neho) a otv
 
 ## Verzie
 
-Každá verzia je samostatný commit a tag, od `v0.1` po najnovšiu. Pozri [tagy](../../tags) alebo [históriu commitov](../../commits/main).
+Každá verzia je samostatný commit a tag, od `v1.0` po najnovšiu. Pozri [tagy](../../tags) alebo [históriu commitov](../../commits/main).
 
 ## Autori
 
