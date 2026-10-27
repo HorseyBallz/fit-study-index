@@ -4,7 +4,9 @@
 
 A study tracker for **Bachelor in Information Technology (BIT)** students at the Faculty of Information Technology, Brno University of Technology (FIT VUT / BUT). Enter your points and it works out credits, grades and what you still need.
 
-### ▶ Open it: **[fit-study-index.pages.dev](https://fit-study-index.pages.dev)**
+### ▶ Open it: **[hulko.xyz](https://hulko.xyz)**
+
+Also at [fit-study-index.pages.dev](https://fit-study-index.pages.dev).
 
 Secret word: **hulo**. It's not a real password, just a door so the page isn't opened by accident.
 
@@ -47,7 +49,9 @@ Made by Filipko & Claude ❤️. Rules are based on the BUT Study and Examinatio
 
 Tracker štúdia pre študentov **bakalárskeho programu Informačné technológie (BIT)** na Fakulte informačních technologií VUT v Brne. Zadáš body a on spočíta kredity, známky a čo ti ešte chýba.
 
-### ▶ Otvoriť: **[fit-study-index.pages.dev](https://fit-study-index.pages.dev)**
+### ▶ Otvoriť: **[hulko.xyz](https://hulko.xyz)**
+
+Tiež na [fit-study-index.pages.dev](https://fit-study-index.pages.dev).
 
 Tajné slovo: **hulo**. Nie je to skutočné heslo, len dvere, aby sa stránka neotvorila omylom.
 
