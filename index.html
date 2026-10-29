@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#14202e"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="icon-180.png"><meta name="apple-mobile-web-app-title" content="FIT Index"><style>[hidden]{display:none!important}</style></head><body><title>FIT Study Index</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f6f8"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f151d"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png"><link rel="icon" type="image/svg+xml" sizes="any" href="favicon.svg"><link rel="apple-touch-icon" href="icon-180.png"><meta name="apple-mobile-web-app-title" content="Hulko"><style>[hidden]{display:none!important}</style></head><body><title>Hulko</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,7 +55,21 @@ button,select,input{font:inherit;color:inherit}
 .brand h1{font-size:28px}
 .logorow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;min-width:0}
 .logo{height:52px;width:auto;max-width:100%;object-fit:contain;object-position:left;align-self:start}
+/* on a wide screen the logo is larger: at 52px its lettering is only 7–8 pixels tall and looks pixelated on a
+   non-Retina monitor; the 1x / 1.5x / 2x files are made for exactly this height */
+@media (min-width:761px){.logo{height:68px}}
+/* the app's own mark comes first: a sundial whose needle is an hourglass (time to the deadlines, the sun's rays
+   around it), in the text colour with only the falling sand in faculty red; the ring and rays are cut where the
+   needle crosses them. The name beside it, then a hairline and the faculty logo (on a phone it moves to its own line) */
+.hmark{display:flex;align-items:center;gap:12px;flex:none}
+.hlogo{width:52px;height:52px;flex:none;color:var(--ink);fill:currentColor}
+.hl-sand{fill:var(--accent)}
+.brand .hmark h1{font-family:var(--f-display);font-size:34px;font-weight:700;letter-spacing:-.025em;line-height:1}
+.lsep{width:1px;height:40px;background:var(--line);margin:0 4px}
+@media (min-width:761px){.hlogo{width:68px;height:68px}.brand .hmark h1{font-size:44px}.lsep{height:52px}}
+@media (max-width:760px){.lsep{display:none}}
 .madeby{margin:8px 0 0;font-size:13px;color:var(--muted);text-align:center}
+.users{margin:2px 0 0;font-size:12px;color:var(--muted);text-align:center}
 .appver{margin:0;font-size:11px;color:var(--muted);opacity:.75;cursor:help}
 .big.met .pct{color:var(--ok)}
 .metmsg{margin:0;font-size:14px;font-weight:600;color:var(--ok)}
@@ -70,9 +84,10 @@ button,select,input{font:inherit;color:inherit}
 .seg.slide{position:relative;display:inline-grid;grid-template-columns:repeat(var(--n,2),1fr);padding:2px}
 .seg.slide .thumb{position:absolute;top:2px;bottom:2px;left:2px;width:calc((100% - 4px) / var(--n,2));border-radius:6px;background:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.2);transform:translateX(calc(var(--pos,0) * 100%))}
 .seg.slide button{position:relative;z-index:1;background:none!important;border-radius:6px;text-align:center}
+.seg.slide.none .thumb{opacity:0}
 .seg.slide button[aria-pressed="true"]{color:var(--paper)}
 @media (prefers-reduced-motion:no-preference){
-  .seg.slide .thumb{transition:transform .32s cubic-bezier(.3,.7,.25,1.15),background-color .3s}
+  .seg.slide .thumb{transition:transform .32s cubic-bezier(.3,.7,.25,1.15),background-color .3s,opacity .25s}
   .seg.slide button{transition:color .25s}
   .seg button:active{transform:scale(.96)}
 }
@@ -107,6 +122,8 @@ button,select,input{font:inherit;color:inherit}
   .mbox{animation:pop .28s cubic-bezier(.2,.9,.3,1.25)}
   .mbox.lvl2{animation:pop .28s cubic-bezier(.2,.9,.3,1.25),glow 1.6s ease-in-out .3s infinite}
 }
+/* Settings is shown and hidden many times, so it animates from script (openSettings / closeSettings) instead */
+#settings,#settings>.mbox{animation:none}
 @keyframes fadein{from{opacity:0}}
 @keyframes pop{from{opacity:0;transform:scale(.88)}}
 @keyframes glow{50%{box-shadow:0 0 0 2px rgba(255,77,100,.7),0 0 80px rgba(255,40,60,.85),0 0 160px rgba(255,40,60,.45)}}
@@ -183,6 +200,19 @@ body.inlog .mbox.sets{max-width:460px;grid-template-columns:1fr}
   :root:not([data-perf="low"]) .logitem.major{animation:majglow 2.6s ease-in-out infinite alternate}
   :root:not([data-perf="low"]) .logmajor::after{animation:majshine 3.6s ease-in-out infinite}
 }
+/* the codename: a small "Version 4" over the big name, and why the version carries it under the banner */
+.logmajor em{display:block;margin-bottom:8px;font-style:normal;font-size:11.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;opacity:.85}
+.logwhy{margin:-6px 0 0;font-size:12.5px;line-height:1.45;color:var(--muted);text-align:center;text-wrap:balance}
+/* an update of a major version (4.1, 4.2 …): the same colours, quieter, no pulse and no shine */
+.logitem.sub{border-color:color-mix(in srgb,#7c3aed 30%,var(--line));background:color-mix(in srgb,#7c3aed 4%,var(--card));box-shadow:0 0 8px color-mix(in srgb,#7c3aed 12%,transparent)}
+.logitem.sub.on{border-color:color-mix(in srgb,#7c3aed 65%,var(--line))}
+.logitem.sub .lv{color:#fff;background:linear-gradient(135deg,#d0102b,#7c3aed);opacity:.8}
+.lmaj.sub{background:none;color:color-mix(in srgb,#7c3aed 70%,var(--ink));box-shadow:inset 0 0 0 1px color-mix(in srgb,#7c3aed 45%,transparent)}
+.logmain.sub{border-color:color-mix(in srgb,#7c3aed 28%,var(--line));box-shadow:0 0 24px color-mix(in srgb,#7c3aed 8%,transparent)}
+.logmajor.sub{padding:12px 16px 11px;opacity:.92;box-shadow:0 4px 16px color-mix(in srgb,#7c3aed 18%,transparent)}
+.logmajor.sub span{font-size:clamp(20px,4.6vw,26px);letter-spacing:.08em;text-shadow:none}
+.logmajor.sub small{margin-top:4px}
+.logmajor.sub::after{display:none}
 @keyframes majglow{from{box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 18%,transparent),0 0 6px color-mix(in srgb,var(--accent) 16%,transparent)}to{box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 42%,transparent),0 0 22px color-mix(in srgb,var(--accent) 42%,transparent)}}
 @keyframes majshine{0%{transform:translateX(-110%)}40%,100%{transform:translateX(110%)}}
 .logcat .tag{display:inline-block;font-family:var(--f-body);font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:3px 10px;border-radius:99px}
@@ -359,7 +389,7 @@ body.dragging,body.dragging *{cursor:grabbing!important}
 /* the door wears the Major Update gradient: the knob, a fill revealed as it slides, the border and the shine on the text */
 .slider{border-color:color-mix(in srgb,#7c3aed 35%,var(--line))}
 .slider:focus:not(.nope){border-color:#7c3aed;box-shadow:0 0 0 4px color-mix(in srgb,#7c3aed 22%,transparent)}
-.slfill{position:absolute;inset:0;background:linear-gradient(110deg,#d0102b,#7c3aed 55%,#2563eb);clip-path:inset(0 calc(100% - var(--x,0px) - 54px) 0 0 round 12px);opacity:calc(.22 + var(--p,0) * .78)}
+.slfill{position:absolute;inset:0;background:linear-gradient(110deg,#d0102b,#7c3aed 55%,#2563eb);clip-path:inset(0 calc(100% - var(--x,0px) - 56px) 0 0 round 12px);opacity:calc(.22 + var(--p,0) * .78)}
 .sltxt{position:relative;padding-left:44px;font-size:15px;font-weight:600;color:var(--muted);opacity:calc(1 - var(--p,0) * 1.8)}
 .slknob{position:absolute;left:4px;top:4px;bottom:4px;width:48px;border-radius:9px;background:linear-gradient(135deg,#d0102b,#7c3aed 60%,#2563eb);color:#fff;display:grid;place-items:center;transform:translateX(var(--x,0px));box-shadow:0 2px 10px color-mix(in srgb,#7c3aed 45%,transparent)}
 .slknob svg{width:22px;height:22px}
@@ -387,10 +417,15 @@ body.dragging,body.dragging *{cursor:grabbing!important}
 .mbox.sets{max-width:900px;text-align:left;gap:0 18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));align-items:start;padding:18px 20px 16px;border-color:var(--line);box-shadow:0 24px 70px rgba(0,0,0,.35);max-height:calc(100dvh - 56px);overflow:auto}
 /* settings come in groups: a small heading over a rounded box of rows */
 .setsec{margin-top:14px}
-.setgh{margin:0 0 6px 4px;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.setgh{margin:0 0 6px 4px;font-size:13px;font-weight:600;color:var(--muted)}
 .setgrp{border:1px solid var(--line);border-radius:12px;background:var(--paper);padding:0 14px}
 .setgrp>.setrow:last-child{border-bottom:0}
 .sethead,.mbox.sets>.setnote{grid-column:1/-1}
+/* two columns that each stack on their own (Appearance + Your data, Courses & layout + About), so a tall section
+   leaves no gap beside the shorter one; once there is room for only one column the sections line up in reading order */
+.mbox.sets{container-type:inline-size}
+.mbox.sets>.setnote{order:3}
+@container (width < 778px){.setcol{display:contents}.setc1>.setsec:last-child{order:1}.setc2>.setsec:last-child{order:2}}
 .sethead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
 .sethead h2{font-size:20px}
 .setx{font-size:16px;width:32px;height:32px;border-radius:50%}
@@ -535,6 +570,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .picker.stuck::before,.picker.stuck::after{opacity:1}
 :root[data-perf="balanced"] .picker::before,:root[data-perf="low"] .picker::before{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--paper)}
 :root[data-perf="balanced"] .picker::after,:root[data-perf="low"] .picker::after{backdrop-filter:none;-webkit-backdrop-filter:none;background:linear-gradient(var(--paper),transparent)}
+/* phones: Safari colours the strip around the Dynamic Island from what touches the top of the page; see-through glass
+   there showed up as a band of another colour above the bar, so on touch screens the bar is solid page colour. It is
+   on all the time (against the page it can't be seen until the bar sticks), so it never waits for a scroll event */
+@media (pointer:coarse){
+  .picker{background-color:var(--paper)}
+  .picker::before{background:var(--paper);backdrop-filter:none;-webkit-backdrop-filter:none;opacity:1}
+  .picker::after{backdrop-filter:none;-webkit-backdrop-filter:none;background:linear-gradient(var(--paper),transparent);opacity:1}
+}
 .picker .lab{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
 .picker .grp{display:flex;align-items:center;gap:8px}
 .picker .seg button{padding:6px 14px}
@@ -611,10 +654,14 @@ table.pts tr.sum td{border-bottom:0;font-weight:600;padding-top:6px}
 .mbox.imp .acts{justify-content:flex-end}
 .mbox.imp textarea[readonly]{font-family:var(--f-mono);font-size:11px;word-break:break-all;border-style:solid}
 .qrbox{display:grid;justify-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.insteps{margin:0;padding-left:22px;display:grid;gap:8px;text-align:left;font-size:14px}
+.insteps li::marker{color:var(--blue);font-weight:600}
 .qrbox svg{width:min(300px,78vw);height:auto;background:#fff;border-radius:10px;padding:6px}
 .bkremind{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 14px;padding:10px 14px;border-radius:12px;border:1px solid color-mix(in srgb,var(--warn) 40%,var(--line));background:var(--warn-soft);color:var(--ink);font-size:13.5px}
 .bkremind[hidden]{display:none}
-html{scrollbar-gutter:stable}
+/* the page places itself after a redraw (stay, roomBelow); the browser's own scroll anchoring (Chrome, not Safari)
+   would move it a second time, so it is off and every browser behaves the same */
+html{scrollbar-gutter:stable;overflow-anchor:none}
 @media (prefers-reduced-motion:no-preference){html:not([data-perf="low"]){scroll-behavior:smooth}}
 html.locked{overflow:hidden}
 .modal,.mbox,.gameover{overscroll-behavior:contain}
@@ -624,7 +671,8 @@ html.locked{overflow:hidden}
 .mall{display:flex;align-items:flex-start;gap:8px;text-align:left;font-size:13px;color:var(--muted);padding:8px 10px;border-radius:9px;background:var(--paper);border:1px solid var(--line);cursor:pointer}
 .mall input{margin-top:2px;flex:none;accent-color:var(--bad)}
 .goband .btn:not(.plain){background:var(--bad);border-color:var(--bad);color:#fff}
-.mbox.wel{max-width:460px;gap:14px;overflow:hidden}
+/* the pages slide inside .welview (which clips them); the window itself scrolls when a page is taller than the screen */
+.mbox.wel{max-width:460px;gap:14px;overflow:hidden auto}
 .weldots{display:flex;gap:6px}
 .weldots i{width:8px;height:8px;border-radius:99px;background:var(--line);transition:width .3s,background-color .3s}
 .weldots i.was{background:color-mix(in srgb,var(--blue) 50%,var(--line))}
@@ -821,10 +869,11 @@ input.optq{width:100%;background:var(--paper);border:1px solid var(--line);borde
     <div class="brand">
       <div style="display:grid;gap:10px;min-width:0">
         <div class="logorow">
-          <img id="logo" class="logo" src="logo-en.webp" alt="Brno University of Technology, Faculty of Information Technology">
-          <h1 id="t-title">FIT Study Index</h1>
+          <div class="hmark"><svg class="hlogo" viewBox="0 0 64 64" aria-hidden="true"><defs><mask id="hl-cut"><rect width="64" height="64" fill="#fff"/><path d="M32 2.5l3.6 11.5h-7.2zM20 16.5h24L32 31.4zM32 32.6l12 14.9H20zM28.4 50h7.2L32 61.5z" fill="#000" stroke="#000" stroke-width="6" stroke-linejoin="round"/></mask></defs><g mask="url(#hl-cut)"><path d="M51.45 12.55L43.18 16.03L47.97 20.82ZM51.45 51.45L47.97 43.18L43.18 47.97ZM12.55 51.45L20.82 47.97L16.03 43.18ZM12.55 12.55L16.03 20.82L20.82 16.03ZM62 32L51.26 28.95L51.26 35.05ZM2 32L12.74 35.05L12.74 28.95Z"/><circle cx="32" cy="32" r="16.2" fill="none" stroke="currentColor" stroke-width="4"/></g><path d="M32 2.5l3.6 11.5h-7.2zM20 16.5h24L32 31.4zM32 32.6l12 14.9H20zM28.4 50h7.2L32 61.5z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/><path class="hl-sand" d="M27.4 24.8h9.2L32 30.4zM25.2 44.6h13.6L32 36.2z"/></svg><h1 id="t-title">Hulko</h1></div>
+          <span class="lsep" aria-hidden="true"></span>
+          <img id="logo" class="logo" srcset="logo-en-1.webp 1x, logo-en-15.webp 1.5x, logo-en-2.webp 2x, logo-en.webp 3x" src="logo-en.webp" alt="Brno University of Technology, Faculty of Information Technology">
         </div>
-        <p class="subline"><span id="t-sub">Bachelor's in Information Technology · BIT</span></p>
+        <p class="subline"><span id="t-sub">Study index · Bachelor's in Information Technology · BIT</span></p>
       </div>
     </div>
     <div class="tools">
@@ -858,7 +907,7 @@ input.optq{width:100%;background:var(--paper);border:1px solid var(--line);borde
 <div class="wrap logpage" id="logview" hidden>
   <header class="top">
     <div class="brand"><div style="display:grid;gap:10px;min-width:0">
-      <div class="logorow"><img class="logo" id="logo2" src="logo-en.webp" alt=""><h1 id="lg-title">Version history</h1></div>
+      <div class="logorow"><img class="logo" id="logo2" srcset="logo-en-1.webp 1x, logo-en-15.webp 1.5x, logo-en-2.webp 2x, logo-en.webp 3x" src="logo-en.webp" alt=""><h1 id="lg-title">Version history</h1></div>
       <p id="lg-desc"></p></div></div>
     <div class="tools">
       <span class="chip saved uptodate" id="lg-up"><span class="dot"></span><span id="lg-uptxt"></span></span>
@@ -876,6 +925,7 @@ input.optq{width:100%;background:var(--paper);border:1px solid var(--line);borde
 <div class="modal" id="settings" hidden>
   <div class="mbox sets" role="dialog" aria-modal="true" aria-labelledby="set-title">
     <div class="sethead"><h2 id="set-title" data-t="settings">Settings</h2><button class="x setx" id="set-close" type="button" aria-label="Close">✕</button></div>
+    <div class="setcol setc1">
     <section class="setsec"><h3 class="setgh" data-t="sgLook">Appearance</h3><div class="setgrp">
     <div class="setrow"><span class="setk" data-t="setLang">Language</span>
       <div class="seg slide" data-key="lang" role="group" aria-label="Language"><span class="thumb" aria-hidden="true"></span>
@@ -894,17 +944,6 @@ input.optq{width:100%;background:var(--paper);border:1px solid var(--line);borde
         <button type="button" data-perf="low" data-t="perfLow">Low</button>
       </div></div>
     </div></section>
-    <section class="setsec" data-full><h3 class="setgh" data-t="sgCourse">Courses &amp; layout</h3><div class="setgrp">
-    <div class="setrow"><span class="setk"><span data-t="dtT">Exam dates</span><small data-t="dtDesc"></small></span>
-      <button type="button" class="wsw" role="switch" id="dt-sw" aria-checked="true"><span></span></button></div>
-    <div class="setrow"><span class="setk"><span data-t="pcT">Hours and minutes</span><small data-t="pcDesc"></small></span>
-      <button type="button" class="wsw" role="switch" id="pc-sw" aria-checked="false"><span></span></button></div>
-    <div class="setrow"><span class="setk"><span data-t="ttT">Timetable</span><small id="tt-desc"></small></span>
-      <div class="bkbtns"><button type="button" class="btn plain" id="tt-load" data-t="ttLoad">Import .ics</button><button type="button" class="btn plain" id="tt-del" data-t="ttDel" hidden>Remove</button>
-      <input type="file" id="tt-file" accept=".ics,text/calendar" hidden></div></div>
-    <div class="setrow"><span class="setk"><span data-t="layT">Layout</span><small data-t="layDesc"></small></span>
-      <button type="button" class="btn plain" id="lay-edit" data-t="layEdit">Edit layout</button></div>
-    </div></section>
     <section class="setsec" data-full><h3 class="setgh" data-t="sgData">Your data</h3><div class="setgrp">
     <div class="setrow"><span class="setk"><span data-t="bkTitle">Backup</span><small data-t="bkDesc"></small></span>
       <div class="bkbtns"><button type="button" class="btn plain" id="bk-save" data-t="bkSave">Download</button><button type="button" class="btn plain" id="bk-load" data-t="bkLoad">Load file</button>
@@ -915,14 +954,35 @@ input.optq{width:100%;background:var(--paper);border:1px solid var(--line);borde
     <div class="setrow"><span class="setk"><span data-t="resetT">Reset</span><small data-t="resetDesc"></small></span>
       <button type="button" class="btn danger-outline" id="reset-btn" data-t="resetBtn">Reset all data</button></div>
     </div></section>
+    </div><div class="setcol setc2">
+    <section class="setsec" data-full><h3 class="setgh" data-t="sgCourse">Courses &amp; layout</h3><div class="setgrp">
+    <div class="setrow"><span class="setk"><span data-t="dtT">Exam dates</span><small data-t="dtDesc"></small></span>
+      <button type="button" class="wsw" role="switch" id="dt-sw" aria-checked="true"><span></span></button></div>
+    <div class="setrow"><span class="setk"><span data-t="pcT">Hours and minutes</span><small data-t="pcDesc"></small></span>
+      <button type="button" class="wsw" role="switch" id="pc-sw" aria-checked="false"><span></span></button></div>
+    <div class="setrow"><span class="setk"><span data-t="ttT">Timetable</span><small id="tt-desc"></small></span>
+      <div class="bkbtns"><button type="button" class="btn plain" id="tt-load" data-t="ttLoad">Import .ics</button><button type="button" class="btn plain" id="tt-del" data-t="ttDel" hidden>Remove</button>
+      <input type="file" id="tt-file" accept=".ics,text/calendar" hidden></div></div>
+    <div class="setrow"><span class="setk"><span data-t="layPre">Layout preset</span><small id="lp-desc"></small></span>
+      <div class="seg slide" data-key="layp" role="group" aria-label="Layout preset"><span class="thumb" aria-hidden="true"></span>
+        <button type="button" data-layp="min">Minimal</button>
+        <button type="button" data-layp="std">Standard</button>
+        <button type="button" data-layp="all">Everything</button>
+      </div></div>
+    <div class="setrow"><span class="setk"><span data-t="layT">Layout</span><small data-t="layDesc"></small></span>
+      <button type="button" class="btn plain" id="lay-edit" data-t="layEdit">Edit layout</button></div>
+    </div></section>
     <section class="setsec" data-full><h3 class="setgh" data-t="sgAbout">About</h3><div class="setgrp">
+    <div class="setrow" id="inst-row" hidden><span class="setk"><span data-t="instT">Install as an app</span><small id="inst-desc"></small></span>
+      <button type="button" class="btn plain" id="inst-btn" data-t="instBtn">Install</button></div>
     <div class="setrow"><span class="setk"><span data-t="logT">Version history</span><small data-t="logDesc"></small></span>
       <button type="button" class="btn plain" id="log-open" data-t="logOpen">See what's new</button></div>
     <div class="setrow"><span class="setk"><span data-t="welT">Setup guide</span><small data-t="welDesc"></small></span>
       <button type="button" class="btn plain" id="wel-replay" data-t="welReplay">Replay setup</button></div>
     <div class="setrow"><span class="setk"><span data-t="repT">Report a problem</span><small data-t="repDesc"></small></span>
-      <a class="btn plain" id="rep-link" href="https://github.com/HorseyBallz/fit-study-index/issues/new" target="_blank" rel="noopener" data-t="repBtn">Open on GitHub</a></div>
+      <a class="btn plain" id="rep-link" href="https://github.com/HorseyBallz/hulko/issues/new" target="_blank" rel="noopener" data-t="repBtn">Open on GitHub</a></div>
     </div></section>
+    </div>
     <p class="setnote" data-t="setSaved">Saved on this device.</p>
   </div>
 </div>
@@ -933,6 +993,9 @@ const PERF_KEY="fit-perf";
 let perf="full";try{perf=localStorage.getItem(PERF_KEY)||"full"}catch(e){}
 document.documentElement.setAttribute("data-perf",perf);
 const noMotion=()=>perf==="low"||matchMedia("(prefers-reduced-motion: reduce)").matches;
+// phones and tablets: their date and list pickers are native windows that open when a field gets focus
+const TOUCH=matchMedia("(pointer: coarse)").matches;
+const IOS=/iP(hone|od|ad)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
 const noFx=()=>perf!=="full";
 
 /* ---------- Curriculum: BIT 2019-2029, plan for ac. y. 2026/27 (fit.vut.cz/study/program/9865) ---------- */
@@ -1011,7 +1074,7 @@ function addOptional(code,slot){
 
 /* ---------- Strings ---------- */
 const T={
- en:{title:"FIT Study Index",sub:"Bachelor's in Information Technology · BIT",
+ en:{title:"Hulko",sub:"Study index · Bachelor's in Information Technology · BIT",
   done:"done",of:"of 180 credits",inprog:"in progress this term",
   
   rComp:"Compulsory courses",rCompS:"146 credits must all be passed",rEng:"English (PVA)",rTech:"Technical elective (PVT)",rTechS:"one of IVH, ICP, ICS, IJA",rEngS:"one course at B1 or higher",pvLow:"below B1",pvBelow:"below B1",
@@ -1080,7 +1143,7 @@ const T={
   
   note1S:"Year 1 needs 30 credits in total. If you passed 15 in winter, you need 15 more this summer.",
   noteY:"From year 2 the minimum is 30 credits per year. Winter and summer count together."},
- sk:{title:"FIT študijný index",sub:"Bakalársky program Informačné technológie · BIT",
+ sk:{title:"Hulko",sub:"Študijný index · Bakalársky program Informačné technológie · BIT",
   done:"hotovo",of:"zo 180 kreditov",inprog:"prebieha tento semester",
   
   rComp:"Povinné predmety",rCompS:"všetkých 146 kreditov treba splniť",rEng:"Angličtina (PVA)",rTech:"Technický PV predmet (PVT)",rTechS:"jeden z IVH, ICP, ICS, IJA",rEngS:"jeden predmet na úrovni B1 alebo vyššej",pvLow:"pod B1",pvBelow:"pod B1",
@@ -1174,9 +1237,9 @@ Object.assign(T.en,{
   trRecvT:"Enter a code",trRecvHow:"Paste the code from the other device. Everything here is replaced with its data.",trPh:"FSI1.…",trCopy:"Copy code",trLoad:"Load",
   trCopied:"Code copied.",trCopyHand:"Select the code and copy it.",trBad:"That isn't a code from this tracker, or it's incomplete.",trFrom:"another device",trQr:"Scan with the phone's camera",
   bkrText:n=>`Your points are only in this browser, and you haven't made a backup for ${n} days.`,bkrLater:"Later",bkrNow:"Back up now",welNext:"Next",welBack:"Back",welSkip:"Skip",welDone:"Get started",
-  wel:[["Welcome to FIT Study Index","A tracker for BIT students: your points, course credits, exams and credits in one place. First, make it yours."],
+  wel:[["Welcome to Hulko","A tracker for BIT students: your points, course credits, exams and credits in one place. First, make it yours."],
     ["Where are you now?","Pick your year and semester. You can change it any time at the top of Courses."],
-    ["Your layout","Drag the windows into the order you like and switch off the ones you don't need. You can change it later in Settings → Edit layout."],
+    ["Your layout","Start from a preset, then drag the windows into the order you like and switch off the ones you don't need. You can change it later in Settings."],
     ["Your timetable","Optional: import your week from Studis as iCal (.ics). Tests and exams then get their start time, and countdowns can show hours and minutes."],
     ["Points and your data","Open a course and type your points, or copy the “Dílčí hodnocení” table in Studis and use “Paste points from Studis” in the card. Your points are saved in this browser only and never leave your device; to move them, use Settings → Your data."]],
   welWin:{summary:"Your credits and the minimum you need",courses:"Your courses, semester by semester",dates:"Exam terms and deadlines ahead",upnext:"What to do next in each course",plan:"Credits per semester, year and whole study",ms:"Badges for what you've reached",hist:"Every change you made"},bkSave:"Download",bkLoad:"Load file",bkNoDl:"Downloading isn't available in this view.",
@@ -1194,8 +1257,15 @@ Object.assign(T.en,{
   crAll:(p,n)=>`${p} / 180 credits passed · ${n} in your plan`,ccTip:(s,p,g,f)=>`${s}: ${p} passed · ${g} in progress`+(f?` · ${f} failed`:""),semAb:{W:"W",S:"S"},
   winT:{summary:"Progress",upnext:"Up next",dates:"Dates",plan:"Credits",courses:"Courses",ms:"Milestones",hist:"History"},
   layT:"Layout",layDesc:"Move the windows around and hide the ones you don't need.",layEdit:"Edit layout",layBarT:"Editing layout",
+  layPre:"Layout preset",layP:{min:"Minimal",std:"Standard",all:"Everything"},
+  layPDesc:{min:"Only Progress and Courses, everything else off",std:"Progress, Dates, Courses and History",all:"Every window, with Credits, Up next and Milestones",own:"Your own mix · pick a preset to start from it"},
+  instT:"Install as an app",instDesc:"An icon on your home screen or dock. It opens full screen and works offline.",instBtn:"Install",instOn:"Installed · you're using the app now",instHowT:"Install as an app",
+  instIos:["Tap the Share button. In iOS 26 it's in the ••• menu next to the address bar.","Choose “Add to Home Screen” (under “View More” if you don't see it).","Keep “Open as Web App” on and tap “Add”."],
+  instIosNote:"The app on your home screen keeps its own data, separate from Safari. To take your points along, use Settings → Your data → Show code here, then Enter code in the app.",
+  instMac:["In the menu bar, choose File → Add to Dock.","Click “Add”."],instOther:["Open your browser's menu.","Choose “Install app” or “Add to Home Screen”."],
+  logUpd:v=>`Update ${v}`,logFam:n=>`Version ${n}`,
   resetT:"Reset",resetDesc:"Delete all points, statuses and settings in this tracker.",verLbl:(v,d)=>`Version ${v} · updated ${d}`,logT:"Version history",logDesc:"What changed in every version of the tracker.",logOpen:"See what's new",repT:"Report a problem",repDesc:"Wrong points, a rule that doesn't match, or a bug? Tell us on GitHub.",repBtn:"Open on GitHub",logBack:"Back",
-  logUp:v=>`Up to date · ${v}`,logUpTip:"You are on the newest version",logVers:"Versions",logCat:{n:"New",i:"Improved",f:"Fixed"},logMajor:"Major update",logMajSub:(a,n,i,f)=>`${a} changes · ${n} new · ${i} improved · ${f} fixed`,verTip:"The version of the tracker itself; saving your data doesn't change it",
+  logUp:v=>`Up to date · ${v}`,logUpTip:"You are on the newest version",usersL:n=>`Used by ${n.toLocaleString("en-GB")} student${n===1?"":"s"}`,logVers:"Versions",logCat:{n:"New",i:"Improved",f:"Fixed"},logMajor:"Major update",logMajSub:(a,n,i,f)=>`${a} changes · ${n} new · ${i} improved · ${f} fixed`,verTip:"The version of the tracker itself; saving your data doesn't change it",
   layBarHint:"Drag a window by its bar · switch windows on or off",layReset:"Reset",layDone:"Done",layOn:"Shown",layOff:"Hidden",layFixed:"Always shown",layMove:"Move · Alt + ↑ / ↓"
 });
 Object.assign(T.sk,{
@@ -1221,9 +1291,9 @@ Object.assign(T.sk,{
   trRecvT:"Zadať kód",trRecvHow:"Vlož kód z druhého zariadenia. Všetko tu sa nahradí jeho údajmi.",trPh:"FSI1.…",trCopy:"Kopírovať kód",trLoad:"Nahrať",
   trCopied:"Kód skopírovaný.",trCopyHand:"Označ kód a skopíruj ho.",trBad:"Toto nie je kód z tohto trackera alebo nie je celý.",trFrom:"iného zariadenia",trQr:"Naskenuj fotoaparátom mobilu",
   bkrText:n=>`Tvoje body sú len v tomto prehliadači a zálohu si nerobil(a) ${n} dní.`,bkrLater:"Neskôr",bkrNow:"Zálohovať teraz",welNext:"Ďalej",welBack:"Späť",welSkip:"Preskočiť",welDone:"Začať",
-  wel:[["Vitaj vo FIT študijnom indexe","Tracker pre študentov BIT: body, zápočty, skúšky a kredity na jednom mieste. Najprv si ho prispôsob."],
+  wel:[["Vitaj v Hulkovi","Tracker pre študentov BIT: body, zápočty, skúšky a kredity na jednom mieste. Najprv si ho prispôsob."],
     ["Kde práve si?","Vyber ročník a semester. Zmeniť to môžeš kedykoľvek hore v Predmetoch."],
-    ["Tvoje rozloženie","Poprehadzuj okná do poradia, ktoré ti vyhovuje, a vypni tie, ktoré nepotrebuješ. Neskôr to zmeníš v Nastavenia → Upraviť rozloženie."],
+    ["Tvoje rozloženie","Začni od predvoľby, potom poprehadzuj okná do poradia, ktoré ti vyhovuje, a vypni tie, ktoré nepotrebuješ. Neskôr to zmeníš v Nastaveniach."],
     ["Tvoj rozvrh","Voliteľné: importuj svoj týždeň zo Studisu ako iCal (.ics). Písomky a skúšky potom dostanú čas začiatku a odpočty môžu ukazovať hodiny a minúty."],
     ["Body a tvoje údaje","Otvor predmet a zapíš body, alebo v Studise skopíruj tabuľku „Dílčí hodnocení“ a v karte použi „Vložiť body zo Studisu“. Body sa ukladajú len v tomto prehliadači a neopúšťajú tvoje zariadenie; na presun použi Nastavenia → Tvoje údaje."]],
   welWin:{summary:"Tvoje kredity a minimum, ktoré potrebuješ",courses:"Tvoje predmety po semestroch",dates:"Nadchádzajúce skúšky a odovzdania",upnext:"Čo ďalej v každom predmete",plan:"Kredity za semester, ročník a celé štúdium",ms:"Odznaky za to, čo si dosiahol",hist:"Každá zmena, ktorú si urobil"},bkSave:"Stiahnuť",bkLoad:"Nahrať súbor",bkNoDl:"Sťahovanie tu nie je dostupné.",
@@ -1241,8 +1311,15 @@ Object.assign(T.sk,{
   crAll:(p,n)=>`${p} / 180 kreditov získaných · ${n} v pláne`,ccTip:(s,p,g,f)=>`${s}: ${p} získaných · ${g} prebieha`+(f?` · ${f} neúspešných`:""),semAb:{W:"Z",S:"L"},
   winT:{summary:"Postup",upnext:"Čo ďalej",dates:"Dátumy",plan:"Kredity",courses:"Predmety",ms:"Míľniky",hist:"História"},
   layT:"Rozloženie",layDesc:"Presúvaj okná a skry tie, ktoré nepotrebuješ.",layEdit:"Upraviť rozloženie",layBarT:"Úprava rozloženia",
+  layPre:"Predvoľba rozloženia",layP:{min:"Minimálne",std:"Štandardné",all:"Všetko"},
+  layPDesc:{min:"Len Postup a Predmety, všetko ostatné vypnuté",std:"Postup, Dátumy, Predmety a História",all:"Všetky okná, aj Kredity, Čo ďalej a Míľniky",own:"Vlastný mix · vyber predvoľbu a začni od nej"},
+  instT:"Nainštalovať ako aplikáciu",instDesc:"Ikona na ploche alebo v docku. Otvorí sa na celú obrazovku a funguje aj offline.",instBtn:"Nainštalovať",instOn:"Nainštalované · práve používaš aplikáciu",instHowT:"Nainštalovať ako aplikáciu",
+  instIos:["Ťukni na tlačidlo Zdieľať. V iOS 26 je v ponuke ••• vedľa adresného riadka.","Vyber „Pridať na plochu“ (ak ho nevidíš, je pod „Zobraziť viac“).","Nechaj zapnuté otváranie ako webová aplikácia a ťukni na „Pridať“."],
+  instIosNote:"Aplikácia na ploche má vlastné údaje, oddelené od Safari. Body do nej prenesieš tak, že tu použiješ Nastavenia → Tvoje údaje → Zobraziť kód a v aplikácii Zadať kód.",
+  instMac:["V lište menu zvoľ Súbor → Pridať do Docku.","Klikni na „Pridať“."],instOther:["Otvor menu prehliadača.","Vyber „Inštalovať aplikáciu“ alebo „Pridať na plochu“."],
+  logUpd:v=>`Aktualizácia ${v}`,logFam:n=>`Verzia ${n}`,
   resetT:"Vymazanie",resetDesc:"Vymaže všetky body, stavy a nastavenia v tomto trackeri.",verLbl:(v,d)=>`Verzia ${v} · aktualizované ${d}`,logT:"História verzií",logDesc:"Čo sa zmenilo v každej verzii trackera.",logOpen:"Pozrieť novinky",repT:"Nahlásiť problém",repDesc:"Nesprávne body, pravidlo, ktoré nesedí, alebo chyba? Napíš nám na GitHub.",repBtn:"Otvoriť na GitHube",logBack:"Späť",
-  logUp:v=>`Aktuálna verzia · ${v}`,logUpTip:"Máš najnovšiu verziu",logVers:"Verzie",logCat:{n:"Nové",i:"Vylepšené",f:"Opravené"},logMajor:"Veľká aktualizácia",logMajSub:(a,n,i,f)=>`${a} zmien · ${n} nových · ${i} vylepšených · ${f} opravených`,verTip:"Verzia samotného trackera; ukladanie tvojich údajov ju nemení",
+  logUp:v=>`Aktuálna verzia · ${v}`,logUpTip:"Máš najnovšiu verziu",usersL:n=>{const f=n>=2&&n<=4;return `${f?"Používajú":"Používa"} ho ${n.toLocaleString("sk-SK")} ${n===1?"študent":f?"študenti":"študentov"}`},logVers:"Verzie",logCat:{n:"Nové",i:"Vylepšené",f:"Opravené"},logMajor:"Veľká aktualizácia",logMajSub:(a,n,i,f)=>`${a} zmien · ${n} nových · ${i} vylepšených · ${f} opravených`,verTip:"Verzia samotného trackera; ukladanie tvojich údajov ju nemení",
   layBarHint:"Okno potiahni za jeho lištu · okná zapni alebo vypni",layReset:"Pôvodné",layDone:"Hotovo",layOn:"Zobrazené",layOff:"Skryté",layFixed:"Vždy zobrazené",layMove:"Presunúť · Alt + ↑ / ↓"
 });
 const TYPE={en:{"Cr+Ex":"Course credit + exam","Ex":"Exam","Cr":"Course credit","ClCr":"Graded course credit"},sk:{"Cr+Ex":"Zápočet + skúška","Ex":"Skúška","Cr":"Zápočet","ClCr":"Klasifikovaný zápočet"}};
@@ -1250,12 +1327,36 @@ const TYPE={en:{"Cr+Ex":"Course credit + exam","Ex":"Exam","Cr":"Course credit",
 /* ---------- App version: the newest entry of the version log (data auto-saves do not count) ---------- */
 // like an app release: small fixes go into the current version, a new feature set gets the next number (3.5 → 3.6),
 // a big change starts a new major (3.x → 4.0)
-const APP_VER="4.0",APP_DATE="2026-10-28";
+const APP_VER="4.1",APP_DATE="2026-10-28";
+// every major version is named after a Brno landmark, the way macOS versions are named after places in California:
+// its x.0 opens with the name in big letters, and the updates after it (x.1, x.2 …) wear the same colours, quieter
+const CODENAMES={4:{n:"Orloj",why:["Named after the astronomical clock on Brno's Freedom Square, because version 4 is all about time: exam dates, deadlines and countdowns.","Pomenovaná podľa orloja na náměstí Svobody v Brne, lebo verzia 4 je celá o čase: termíny skúšok, odovzdania a odpočty."]}};
+const codeOf=e=>CODENAMES[parseInt(e.v,10)];
 
 /* ---------- Version log: one entry per version, newest first ----------
-   v = version; major = a major update (glows in the list, with a big tag); n / i / f = new / improved / fixed,
-   each item [English, Slovak] */
+   v = version; major = a major update (glows in the list and opens with its codename); n / i / f = new / improved /
+   fixed, each item [English, Slovak] */
 const CHANGELOG=[
+ {v:"4.1",d:"2026-10-28",t:["Presets & polish","Predvoľby a doladenie"],
+  n:[["New name and logo: Hulko, like the site’s address hulko.xyz, with its own mark first (also the browser tab icon) and the faculty logo beside it. The line below says it is a study index","Nový názov a logo: Hulko, ako adresa stránky hulko.xyz, s vlastným znakom na začiatku (aj ako ikona na karte prehliadača) a logom fakulty vedľa neho. Riadok pod nimi hovorí, že ide o študijný index"],
+     ["Layout presets in Settings and in the setup: Minimal, Standard and Everything","Predvoľby rozloženia v Nastaveniach aj v sprievodcovi: Minimálne, Štandardné a Všetko"],
+     ["Install as an app in Settings → About: the browser's own Install where there is one, step by step for iPhone, iPad and Safari on a Mac","Nainštalovať ako aplikáciu v Nastavenia → O aplikácii: tlačidlo prehliadača, kde ho má, a návod krok za krokom pre iPhone, iPad a Safari na Macu"],
+     ["Codenames: every major version is named after a Brno landmark. Version 4 is Orloj, and its updates wear the same colours, quieter","Kódové mená: každá veľká verzia nesie meno brnianskej pamiatky. Verzia 4 je Orloj a jej aktualizácie majú rovnaké farby, len tichšie"],
+     ["User count in the footer: “Used by N students” (public site). Each browser is counted once with a random id and nothing else","Počet používateľov v pätičke: „Používa ho N študentov“ (verejná stránka). Každý prehliadač sa započíta raz, len s náhodným identifikátorom"]],
+  i:[["Changing the semester or year: the courses slide, the bar stays where it is, and a shorter page glides up instead of jumping","Zmena semestra alebo ročníka: predmety sa posunú, lišta ostane na mieste a kratšia stránka sa plynulo posunie namiesto skoku"],
+     ["Settings open with an animation, the mirror of closing","Nastavenia sa otvárajú s animáciou, zrkadlovo k zatváraniu"],
+     ["Settings: each column stacks on its own, so no gap opens under Appearance, and the section titles are no longer in capitals","Nastavenia: každý stĺpec sa skladá samostatne, takže pod Vzhľadom nevznikne medzera, a nadpisy sekcií už nie sú veľkými písmenami"],
+     ["Sharper logo: the original files without compression, in sizes made for each screen, larger on wide screens and set on whole pixels, so it stays crisp on a PC monitor too","Ostrejšie logo: pôvodné súbory bez kompresie, vo veľkostiach pre každú obrazovku, väčšie na širokej obrazovke a zarovnané na celé pixely, takže je ostré aj na monitore počítača"],
+     ["Phones: the year and semester bar is solid page colour once it sticks to the top, so no band of another colour shows under the Dynamic Island","Telefóny: lišta ročníka a semestra má po prilepení hore plnú farbu stránky, takže pod Dynamic Island nie je pás inej farby"],
+     ["The browser's own bars follow the light or dark theme (public site)","Lišty prehliadača sa riadia svetlým alebo tmavým vzhľadom (verejná stránka)"],
+     ["New visitors start with the Standard layout; a layout you already have stays as it is","Noví návštevníci začínajú s rozložením Štandardné; tvoje doterajšie rozloženie ostáva"]],
+  f:[["Slide to open: at the end the colour fills the whole box, with no thin gap on the right","Posuň a otvor: na konci farba vyplní celé pole, bez tenkej medzery vpravo"],
+     ["iPhone: Reset in the date picker removes the date, and the calendar icon comes back","iPhone: Reset v kalendári dátum odstráni a vráti sa ikona kalendára"],
+     ["iPhone: tapping away from an empty date no longer saves today's date","iPhone: ťuknutie vedľa prázdneho dátumu už neuloží dnešný dátum"],
+     ["iPhone: picking a status (Failed, for example) no longer opens the list a second time","iPhone: výber stavu (napríklad Neúspešný) už neotvorí zoznam druhýkrát"],
+     ["Settings no longer stay slightly smaller after being closed once","Nastavenia už po prvom zatvorení neostanú o trochu menšie"],
+     ["A backup made just after midnight is named with the right day","Záloha urobená tesne po polnoci má v názve správny deň"],
+     ["Setup on a small phone: a page taller than the screen scrolls, and every page starts at its top","Sprievodca na malom telefóne: stránka vyššia ako obrazovka sa dá posúvať a každá začína hore"]]},
  {v:"4.0",d:"2026-10-28",major:1,t:["Dates, Credits & setup","Dátumy, Kredity a sprievodca"],
   n:[["Dates window: every exam term and deadline ahead in one list","Okno Dátumy: všetky nadchádzajúce termíny skúšok a odovzdaní v jednom zozname"],
      ["Add all to calendar: one .ics file with every date","Pridať všetko do kalendára: jeden .ics súbor so všetkými dátumami"],
@@ -1923,11 +2024,12 @@ const dtBtn=key=>document.querySelector(`[data-dtedit="${key}"]`);
 function dtOpen(key){
   if(dtEdit&&dtEdit!==key)dtClose(true);
   const b=dtBtn(key),w=b&&b.offsetParent?b.getBoundingClientRect().width:0,h=b&&b.closest(".pnm")?b.closest(".pnm").offsetHeight:0;
-  dtEdit=key;refreshCard(key.split("|")[1]);
+  dtEdit=key;dtStart=dtGet(key);dtPicked=false;refreshCard(key.split("|")[1]);
   const el=document.getElementById(dtId(key));if(!el)return;el.focus({preventScroll:true});dtFit();
   // the row keeps its height while the field is open, so nothing under it moves
   if(h)el.closest(".pnm").style.minHeight=h+"px";
-  let shown=false;const pick=()=>{if(shown)return;shown=true;if(document.activeElement===el)try{el.showPicker()}catch(e){}};
+  // iOS opens its picker as soon as the field gets focus from the tap; asking again would stack a second one on top
+  let shown=false;const pick=()=>{if(shown)return;shown=true;if(document.activeElement===el&&!IOS)try{el.showPicker()}catch(e){}};
   if(!w||noMotion())return pick();
   el.animate([{width:w+"px",marginRight:"0px",flexGrow:0,opacity:.3},{width:el.getBoundingClientRect().width+"px",marginRight:el.style.marginRight||"0px",flexGrow:0,opacity:1}],{duration:220,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=pick;
   setTimeout(pick,300);
@@ -1959,9 +2061,20 @@ function dtGhost(el,key){
 // commit = keep what was typed if it is a full date, or remove the date if the field was emptied; otherwise nothing changes
 function dtClose(commit){
   if(!dtEdit)return;const key=dtEdit,el=document.getElementById(dtId(key)),after=dtGhost(el,key);dtEdit=null;
-  if(commit&&el&&(el.value===""?dtGet(key)!=="":dtOk(el.value)))dtSet(key,el.value);
+  if(commit&&el&&!dtAuto(el)&&(el.value===""?dtGet(key)!=="":dtOk(el.value)))dtSet(key,el.value);
   refreshCard(key.split("|")[1]);if(after)after();
 }
+// iPhone and iPad write today's date into an empty date field the moment its picker opens, so that date alone is not
+// a choice: tapping away then cancels, as everywhere else
+let dtStart="",dtPicked=false;
+const dtAuto=el=>IOS&&dtStart===""&&!dtPicked&&el.value===isoOf(new Date());
+// on a phone or tablet the date is only ever picked, never typed: a picked date (or the picker's Reset / Clear, which
+// empties the field and so removes the date) is taken at once, and the chip or the calendar icon takes the field's place
+document.addEventListener("change",e=>{
+  const el=e.target;if(!TOUCH||!el.classList||!el.classList.contains("dtin")||dtEdit!==el.dataset.dt||dtAuto(el))return;
+  dtPicked=true;const key=el.dataset.dt;el.blur();
+  setTimeout(()=>{if(dtEdit===key)dtClose(true)},60);
+});
 // a press anywhere else ends the editing first (and may open another date field in the same go)
 document.addEventListener("pointerdown",e=>{
   if(!dtEdit||e.target.closest(".dtin"))return;const b=e.target.closest("[data-dtedit]");
@@ -2112,6 +2225,36 @@ function alignRows(){
     cols.flat().forEach(d=>d.classList.remove("measure"));
   });
 }
+// the logo comes in sizes made for the screen's pixel density (68px tall on a wide screen): the browser shrinking the
+// big original 9× on a PC screen left the thin letters soft; 3x and up (phones) still get the original
+function setLogo(img){
+  const k=S.lang==="sk"?"cz":"en",set=`logo-${k}-1.webp 1x, logo-${k}-15.webp 1.5x, logo-${k}-2.webp 2x, logo-${k}.webp 3x`;
+  if(img.getAttribute("srcset")!==set){img.srcset=set;img.src=`logo-${k}.webp`}
+}
+// a centred page can leave the logo half a pixel off the screen's grid, and some browsers (Firefox, Zen) then smear
+// it over two pixels; it is nudged onto whole pixels. A measure taken while something around the logo moves (the
+// intro, edit mode, page swaps) is wrong once it stops, so snapSoon first waits for every animation of an element
+// that holds the logo (CSS or element.animate(), which fires no end event) and only then measures
+function snapLogos(){
+  document.querySelectorAll(".logo").forEach(img=>{img.style.translate="";if(!img.offsetParent)return;
+    const r=img.getBoundingClientRect(),d=devicePixelRatio||1,fx=r.left*d-Math.round(r.left*d),fy=r.top*d-Math.round(r.top*d);
+    if(fx||fy)img.style.translate=`${-fx/d}px ${-fy/d}px`});
+}
+const holdsLogo=el=>el instanceof Element&&[...document.querySelectorAll(".logo")].some(i=>el.contains(i));
+let snapQ=0;
+function snapSoon(){
+  if(snapQ)return;snapQ=1;
+  requestAnimationFrame(()=>{
+    const moving=document.getAnimations().filter(a=>a.playState==="running"&&holdsLogo(a.effect&&a.effect.target)&&isFinite(a.effect.getComputedTiming().endTime));
+    if(!moving.length){snapQ=0;snapLogos();return}
+    Promise.allSettled(moving.map(a=>a.finished)).then(()=>{snapQ=0;snapSoon()});
+  });
+}
+const snapAfter=e=>{if(holdsLogo(e.target))snapSoon()};
+addEventListener("resize",snapSoon);if(document.fonts)document.fonts.ready.then(snapSoon);
+addEventListener("animationend",snapAfter,true);addEventListener("transitionend",snapAfter,true);
+// moving the window to a screen with another pixel density changes the grid without always firing resize
+(function watchDpr(){matchMedia(`(resolution: ${devicePixelRatio}dppx)`).addEventListener("change",()=>{snapSoon();watchDpr()},{once:true})})();
 function render(){
   colsNow=colCount();renderBkRemind();
   const t=L();
@@ -2123,7 +2266,7 @@ function render(){
   document.getElementById("th-light").textContent=t.light;
   document.getElementById("th-dark").textContent=t.dark;
   applyTheme();
-  const lg=document.getElementById("logo"),src=S.lang==="sk"?"logo-cz.webp":"logo-en.webp";if(lg.getAttribute("src")!==src)lg.src=src;lg.alt=t.logoAlt;
+  const lg=document.getElementById("logo");setLogo(lg);lg.alt=t.logoAlt;snapSoon();
   renderSettings();
   document.querySelectorAll("[data-bb]").forEach(el=>el.textContent=t[el.dataset.bb]);
   applyLayout();
@@ -2154,7 +2297,7 @@ function render(){
   document.getElementById("sems").innerHTML=h;
   alignRows();syncPulses();requestAnimationFrame(syncPulses);
   renderHistory();
-  document.getElementById("foot").innerHTML=`<h3>${t.gradesH}</h3><div class="grades">${gradeChips()}</div><p class="madeby">Made by Filipko &amp; Claude ❤️</p><p class="appver mono" title="${t.verTip}">${t.verLbl(APP_VER,new Date(APP_DATE+"T12:00:00").toLocaleDateString(S.lang==="sk"?"sk-SK":"en-GB",{day:"numeric",month:"short",year:"numeric"}))}</p>`;
+  document.getElementById("foot").innerHTML=`<h3>${t.gradesH}</h3><div class="grades">${gradeChips()}</div><p class="madeby">Made by Filipko &amp; Claude ❤️</p>${userCount?`<p class="users" id="users">${t.usersL(userCount)}</p>`:""}<p class="appver mono" title="${t.verTip}">${t.verLbl(APP_VER,new Date(APP_DATE+"T12:00:00").toLocaleDateString(S.lang==="sk"?"sk-SK":"en-GB",{day:"numeric",month:"short",year:"numeric"}))}</p>`;
   animateChanges();
 }
 
@@ -2165,9 +2308,11 @@ function syncSegs(){
   const still=noMotion();
   document.querySelectorAll(".seg.slide").forEach(el=>{
     let th=el.querySelector(".thumb");if(!th){th=document.createElement("span");th.className="thumb";th.setAttribute("aria-hidden","true");el.prepend(th)}
-    const bs=[...el.querySelectorAll("button")],idx=Math.max(0,bs.findIndex(b=>b.getAttribute("aria-pressed")==="true"));
+    const bs=[...el.querySelectorAll("button")],on=bs.findIndex(b=>b.getAttribute("aria-pressed")==="true"),idx=Math.max(0,on);
     const key=el.dataset.key||el.getAttribute("aria-label"),prev=segPrev[key];
     el.style.setProperty("--n",bs.length);
+    // nothing chosen (a layout that matches no preset): the marker fades out where it was
+    el.classList.toggle("none",on<0);if(on<0)return;
     if(prev!=null&&prev!==idx&&!still){el.style.setProperty("--pos",prev);getComputedStyle(th).transform;el.style.setProperty("--pos",idx)}
     else el.style.setProperty("--pos",idx);
     segPrev[key]=idx;
@@ -2177,6 +2322,8 @@ function applyTheme(){
   let m=null;try{m=localStorage.getItem("fit-theme")}catch(e){}
   if(m)document.documentElement.setAttribute("data-mode",m);
   const dark=m?m==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  // the browser's own bars (the public site's theme-color) wear the page colour of the theme in use
+  document.querySelectorAll('meta[name="theme-color"]').forEach(x=>x.content=(m?dark:/dark/.test(x.media))?"#0f151d":"#f4f6f8");
   document.getElementById("th-light").setAttribute("aria-pressed",!dark);
   document.getElementById("th-dark").setAttribute("aria-pressed",dark);
   syncSegs();
@@ -2202,12 +2349,12 @@ const GATE="fit-unlocked-v1";
 function swap(from,to,after){
   const a=document.getElementById(from),b=document.getElementById(to);
   if(a.hidden||a.dataset.busy)return;
-  if(noMotion()){a.hidden=true;b.hidden=false;scrollTo({top:0,behavior:"instant"});after&&after();return}
+  if(noMotion()){a.hidden=true;b.hidden=false;scrollTo({top:0,behavior:"instant"});after&&after();snapSoon();return}
   a.dataset.busy=1;let done=false;
   const out=a.animate([{opacity:1,transform:"none",filter:"blur(0)"},{opacity:0,transform:"scale(.97)",filter:"blur(6px)"}],{duration:260,easing:"ease-in",fill:"forwards"});
   const finish=()=>{if(done)return;done=true;out.cancel();
     delete a.dataset.busy;a.hidden=true;b.hidden=false;scrollTo({top:0,behavior:"instant"});after&&after();
-    b.animate([{opacity:0,transform:"scale(1.03)",filter:"blur(6px)"},{opacity:1,transform:"none",filter:"blur(0)"}],{duration:360,easing:"cubic-bezier(.2,.8,.2,1)"});
+    b.animate([{opacity:0,transform:"scale(1.03)",filter:"blur(6px)"},{opacity:1,transform:"none",filter:"blur(0)"}],{duration:360,easing:"cubic-bezier(.2,.8,.2,1)"});snapSoon();
   };
   out.onfinish=finish;setTimeout(finish,320);
 }
@@ -2391,6 +2538,8 @@ function renderSettings(){
   const dt=document.getElementById("dt-sw");dt.setAttribute("aria-checked",String(!S.noDates));dt.setAttribute("aria-label",t.dtT);
   const pc=document.getElementById("pc-sw");pc.setAttribute("aria-checked",String(!!S.preciseCd));pc.setAttribute("aria-label",t.pcT);
   document.getElementById("tt-desc").textContent=ttDesc();document.getElementById("tt-del").hidden=!S.tt;
+  box.querySelectorAll("[data-layp]").forEach(b=>b.textContent=t.layP[b.dataset.layp]);box.querySelector('[data-key="layp"]').setAttribute("aria-label",t.layPre);presetSync();
+  renderInstall();
   document.getElementById("set-close").setAttribute("aria-label",t.close);
   const g=document.getElementById("set-btn");g.setAttribute("aria-label",t.settings);g.title=t.settings;
   const x=document.getElementById("exit-btn");x.setAttribute("aria-label",t.exitBtn);x.title=t.exitBtn;
@@ -2401,10 +2550,16 @@ function setPerf(p){
   renderSettings();syncSegs();
 }
 function settingsKey(e){if(e.key==="Escape")closeSettings()}
+// opens like it closes, only the other way: the backdrop fades in and the box rises into place with a little overshoot
+// (the closing animation stays on the box after it hides, so every animation in the pop-up is cleared first)
 function openSettings(){
   const m=document.getElementById("settings");if(!m.hidden&&!m.dataset.closing)return;
-  m.getAnimations().forEach(a=>a.cancel());delete m.dataset.closing;
+  m.getAnimations({subtree:true}).forEach(a=>a.cancel());delete m.dataset.closing;
   renderSettings();m.hidden=false;syncSegs();
+  if(!noMotion()){
+    m.animate([{opacity:0},{opacity:1}],{duration:220,easing:"ease-out"});
+    m.querySelector(".mbox").animate([{opacity:0,transform:"translateY(18px) scale(.95)"},{opacity:1,transform:"none"}],{duration:340,easing:"cubic-bezier(.2,.9,.3,1.15)"});
+  }
   ["set-btn","set-btn2"].forEach(i=>document.getElementById(i).setAttribute("aria-expanded","true"));
   document.addEventListener("keydown",settingsKey);
   document.getElementById("set-close").focus();
@@ -2414,14 +2569,37 @@ function closeSettings(now){
   const m=document.getElementById("settings");if(m.hidden||m.dataset.closing)return;
   document.removeEventListener("keydown",settingsKey);
   ["set-btn","set-btn2"].forEach(i=>document.getElementById(i).setAttribute("aria-expanded","false"));
-  const end=()=>{m.hidden=true;delete m.dataset.closing;m.getAnimations().forEach(a=>a.cancel())};
+  const end=()=>{m.hidden=true;delete m.dataset.closing;m.getAnimations({subtree:true}).forEach(a=>a.cancel())};
   if(now||noMotion())return end();
   m.dataset.closing=1;
   m.animate([{opacity:1},{opacity:0}],{duration:220,easing:"ease-out",fill:"forwards"});
-  m.querySelector(".mbox").animate([{transform:"none"},{transform:"scale(.96)"}],{duration:220,easing:"ease-out",fill:"forwards"});
+  m.querySelector(".mbox").animate([{transform:"none"},{transform:"translateY(10px) scale(.96)"}],{duration:220,easing:"ease-out",fill:"forwards"});
   setTimeout(end,240);
 }
 document.getElementById("settings").addEventListener("click",e=>{if(e.target.id==="settings")closeSettings()});
+/* ---------- Install as an app: only on the public site, which has the app files (manifest, offline worker) ---------- */
+// Chrome, Edge and Android offer their own install window; Safari has none, so its steps are explained instead
+let instEvt=null;
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();instEvt=e;renderInstall()});
+addEventListener("appinstalled",()=>{instEvt=null;renderInstall()});
+const standalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+function renderInstall(){
+  const t=L(),on=standalone();
+  document.getElementById("inst-row").hidden=!document.querySelector('link[rel="manifest"]');
+  document.getElementById("inst-desc").textContent=on?t.instOn:t.instDesc;document.getElementById("inst-btn").hidden=on;
+}
+async function installApp(){
+  if(instEvt){const e=instEvt;instEvt=null;try{await e.prompt();await e.userChoice}catch(x){}renderInstall();return}
+  const t=L(),ua=navigator.userAgent,mac=!IOS&&/Macintosh/.test(ua)&&!/Chrome|Chromium|Edg|Firefox/.test(ua),steps=IOS?t.instIos:mac?t.instMac:t.instOther;
+  closeSettings(true);closeModal();
+  const m=document.createElement("div");m.className="modal";m.id="modal";m.dataset.kind="exit";
+  m.innerHTML=`<div class="mbox imp" role="dialog" aria-modal="true" aria-labelledby="m-title"><h2 id="m-title">${t.instHowT}</h2>
+    <ol class="insteps">${steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol>${IOS?`<p class="setnote">${esc(t.instIosNote)}</p>`:""}
+    <div class="acts"><button class="btn" type="button" id="m-cancel">${t.close}</button></div></div>`;
+  document.body.append(m);
+  m.addEventListener("click",e=>{if(e.target===m)closeModal(true)});m.querySelector("#m-cancel").onclick=()=>closeModal(true);
+  document.addEventListener("keydown",modalKey);m.querySelector("#m-cancel").focus();
+}
 function openReset(step){
   closeModal();const t=L();
   const m=document.createElement("div");m.className="modal";m.id="modal";if(["exit","restore","over","overexit"].includes(step))m.dataset.kind="exit";
@@ -2457,7 +2635,7 @@ function welPane(i){
     x=`<div class="welrow"><span>${t.setLang}</span>${seg("data-wl",[["en","EN"],["sk","SK"]],S.lang)}</div><div class="welrow"><span>${t.setTheme}</span>${seg("data-wt",[["light",t.light],["dark",t.dark]],dark?"dark":"light")}</div>`}
   if(i===1)x=`<div class="welrow"><span>${t.yearLbl}</span>${seg("data-wy",[["1","1."],["2","2."],["3","3."]],c[0])}</div><div class="welrow"><span>${t.semLbl}</span>${seg("data-wh",[["W",t.semCap.W],["S",t.semCap.S]],c[1])}</div>`;
   // every window in its current order: drag by the grip (or Alt + ↑ / ↓) to reorder, switch the optional ones on or off
-  if(i===2)x=`<ol class="wellay">${l.order.map(w=>`<li class="wlrow" data-w="${w}"><span class="wlgrip" tabindex="0" title="${t.layMove}" aria-label="${esc(t.winT[w])} · ${t.layMove}">⠿</span><span class="wltxt">${t.winT[w]}<small>${t.welWin[w]}</small></span>${WIN_FIXED.includes(w)?`<span class="wfix">${t.layFixed}</span>`:`<button type="button" class="wsw" role="switch" aria-checked="${!l.off[w]}" aria-label="${t.winT[w]}" data-wwin="${w}"><span></span></button>`}</li>`).join("")}</ol>`;
+  if(i===2)x=`<div class="welrow"><span>${t.layPre}<small id="wlp-desc">${t.layPDesc[presetNow()||"own"]}</small></span>${seg("data-wlp",Object.keys(PRESETS).map(p=>[p,t.layP[p]]),presetNow())}</div><ol class="wellay">${l.order.map(w=>`<li class="wlrow" data-w="${w}"><span class="wlgrip" tabindex="0" title="${t.layMove}" aria-label="${esc(t.winT[w])} · ${t.layMove}">⠿</span><span class="wltxt">${t.winT[w]}<small>${t.welWin[w]}</small></span>${WIN_FIXED.includes(w)?`<span class="wfix">${t.layFixed}</span>`:`<button type="button" class="wsw" role="switch" aria-checked="${!l.off[w]}" aria-label="${t.winT[w]}" data-wwin="${w}"><span></span></button>`}</li>`).join("")}</ol>`;
   if(i===3)x=`<div class="welrow"><span>${t.ttT}<small>${ttDesc()}</small></span><button type="button" class="btn plain" data-wtt="1">${t.ttLoad}</button></div>
     <div class="welrow"><span>${t.pcT}<small>${t.pcDesc}</small></span><button type="button" class="wsw" role="switch" aria-checked="${!!S.preciseCd}" aria-label="${t.pcT}" data-wpc="1"><span></span></button></div>`;
   return `<h2 id="m-title">${W[0]}</h2><p>${W[1]}</p>${x}`;
@@ -2481,12 +2659,14 @@ function openWelcome(){
     if(b.dataset.wl){S.lang=b.dataset.wl;rerender();changed();return welRefresh()}
     if(b.dataset.wt){try{localStorage.setItem("fit-theme",b.dataset.wt)}catch(e){}applyTheme();return welRefresh()}
     if(b.dataset.wy||b.dataset.wh){const c=cur();S.current=(b.dataset.wy||c[0])+(b.dataset.wh||c[1]);render();changed();return welRefresh()}
-    if(b.dataset.wwin){const l=lay();l.off[b.dataset.wwin]=!l.off[b.dataset.wwin];S.layout={order:l.order,off:l.off};applyLayout();changed();b.setAttribute("aria-checked",String(!l.off[b.dataset.wwin]));return}
+    if(b.dataset.wwin){const l=lay();l.off[b.dataset.wwin]=!l.off[b.dataset.wwin];S.layout={order:l.order,off:l.off};applyLayout();changed();b.setAttribute("aria-checked",String(!l.off[b.dataset.wwin]));presetSync();return}
+    // a preset flips the switches below it in place, so their knobs slide
+    if(b.dataset.wlp){setPreset(b.dataset.wlp);m.querySelectorAll("[data-wwin]").forEach(s=>s.setAttribute("aria-checked",String(!lay().off[s.dataset.wwin])));return}
     if(b.dataset.wpc){S.preciseCd=!S.preciseCd;if(!S.preciseCd)delete S.preciseCd;b.setAttribute("aria-checked",String(!!S.preciseCd));rerender();changed();return}
     if(b.dataset.wtt)return document.getElementById("tt-file").click();
   });
   welDrag(m);
-  document.addEventListener("keydown",modalKey);syncSegs();m.querySelector("#wel-next").focus();
+  document.addEventListener("keydown",modalKey);syncSegs();m.querySelector("#wel-next").focus({preventScroll:true});
 }
 // reordering the windows in the welcome: the row follows the pointer, the others slide out of its way (FLIP);
 // the order is saved when it is dropped, and the page behind the window rearranges itself at once
@@ -2520,14 +2700,16 @@ function welGo(to){
   const view=box.querySelector(".welview"),old=view.querySelector(".welpane"),dir=to>welStep?1:-1;welStep=to;
   box.querySelector(".weldots").innerHTML=welDots();box.querySelector(".acts").innerHTML=welActs();
   const nw=document.createElement("div");nw.className="welpane";nw.innerHTML=welPane(to);
-  if(noMotion()){old.replaceWith(nw);syncSegs();box.querySelector("#wel-next").focus();return}
+  // a page taller than the screen scrolls the window; the next page starts from its top
+  box.scrollTo({top:0,behavior:noMotion()?"instant":"smooth"});
+  if(noMotion()){old.replaceWith(nw);syncSegs();box.querySelector("#wel-next").focus({preventScroll:true});return}
   welBusy=true;const h0=view.offsetHeight;view.append(nw);syncSegs();nw.style.position="absolute";nw.style.inset="0 20px auto 20px";
   const h1=nw.offsetHeight,E="cubic-bezier(.65,0,.25,1)";
   view.animate([{height:h0+"px"},{height:h1+"px"}],{duration:420,easing:E,fill:"forwards"});
   old.animate([{transform:"none",opacity:1},{transform:`translateX(${-dir*110}%)`,opacity:.2}],{duration:420,easing:E,fill:"forwards"});
   nw.animate([{transform:`translateX(${dir*110}%)`,opacity:.2},{transform:"none",opacity:1}],{duration:420,easing:E,fill:"forwards"});
   setTimeout(()=>{old.remove();nw.style.position="";nw.style.inset="";nw.getAnimations().forEach(a=>a.cancel());view.getAnimations().forEach(a=>a.cancel());welBusy=false;
-    const nx=box.querySelector("#wel-next");if(nx)nx.focus()},440);
+    const nx=box.querySelector("#wel-next");if(nx)nx.focus({preventScroll:true})},440);
 }
 /* ---------- Backup reminder: on the public site the data lives in one browser only ---------- */
 // shown after 10+ changes and 14+ days without a backup; "Later" hides it for a week
@@ -2613,8 +2795,8 @@ async function takeCode(){
   pendingBk={st,when:L().trFrom};openReset("restore");
 }
 async function saveBackup(){
-  const t=L(),day=new Date().toISOString().slice(0,10);
-  try{await saveFile(`fit-study-index-backup-${day}.json`,JSON.stringify({app:"fit-study-index",saved:new Date().toISOString(),state:S},null,2),"application/json");S.lastBk=Date.now();S.bkEdits=0;changed();bkMsg(t.bkSaved)}
+  const t=L(),day=isoOf(new Date());
+  try{await saveFile(`hulko-backup-${day}.json`,JSON.stringify({app:"hulko",saved:new Date().toISOString(),state:S},null,2),"application/json");S.lastBk=Date.now();S.bkEdits=0;changed();bkMsg(t.bkSaved)}
   catch(e){if(e&&e.code==="declined")return;bkMsg(e&&(e.code==="unavailable"||e.code==="not_granted")?t.bkNoDl:t.bkFail,true)}
 }
 function readBackup(file){
@@ -2644,7 +2826,7 @@ const KEEP=["lang","layout","noDates","preciseCd","tt","crView","view","msOpt","
 function resetStudy(quiet,all){
   const keep={lang:S.lang};if(!all)for(const k of KEEP)if(S[k]!=null)keep[k]=S[k];
   if(all){try{localStorage.removeItem("fit-theme");localStorage.removeItem(PERF_KEY)}catch(e){}perf="full";document.documentElement.setAttribute("data-perf",perf);document.documentElement.removeAttribute("data-mode")}
-  closeModal();S=Object.assign(defaults(),keep,{idm5:1,optV2:1,welcomed:all?0:1,since:Date.now()});
+  closeModal();S=Object.assign(defaults(),keep,{idm5:1,optV2:1,welcomed:all?0:1,since:Date.now()});if(all)S.layout=stdLayout();
   metPrev=null;nfPrev=null;snapPrev=null;dtEdit=null;rerender();changed();
   if(all&&!quiet)return setTimeout(openWelcome,300);
   if(quiet)return;
@@ -2652,7 +2834,7 @@ function resetStudy(quiet,all){
 }
 function resetAll(){
   const lang=S.lang;closeModal();
-  S=defaults();S.lang=lang;S.idm5=1;S.optV2=1;
+  S=defaults();S.lang=lang;S.idm5=1;S.optV2=1;S.layout=stdLayout();
   metPrev=null;
   rerender();changed();
   const toast=document.createElement("div");toast.className="toast";toast.style.background="var(--bad)";toast.textContent=L().resetDone;document.body.append(toast);setTimeout(()=>toast.remove(),2800);
@@ -2790,7 +2972,7 @@ function showImport(res){
   const odd=plan.filter(x=>x.exam==null&&((x.key&&x.key[0]==="p"&&x.mxCh)||(!x.key&&x.bm>0)));
   if(odd.length){
     const lines=odd.map(x=>x.key?`- ${x.to}: tracker max ${x.am}, Studis max ${x.bm}`:`- ${x.src}: in Studis (max ${x.bm}), not in the tracker`).join("\n");
-    const url=`https://github.com/HorseyBallz/fit-study-index/issues/new?title=${encodeURIComponent(`Course data: ${code}`)}&body=${encodeURIComponent(`Studis shows a different points scheme for ${code} than the tracker:\n\n${lines}\n`)}`;
+    const url=`https://github.com/HorseyBallz/hulko/issues/new?title=${encodeURIComponent(`Course data: ${code}`)}&body=${encodeURIComponent(`Studis shows a different points scheme for ${code} than the tracker:\n\n${lines}\n`)}`;
     note+=(note?"<br>":"")+t.isOdd(esc(code),url);
   }
   out.innerHTML=(note?`<div class="verdict info">${note}</div>`:"")+`<table class="impt"><tbody>${plan.map(x=>{
@@ -2944,6 +3126,25 @@ const lay=()=>{const l=S.layout||{},o=(l.order||[]).filter(w=>WINS.includes(w));
   WINS.forEach((w,i)=>{if(o.includes(w))return;const prev=WINS.slice(0,i).reverse().find(x=>o.includes(x));o.splice(prev?o.indexOf(prev)+1:0,0,w)});
   return {order:o,off:Object.assign({},WIN_OFF,l.off)}};
 const winEl=id=>document.querySelector(`.win[data-win="${id}"]`);
+// presets (Settings and the setup) only switch windows on or off; the order stays the way it was arranged
+const PRESETS={min:WIN_FIXED,std:["summary","dates","courses","hist"],all:WINS};
+const presetNow=()=>{const l=lay();return Object.keys(PRESETS).find(p=>WINS.every(w=>WIN_FIXED.includes(w)||!l.off[w]===PRESETS[p].includes(w)))||""};
+const presetOff=p=>{const off={};WINS.forEach(w=>{if(!WIN_FIXED.includes(w))off[w]=!PRESETS[p].includes(w)});return off};
+// someone new (or after a full reset) starts on Standard; a saved layout is never changed for them
+const stdLayout=()=>({order:WINS.slice(),off:presetOff("std")});
+function setPreset(p){
+  const l=lay(),was=winsShown();
+  S.layout={order:l.order,off:presetOff(p)};applyLayout();changed();presetSync();
+  // the windows that came back fade in where they now sit
+  if(!noMotion())winsShown().filter(w=>!was.includes(w)).forEach(w=>w.animate([{opacity:0,transform:"translateY(12px)"},{opacity:1,transform:"none"}],{duration:340,easing:"cubic-bezier(.2,.8,.2,1)"}));
+}
+// every preset switch on the page (Settings, the setup) and its line of text show the current choice; none when it's a mix
+function presetSync(){
+  const t=L(),p=presetNow();
+  document.querySelectorAll("[data-layp],[data-wlp]").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.layp||b.dataset.wlp)===p)));
+  document.querySelectorAll("#lp-desc,#wlp-desc").forEach(el=>el.textContent=t.layPDesc[p||"own"]);
+  syncSegs();
+}
 function applyLayout(){
   const L0=lay(),wrap=document.getElementById("app"),foot=document.getElementById("foot");
   // windows are only moved when the order really differs, so a box you are typing in keeps its focus
@@ -2978,7 +3179,7 @@ function enterEdit(){
   applyLayout();drawBars();edRoom();scrollTo({top:0});
   if(!noMotion()){
     bar.animate([{opacity:0,transform:"translate(-50%,-130%)"},{opacity:1,transform:"translate(-50%,0)"}],{duration:380,easing:"cubic-bezier(.2,.9,.3,1.15)"});
-    document.querySelector(".top").animate([{transform:"translateY(-60px)"},{transform:"none"}],{duration:380,easing:"cubic-bezier(.2,.8,.2,1)"});
+    document.querySelector(".top").animate([{transform:"translateY(-60px)"},{transform:"none"}],{duration:380,easing:"cubic-bezier(.2,.8,.2,1)"});snapSoon();
     winsIn("scale(.94) translateY(14px)");
   }
   document.querySelector(".winbar").focus({preventScroll:true});
@@ -2990,6 +3191,7 @@ function exitEdit(now){
     document.getElementById("app").style.paddingTop="";
     drawBars();applyLayout();alignRows();
     if(!now&&!noMotion()){winsIn("scale(.97) translateY(-10px)");document.querySelector(".top").animate([{transform:"translateY(40px)"},{transform:"none"}],{duration:340,easing:"cubic-bezier(.2,.8,.2,1)"})}
+    snapSoon();
   };
   if(now||noMotion())return finish();
   edBusy=true;
@@ -3071,18 +3273,24 @@ const logDate=iso=>new Date(iso+"T12:00:00").toLocaleDateString(S.lang==="sk"?"s
 function renderLog(anim){
   const t=L(),k=S.lang==="sk"?1:0,e=CHANGELOG[logSel];
   document.getElementById("lg-title").textContent=t.logT;document.getElementById("lg-desc").textContent=t.logDesc;
-  const lg=document.getElementById("logo2");lg.src=S.lang==="sk"?"logo-cz.webp":"logo-en.webp";lg.alt=t.logoAlt;
+  const lg=document.getElementById("logo2");setLogo(lg);lg.alt=t.logoAlt;snapSoon();
   document.getElementById("lg-uptxt").textContent=t.logUp(APP_VER);document.getElementById("lg-up").title=t.logUpTip;
   const sb=document.getElementById("set-btn2");sb.setAttribute("aria-label",t.settings);sb.title=t.settings;
   const bb=document.getElementById("log-back");bb.setAttribute("aria-label",t.logBack);bb.title=t.logBack;
   document.getElementById("loglist").setAttribute("aria-label",t.logVers);
   document.getElementById("lg-ver").textContent=t.verLbl(APP_VER,logDate(APP_DATE));
-  document.getElementById("loglist").innerHTML=`<h2 class="grouph">${t.logVers}</h2><ol>${CHANGELOG.map((x,i)=>`<li><button type="button" class="logitem${x.major?" major":""}${i===logSel?" on":""}" data-logv="${i}"${i===logSel?' aria-current="true"':""}>
-    <span class="lv mono">${x.v}</span><span class="lt">${esc(x.t[k])}</span><span class="ld">${logDate(x.d)}${x.major?` <b class="lmaj">${t.logMajor}</b>`:""}</span></button></li>`).join("")}</ol>`;
+  // a major version and its updates share the codename's colours: the x.0 glows, the updates after it are quieter
+  const kind=x=>x.major?"major":codeOf(x)?"sub":"";
+  document.getElementById("loglist").innerHTML=`<h2 class="grouph">${t.logVers}</h2><ol>${CHANGELOG.map((x,i)=>{const cn=codeOf(x),kd=kind(x);
+    return `<li><button type="button" class="logitem${kd?" "+kd:""}${i===logSel?" on":""}" data-logv="${i}"${i===logSel?' aria-current="true"':""}>
+    <span class="lv mono">${x.v}</span><span class="lt">${esc(x.t[k])}</span><span class="ld">${logDate(x.d)}${kd?` <b class="lmaj ${kd}">${cn?cn.n:t.logMajor}</b>`:""}</span></button></li>`}).join("")}</ol>`;
   const sec=(key,cls)=>e[key]&&e[key].length?`<section class="logcat ${cls}"><h3><span class="tag">${t.logCat[key]}</span></h3><ul>${e[key].map(x=>`<li>${esc(x[k])}</li>`).join("")}</ul></section>`:"";
-  const m=document.getElementById("logmain");
-  const cnt=key=>(e[key]||[]).length;m.classList.toggle("major",!!e.major);
-  m.innerHTML=`${e.major?`<p class="logmajor"><span>${t.logMajor}</span><small>${t.logMajSub(cnt("n")+cnt("i")+cnt("f"),cnt("n"),cnt("i"),cnt("f"))}</small></p>`:""}<p class="logkicker mono">${logDate(e.d)}</p><h2 class="logtitle"><span class="mono">${e.v}</span> ${esc(e.t[k])}</h2>${sec("n","n")}${sec("i","i")}${sec("f","f")}`;
+  const m=document.getElementById("logmain"),cn=codeOf(e),kd=kind(e);
+  const cnt=key=>(e[key]||[]).length,sum=t.logMajSub(cnt("n")+cnt("i")+cnt("f"),cnt("n"),cnt("i"),cnt("f"));
+  m.classList.toggle("major",kd==="major");m.classList.toggle("sub",kd==="sub");
+  const head=kd==="major"?`<p class="logmajor">${cn?`<em>${t.logFam(parseInt(e.v,10))}</em>`:""}<span>${cn?cn.n:t.logMajor}</span><small>${sum}</small></p>${cn?`<p class="logwhy">${esc(cn.why[k])}</p>`:""}`
+    :kd==="sub"?`<p class="logmajor sub"><span>${cn.n}</span><small>${t.logUpd(e.v)} · ${sum}</small></p>`:"";
+  m.innerHTML=`${head}<p class="logkicker mono">${logDate(e.d)}</p><h2 class="logtitle"><span class="mono">${e.v}</span> ${esc(e.t[k])}</h2>${sec("n","n")}${sec("i","i")}${sec("f","f")}`;
   if(anim&&!noMotion())m.animate([{opacity:0,transform:"translateY(8px)"},{opacity:1,transform:"none"}],{duration:260,easing:"cubic-bezier(.2,.8,.2,1)"});
 }
 function openLog(){
@@ -3193,8 +3401,8 @@ function exportIcs(){
     const when=x.m!=null?[`DTSTART:${y}${p(m)}${p(d)}T${p(Math.floor(x.m/60))}${p(x.m%60)}00`,`DURATION:PT1H`]:[`DTSTART;VALUE=DATE:${y}${p(m)}${p(d)}`,`DTEND;VALUE=DATE:${nx.getFullYear()}${p(nx.getMonth()+1)}${p(nx.getDate())}`];
     return ["BEGIN:VEVENT",`UID:${x.d.c}-${x.uid}@fit-study-index`,`DTSTAMP:${stamp}`,...when,
       `SUMMARY:${e(x.d.c+" · "+x.what)}`,`DESCRIPTION:${e(nm(x.d))}`,"END:VEVENT"].join("\r\n")});
-  const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//FIT Study Index//EN","CALSCALE:GREGORIAN",`X-WR-CALNAME:${e(t.title)}`,...ev,"END:VCALENDAR",""].join("\r\n");
-  saveFile("fit-study-index-dates.ics",ics,"text/calendar").then(()=>{const toast=document.createElement("div");toast.className="toast";toast.textContent=t.icsDone(list.length);document.body.append(toast);setTimeout(()=>toast.remove(),2800)},()=>{});
+  const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Hulko//EN","CALSCALE:GREGORIAN",`X-WR-CALNAME:${e(t.title)}`,...ev,"END:VCALENDAR",""].join("\r\n");
+  saveFile("hulko-dates.ics",ics,"text/calendar").then(()=>{const toast=document.createElement("div");toast.className="toast";toast.textContent=t.icsDone(list.length);document.body.append(toast);setTimeout(()=>toast.remove(),2800)},()=>{});
 }
 function renderUpNext(){
   const t=L(),box=document.getElementById("upnext"),items=[];
@@ -3316,13 +3524,19 @@ document.addEventListener("keydown",e=>{
 
 /* ---------- Swipe left / right over the courses to change the semester (phones) ---------- */
 function slotsShown(){const y=["1","2","3"];if(allCourses().some(d=>cs(d.c).taken[0]==="4")||cur()[0]==="4")y.push("4");return SLOTS.filter(s=>y.includes(s[0]))}
-function goSlot(dir){
-  const list=slotsShown(),i=list.indexOf(cur()),n=list[i+dir];if(!n)return;
-  const box=document.getElementById("sems");
-  const swap=()=>{S.current=n;render();changed()};
-  if(noMotion())return swap();
-  box.animate([{transform:"none",opacity:1},{transform:`translateX(${-dir*40}px)`,opacity:0}],{duration:140,easing:"ease-in"}).onfinish=()=>{
-    swap();box.animate([{transform:`translateX(${dir*40}px)`,opacity:0},{transform:"none",opacity:1}],{duration:220,easing:"cubic-bezier(.2,.8,.2,1)"})};
+function goSlot(dir){const list=slotsShown(),n=list[list.indexOf(cur())+dir];if(n)toSlot(n)}
+// another semester (a swipe, or the year / semester bar): the courses slide out to one side and the new ones in from the
+// other, the bar stays where it is on the screen, and a shorter page glides up to its new end instead of jumping
+function toSlot(n){
+  const dir=Math.sign(SLOTS.indexOf(n)-SLOTS.indexOf(cur()));if(!dir)return;
+  const box=document.getElementById("sems"),go=()=>{stay("#picker",render);changed()};
+  // the bar answers at once (its marker slides), the courses follow when they have slid out
+  S.current=n;renderPicker();syncSegs();
+  if(noMotion())return go();
+  let done=false;const swap=()=>{if(done)return;done=true;box.getAnimations().forEach(a=>a.cancel());go();
+    box.animate([{transform:`translateX(${dir*40}px)`,opacity:0},{transform:"none",opacity:1}],{duration:220,easing:"cubic-bezier(.2,.8,.2,1)"})};
+  box.animate([{transform:"none",opacity:1},{transform:`translateX(${-dir*40}px)`,opacity:0}],{duration:140,easing:"ease-in",fill:"forwards"}).onfinish=swap;
+  setTimeout(swap,200);
 }
 let sw=null;
 document.getElementById("sems").addEventListener("touchstart",e=>{
@@ -3340,13 +3554,32 @@ let refreshing=false;
 // a redraw started from somewhere on the page (Credits arrows, the semester picker, a card) keeps that place where it
 // is on the screen: whatever above it grew or shrank, the page scrolls by the same amount, so nothing jumps
 function stay(sel,fn){
-  const el=document.querySelector(sel),y=el&&el.getBoundingClientRect().top;fn();
+  const el=document.querySelector(sel),y=el&&el.getBoundingClientRect().top,ease=roomBelow();fn();
   const el2=document.querySelector(sel);if(el&&el2&&el2.offsetParent){const dy=el2.getBoundingClientRect().top-y;if(Math.abs(dy)>.5)scrollBy({top:dy,behavior:"instant"})}
+  ease();
 }
+// a redraw that makes the page shorter while you are near its end (a semester with fewer courses, say) would make the
+// browser jump to the new end in one go; instead the lost height stays as empty room under the page and then shrinks
+// away, so the page glides up to its new end. Call it before the redraw and the returned function after it.
+function roomBelow(){
+  const app=document.getElementById("app");if(app.hidden||noMotion())return ()=>{};
+  // room still left from the last change counts too: the page is measured with it, then a plain style holds a whole
+  // screen of room while the redraw happens, so the browser has nothing to jump to
+  const run=app.getAnimations().find(a=>a.id==="room"),h0=document.documentElement.scrollHeight;
+  const pb=run?+app.dataset.pb:parseFloat(getComputedStyle(app).paddingBottom);
+  app.style.paddingBottom=pb+innerHeight+"px";if(run)run.cancel();
+  return ()=>{
+    const h1=document.documentElement.scrollHeight-innerHeight,need=Math.round(Math.min(h0-h1,scrollY+innerHeight-h1));
+    app.style.paddingBottom="";if(need<=1)return;
+    app.dataset.pb=pb;
+    app.animate([{paddingBottom:pb+need+"px"},{paddingBottom:pb+"px"}],{duration:Math.min(650,280+need*.5),easing:"cubic-bezier(.33,0,.2,1)"}).id="room";
+  };
+}
+// on a phone a list that gets focus opens its picker again, so a list someone just picked from is not focused again
 function keepFocus(fn){
   const a=document.activeElement;focusId=a&&a.id;caret=a&&a.selectionStart;
   refreshing=true;try{fn()}finally{refreshing=false}
-  if(focusId){const el=document.getElementById(focusId);if(el&&el!==document.activeElement){el.focus({preventScroll:true});try{if(caret!=null)el.setSelectionRange(caret,caret)}catch(e){}}}
+  if(focusId){const el=document.getElementById(focusId);if(el&&el!==document.activeElement&&!(TOUCH&&el.tagName==="SELECT")){el.focus({preventScroll:true});try{if(caret!=null)el.setSelectionRange(caret,caret)}catch(e){}}}
 }
 // course cards glide to their new places when a change adds, removes or moves one (a retake, a semester picked in the
 // card, an optional course added or removed, an undo); a card that leaves the semester on screen shrinks away first
@@ -3487,6 +3720,8 @@ document.addEventListener("click",e=>{
   if(b.id==="bkr-now"){saveBackup().then(renderBkRemind);return}
   if(b.id==="bkr-later"){S.bkSnooze=Date.now();changed();renderBkRemind();return}
   if(b.id==="lay-edit"){enterEdit();return}
+  if(b.dataset.layp){setPreset(b.dataset.layp);return}
+  if(b.id==="inst-btn"){installApp();return}
   if(b.id==="log-open"){openLog();return}
   if(b.id==="log-back"){closeLog();return}
   if(b.id==="set-btn2"){openSettings();return}
@@ -3502,7 +3737,7 @@ document.addEventListener("click",e=>{
   if(b.id==="dt-sw"){S.noDates=!S.noDates;if(!S.noDates)delete S.noDates;b.setAttribute("aria-checked",String(!S.noDates));rerender();changed();return}
   if(b.id==="th-light"||b.id==="th-dark"){try{localStorage.setItem("fit-theme",b.id.slice(3))}catch(e){}applyTheme();return}
   if(b.dataset.view){S.view=b.dataset.view;stay("#summary",render);changed();return}
-  if(b.dataset.year||b.dataset.half){const c=cur();S.current=(b.dataset.year||c[0])+(b.dataset.half||c[1]);stay("#picker",render);changed();return}
+  if(b.dataset.year||b.dataset.half){const c=cur();toSlot((b.dataset.year||c[0])+(b.dataset.half||c[1]));return}
   // retake keeps a copy of the first attempt, so "Undo" (toast now, or the button on the moved card later) can put it back
   if(b.dataset.retake){const c=b.dataset.retake,r=cs(c);r.prev={taken:r.taken,status:r.status,auto:r.auto,pts:r.pts,extra:r.extra,exam:r.exam,examDate:r.examDate,due:r.due};
     logIt({c,f:"retake",b:SLOTS[SLOTS.indexOf(r.taken)+2]});
@@ -3558,6 +3793,20 @@ function migrate(){
 {const lockNow=()=>document.documentElement.classList.toggle("locked",!document.getElementById("settings").hidden||!!document.querySelector("#modal,.gameover"));
   new MutationObserver(lockNow).observe(document.body,{childList:true});
   new MutationObserver(lockNow).observe(document.getElementById("settings"),{attributes:true,attributeFilter:["hidden"]})}
+// the public site counts each browser once: it makes a random id, keeps it with its own settings (a reset keeps it)
+// and sends only that id to /api/users, which answers how many there are; the footer then says "Used by N students".
+// Inside Claude, from a file, or if the request fails, nothing is sent and nothing is shown
+let userCount=0;const UID_KEY="fit-uid";
+async function countUsers(){
+  if(window.claude||!/^https?:$/.test(location.protocol))return;
+  let id=null;
+  try{id=localStorage.getItem(UID_KEY);if(!id&&crypto.randomUUID){id=crypto.randomUUID();localStorage.setItem(UID_KEY,id)}}catch(e){id=null}
+  try{
+    const r=await fetch("api/users",id?{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({id})}:{cache:"no-store"});
+    const n=r.ok&&r.headers.get("content-type")?.includes("json")?(await r.json()).count:0;
+    if(Number.isInteger(n)&&n>0){userCount=n;render()}
+  }catch(e){}
+}
 /* ---------- Boot ---------- */
 (async function boot(){
   let server=null;
@@ -3567,7 +3816,7 @@ function migrate(){
   load(serverHasData?server:(local&&local.s)||server||null);
   // a brand-new user starts with no optional courses (ISM is only added when moving old saves)
   const isNew=!serverHasData&&!(local&&local.s);
-  if(isNew)S.optV2=1;
+  if(isNew){S.optV2=1;S.layout=stdLayout()}
   // the welcome cards are for first-time visitors; anyone who already has data has seen the tracker
   if(S.welcomed==null)S.welcomed=isNew?0:1;
   migrate();
@@ -3577,7 +3826,7 @@ function migrate(){
   if(hm){pendingCode=hm[1];try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}
   showGate();
   allCourses().forEach(d=>autoStatus(d.c));
-  render();msReady=true;
+  render();msReady=true;countUsers();
   setChip("saved",L().local);
   try{
     if(window.claude&&window.claude.use){

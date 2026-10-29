@@ -1,12 +1,12 @@
 {
-  "name": "FIT Study Index",
-  "short_name": "FIT Index",
-  "description": "Unofficial study tracker for BIT students at FIT VUT Brno: points, course credits, exams and credits.",
+  "name": "Hulko",
+  "short_name": "Hulko",
+  "description": "Hulko, the unofficial study index for BIT students at FIT VUT Brno: points, course credits, exams and credits.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0f151d",
-  "theme_color": "#14202e",
+  "theme_color": "#f4f6f8",
   "icons": [
     {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
     {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}

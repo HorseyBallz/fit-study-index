@@ -1,8 +1,8 @@
-# FIT Study Index
+# Hulko
 
 **[🇸🇰 Slovenská verzia nižšie](#slovensky)**
 
-A study tracker for **Bachelor in Information Technology (BIT)** students at the Faculty of Information Technology, Brno University of Technology (FIT VUT / BUT). Enter your points and it works out credits, grades and what you still need.
+**Hulko** is a study index for **Bachelor in Information Technology (BIT)** students at the Faculty of Information Technology, Brno University of Technology (FIT VUT / BUT). Enter your points and it works out credits, grades and what you still need.
 
 ### ▶ Open it: **[hulko.xyz](https://hulko.xyz)**
 
@@ -53,9 +53,9 @@ Made by Filipko & Claude ❤️. Rules are based on the BUT Study and Examinatio
 
 <a id="slovensky"></a>
 
-# FIT Study Index (slovensky)
+# Hulko (slovensky)
 
-Tracker štúdia pre študentov **bakalárskeho programu Informačné technológie (BIT)** na Fakulte informačních technologií VUT v Brne. Zadáš body a on spočíta kredity, známky a čo ti ešte chýba.
+**Hulko** je študijný index pre študentov **bakalárskeho programu Informačné technológie (BIT)** na Fakulte informačních technologií VUT v Brne. Zadáš body a on spočíta kredity, známky a čo ti ešte chýba.
 
 ### ▶ Otvoriť: **[hulko.xyz](https://hulko.xyz)**
 
