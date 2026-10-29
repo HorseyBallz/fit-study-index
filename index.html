@@ -1327,7 +1327,7 @@ const TYPE={en:{"Cr+Ex":"Course credit + exam","Ex":"Exam","Cr":"Course credit",
 /* ---------- App version: the newest entry of the version log (data auto-saves do not count) ---------- */
 // like an app release: small fixes go into the current version, a new feature set gets the next number (3.5 → 3.6),
 // a big change starts a new major (3.x → 4.0)
-const APP_VER="4.1",APP_DATE="2026-10-28";
+const APP_VER="4.1",APP_DATE="2026-10-29";
 // every major version is named after a Brno landmark, the way macOS versions are named after places in California:
 // its x.0 opens with the name in big letters, and the updates after it (x.1, x.2 …) wear the same colours, quieter
 const CODENAMES={4:{n:"Orloj",why:["Named after the astronomical clock on Brno's Freedom Square, because version 4 is all about time: exam dates, deadlines and countdowns.","Pomenovaná podľa orloja na náměstí Svobody v Brne, lebo verzia 4 je celá o čase: termíny skúšok, odovzdania a odpočty."]}};
@@ -1337,7 +1337,7 @@ const codeOf=e=>CODENAMES[parseInt(e.v,10)];
    v = version; major = a major update (glows in the list and opens with its codename); n / i / f = new / improved /
    fixed, each item [English, Slovak] */
 const CHANGELOG=[
- {v:"4.1",d:"2026-10-28",t:["Presets & polish","Predvoľby a doladenie"],
+ {v:"4.1",d:"2026-10-29",t:["Presets & polish","Predvoľby a doladenie"],
   n:[["New name and logo: Hulko, like the site’s address hulko.xyz, with its own mark first (also the browser tab icon) and the faculty logo beside it. The line below says it is a study index","Nový názov a logo: Hulko, ako adresa stránky hulko.xyz, s vlastným znakom na začiatku (aj ako ikona na karte prehliadača) a logom fakulty vedľa neho. Riadok pod nimi hovorí, že ide o študijný index"],
      ["Layout presets in Settings and in the setup: Minimal, Standard and Everything","Predvoľby rozloženia v Nastaveniach aj v sprievodcovi: Minimálne, Štandardné a Všetko"],
      ["Install as an app in Settings → About: the browser's own Install where there is one, step by step for iPhone, iPad and Safari on a Mac","Nainštalovať ako aplikáciu v Nastavenia → O aplikácii: tlačidlo prehliadača, kde ho má, a návod krok za krokom pre iPhone, iPad a Safari na Macu"],
