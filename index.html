@@ -3346,8 +3346,8 @@ function renderLog(anim){
   const m=document.getElementById("logmain"),cn=codeOf(e),kd=kind(e);
   const cnt=key=>(e[key]||[]).length,sum=t.logMajSub(cnt("n")+cnt("i")+cnt("f"),cnt("n"),cnt("i"),cnt("f"));
   m.classList.toggle("major",kd==="major");m.classList.toggle("sub",kd==="sub");
-  const head=kd==="major"?`<p class="logmajor">${cn?`<em>${t.logFam(parseInt(e.v,10))}</em>`:""}<span>${cn?cn.n:t.logMajor}</span><small>${sum}</small></p>${cn?`<p class="logwhy">${esc(cn.why[k])}</p>`:""}`
-    :kd==="sub"?`<p class="logmajor sub"><span>${cn.n}</span><small>${t.logUpd(e.v)} · ${sum}</small></p>`:"";
+  const head=kd==="major"?`<p class="logmajor">${cn?`<em>${t.logFam(parseInt(e.v,10))}</em>`:""}<span>${cn?cn.n:t.logMajor}</span>${e.v==="4.0"?`<small>${sum}</small>`:""}</p>${cn?`<p class="logwhy">${esc(cn.why[k])}</p>`:""}`
+    :kd==="sub"?`<p class="logmajor sub"><span>${cn.n}</span><small>${t.logUpd(e.v)}</small></p>`:"";
   m.innerHTML=`${head}<p class="logkicker mono">${logDate(e.d)}</p><h2 class="logtitle"><span class="mono">${e.v}</span> ${esc(e.t[k])}</h2>${sec("n","n")}${sec("i","i")}${sec("f","f")}`;
   if(anim&&!noMotion())m.animate([{opacity:0,transform:"translateY(8px)"},{opacity:1,transform:"none"}],{duration:260,easing:"cubic-bezier(.2,.8,.2,1)"});
 }
