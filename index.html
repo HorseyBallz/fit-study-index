@@ -9,6 +9,7 @@
   --paper:#f4f6f8; --card:#ffffff; --ink:#14202e; --muted:#5b6878; --line:#d8dee6;
   --accent:#d0102b; --accent-soft:#fbe5e8; --blue:#1f4f8f; --blue-soft:#e3ecf7;
   --ok:#1d7a4a; --ok-soft:#e1f2e8; --warn:#9a6200; --warn-soft:#fbf0d9; --bad:#b4232c; --bad-soft:#fbe3e4; --save:#ef7d1a;
+  --pri:var(--ink); --on-pri:var(--paper); /* buttons and the sliding pill; a colour theme (Settings → Appearance) overrides them */
   --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
@@ -82,10 +83,10 @@ button,select,input{font:inherit;color:inherit}
 .toast.undo button{border:0;border-radius:99px;padding:5px 14px;background:var(--paper);color:var(--ink);font-weight:600;cursor:pointer}
 /* sliding two-option toggles (theme, language) */
 .seg.slide{position:relative;display:inline-grid;grid-template-columns:repeat(var(--n,2),1fr);padding:2px}
-.seg.slide .thumb{position:absolute;top:2px;bottom:2px;left:2px;width:calc((100% - 4px) / var(--n,2));border-radius:6px;background:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.2);transform:translateX(calc(var(--pos,0) * 100%))}
+.seg.slide .thumb{position:absolute;top:2px;bottom:2px;left:2px;width:calc((100% - 4px) / var(--n,2));border-radius:6px;background:var(--pri);box-shadow:0 1px 4px rgba(0,0,0,.2);transform:translateX(calc(var(--pos,0) * 100%))}
 .seg.slide button{position:relative;z-index:1;background:none!important;border-radius:6px;text-align:center}
 .seg.slide.none .thumb{opacity:0}
-.seg.slide button[aria-pressed="true"]{color:var(--paper)}
+.seg.slide button[aria-pressed="true"]{color:var(--on-pri)}
 @media (prefers-reduced-motion:no-preference){
   .seg.slide .thumb{transition:transform .32s cubic-bezier(.3,.7,.25,1.15),background-color .3s,opacity .25s}
   .seg.slide button{transition:color .25s}
@@ -170,6 +171,7 @@ body.inlog .mbox.sets{max-width:460px;grid-template-columns:1fr}
 .chip.uptodate{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,var(--line))}
 .chip.uptodate .dot{animation:none!important;background:var(--ok);border:0}
 .gear.backb:hover svg{transform:translateX(-2px)}
+.logpage #lg-title{font-size:22px}
 .logpage #lg-desc{margin:0;color:var(--muted);font-size:13px}
 .logbody{display:grid;grid-template-columns:260px minmax(0,1fr);gap:28px;align-items:start}
 .loglist{position:sticky;top:calc(16px + env(safe-area-inset-top,0px));display:grid;gap:8px;max-height:calc(100vh - 40px);overflow:auto;padding:10px 14px 10px 10px;margin:-10px}
@@ -404,7 +406,7 @@ body.dragging,body.dragging *{cursor:grabbing!important}
 .tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
 .seg button{border:0;background:none;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted)}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.seg button[aria-pressed="true"]{background:var(--pri);color:var(--on-pri)}
 .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 10px;border-radius:99px;background:var(--card);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
 /* gear next to the save chip, and the settings pop-up it opens (same blurred backdrop, neutral instead of red) */
 .gear{width:32px;height:32px;display:grid;place-items:center;padding:0;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;transition:border-color .2s,background-color .2s}
@@ -678,6 +680,20 @@ html.locked{overflow:hidden}
 .weldots i.was{background:color-mix(in srgb,var(--blue) 50%,var(--line))}
 .weldots i.on{width:22px;background:var(--blue)}
 .welview{position:relative;overflow:hidden;margin:0 -20px;padding:0 20px}
+/* colour themes: a swatch per colour; the first (half dark, half light) is the original look */
+.swatches{display:flex;flex-wrap:wrap;gap:9px;justify-content:flex-end}
+.sw{width:26px;height:26px;border-radius:50%;border:0;padding:0;cursor:pointer;background:var(--sw);box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)}
+.sw[data-acc="mono"]{background:linear-gradient(135deg,var(--ink) 50%,var(--paper) 50%)}
+.sw[aria-pressed="true"]{box-shadow:inset 0 0 0 1px rgba(0,0,0,.2),0 0 0 2px var(--card),0 0 0 4px var(--ink)}
+.clashes{list-style:none;margin:0 0 10px;padding:8px 12px;border-radius:9px;background:var(--warn-soft);color:var(--warn);font-size:13px;font-weight:500;display:grid;gap:4px}
+.upitem.clash{box-shadow:inset 3px 0 0 var(--warn)}
+.modal.srch{place-items:start center;padding-top:12vh}
+.sres{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.sres button{width:100%;display:flex;gap:10px;align-items:baseline;text-align:left;padding:8px 10px;border:1px solid transparent;border-radius:8px;background:none;cursor:pointer;font-size:14px}
+.sres button.on{background:var(--blue-soft);border-color:var(--line)}
+.sres .sem{margin-left:auto;font-size:12px;color:var(--muted)}
+#sq{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--paper);font-size:16px}
+.welchoice{display:grid;gap:8px}.welchoice .btn{padding:10px 14px;font-size:14px}
 .welpane{display:grid;gap:12px;align-content:start}
 .welpane p{margin:0}
 .welrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px;padding:8px 0;border-top:1px solid var(--line);font-size:14px;font-weight:600}
@@ -842,7 +858,7 @@ input.optq{width:100%;background:var(--paper);border:1px solid var(--line);borde
 .addrow{min-width:0}
 .addrow>*{min-width:0;max-width:100%}
 .addrow select{text-overflow:ellipsis}
-.btn{border:1px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:7px;padding:5px 12px;font-size:13px;font-weight:500;cursor:pointer}
+.btn{border:1px solid var(--pri);background:var(--pri);color:var(--on-pri);border-radius:7px;padding:5px 12px;font-size:13px;font-weight:500;cursor:pointer}
 .foot{font-size:12px;color:var(--muted);display:grid;gap:6px;max-width:72ch;margin:0 auto;text-align:center;justify-items:center}
 .foot h3{font-family:var(--f-body);font-size:13px;color:var(--ink)}
 .grades{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
@@ -878,6 +894,7 @@ input.optq{width:100%;background:var(--paper);border:1px solid var(--line);borde
     </div>
     <div class="tools">
       <span class="chip" id="savechip"><span class="dot"></span><span id="savetxt">Saved on this device</span></span>
+      <button class="gear" id="srch-btn" type="button" aria-label="Search" title="Search (/)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
       <button class="gear" id="set-btn" type="button" aria-label="Settings" title="Settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.4h-4l-.4 2.5A7.5 7.5 0 0 0 7 6.4l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
       <button class="gear exitb" id="exit-btn" type="button" aria-label="Exit" title="Exit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 8l-4 4 4 4M6 12h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
@@ -907,8 +924,8 @@ input.optq{width:100%;background:var(--paper);border:1px solid var(--line);borde
 <div class="wrap logpage" id="logview" hidden>
   <header class="top">
     <div class="brand"><div style="display:grid;gap:10px;min-width:0">
-      <div class="logorow"><img class="logo" id="logo2" srcset="logo-en-1.webp 1x, logo-en-15.webp 1.5x, logo-en-2.webp 2x, logo-en.webp 3x" src="logo-en.webp" alt=""><h1 id="lg-title">Version history</h1></div>
-      <p id="lg-desc"></p></div></div>
+      <div class="logorow"><div class="hmark"><svg class="hlogo" viewBox="0 0 64 64" aria-hidden="true"><defs><mask id="hl-cut2"><rect width="64" height="64" fill="#fff"/><path d="M32 2.5l3.6 11.5h-7.2zM20 16.5h24L32 31.4zM32 32.6l12 14.9H20zM28.4 50h7.2L32 61.5z" fill="#000" stroke="#000" stroke-width="6" stroke-linejoin="round"/></mask></defs><g mask="url(#hl-cut2)"><path d="M51.45 12.55L43.18 16.03L47.97 20.82ZM51.45 51.45L47.97 43.18L43.18 47.97ZM12.55 51.45L20.82 47.97L16.03 43.18ZM12.55 12.55L16.03 20.82L20.82 16.03ZM62 32L51.26 28.95L51.26 35.05ZM2 32L12.74 35.05L12.74 28.95Z"/><circle cx="32" cy="32" r="16.2" fill="none" stroke="currentColor" stroke-width="4"/></g><path d="M32 2.5l3.6 11.5h-7.2zM20 16.5h24L32 31.4zM32 32.6l12 14.9H20zM28.4 50h7.2L32 61.5z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/><path class="hl-sand" d="M27.4 24.8h9.2L32 30.4zM25.2 44.6h13.6L32 36.2z"/></svg><h1>Hulko</h1></div><span class="lsep" aria-hidden="true"></span><img class="logo" id="logo2" srcset="logo-en-1.webp 1x, logo-en-15.webp 1.5x, logo-en-2.webp 2x, logo-en.webp 3x" src="logo-en.webp" alt=""></div>
+      <h2 id="lg-title">Version history</h2><p id="lg-desc"></p></div></div>
     <div class="tools">
       <span class="chip saved uptodate" id="lg-up"><span class="dot"></span><span id="lg-uptxt"></span></span>
       <button class="gear" id="set-btn2" type="button" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.4h-4l-.4 2.5A7.5 7.5 0 0 0 7 6.4l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
@@ -937,6 +954,7 @@ input.optq{width:100%;background:var(--paper);border:1px solid var(--line);borde
         <button id="th-light" type="button" aria-pressed="false">Light</button>
         <button id="th-dark" type="button" aria-pressed="false">Dark</button>
       </div></div>
+    <div class="setrow"><span class="setk" data-t="accT">Colour</span><div class="swatches" role="group" aria-label="Colour"></div></div>
     <div class="setrow"><span class="setk"><span data-t="setPerf">Animations &amp; effects</span><small id="perf-desc"></small></span>
       <div class="seg slide" data-key="perf" role="group" aria-label="Animations and effects"><span class="thumb" aria-hidden="true"></span>
         <button type="button" data-perf="full" data-t="perfFull">Full</button>
@@ -1234,10 +1252,15 @@ Object.assign(T.en,{
   hRetake:s=>`moved to ${s} (retake)`,hUnretake:"retake undone",hAddItem:"item added",hDelItem:"item removed",hAddC:"course added",hRmC:"course removed",auto:"auto",
   bkTitle:"Backup",bkDesc:"Save all your data to a file, or load one back.",trT:"Move to another device",trDesc:"Show a code (or QR code) here and enter it on the other device.",trSend:"Show code",trRecv:"Enter code",
   trSendT:"Move to another device",trSendHow:"Scan the QR code with your phone's camera: it opens the tracker there with your data. Or copy the code and enter it on the other device in Settings → Your data → Enter code.",trLen:n=>`The code has ${n} characters; Copy code puts it on the clipboard.`,trQrWait:"Making the QR code…",trNoQr:"The QR code couldn't be made here. Use Copy code.",
-  trRecvT:"Enter a code",trRecvHow:"Paste the code from the other device. Everything here is replaced with its data.",trPh:"FSI1.…",trCopy:"Copy code",trLoad:"Load",
+  trRecvT:"Enter a code",trRecvHow:"Paste the code from the other device. Everything here is replaced with its data.",trPh:"FSI1.…",trCopy:"Copy code",trShare:"Send code",shareT:"My Hulko data",shareText:"Open this link on your other device to load my Hulko data.",shareFail:"The share sheet couldn't open. Use Copy code.",
+  accT:"Colour",acc:{mono:"Original",red:"Red",yellow:"Yellow",blue:"Blue",green:"Green",orange:"Orange",purple:"Purple"},
+  welNew:"I'm new here",welOldB:"I've used Hulko before",welOldH:"Bring your data over",welOldD:"Load a backup file, or enter the code from your other device. Your settings come with it.",welBk:"Load backup file",welCode:"Enter code",
+  clashT:"Exam clashes",clSame:(a,b,d)=>`${a} and ${b} exams are on the same day (${d})`,clNext:(a,b,d)=>`${a} and ${b} exams are on back-to-back days (from ${d})`,clClass:(a,c,d,tm)=>`${a} exam (${d}, ${tm}) overlaps a ${c} class`,
+  srchT:"Find a course",srchPh:"Course code or name",srchNone:"No course matches.",srchBtn:"Search",srchHint:"/ search · ↑ ↓ choose · Enter open · [ ] change semester",trLoad:"Load",
   trCopied:"Code copied.",trCopyHand:"Select the code and copy it.",trBad:"That isn't a code from this tracker, or it's incomplete.",trFrom:"another device",trQr:"Scan with the phone's camera",
   bkrText:n=>`Your points are only in this browser, and you haven't made a backup for ${n} days.`,bkrLater:"Later",bkrNow:"Back up now",welNext:"Next",welBack:"Back",welSkip:"Skip",welDone:"Get started",
-  wel:[["Welcome to Hulko","A tracker for BIT students: your points, course credits, exams and credits in one place. First, make it yours."],
+  wel:[["Welcome to Hulko","A tracker for BIT students: your points, course credits, exams and credits in one place. Is this your first time here?"],
+    ["Make it yours","Pick light or dark and a colour. You can change them any time in Settings."],
     ["Where are you now?","Pick your year and semester. You can change it any time at the top of Courses."],
     ["Your layout","Start from a preset, then drag the windows into the order you like and switch off the ones you don't need. You can change it later in Settings."],
     ["Your timetable","Optional: import your week from Studis as iCal (.ics). Tests and exams then get their start time, and countdowns can show hours and minutes."],
@@ -1288,10 +1311,15 @@ Object.assign(T.sk,{
   hRetake:s=>`presunuté do: ${s} (opakovanie)`,hUnretake:"opakovanie zrušené",hAddItem:"položka pridaná",hDelItem:"položka odstránená",hAddC:"predmet pridaný",hRmC:"predmet odstránený",auto:"auto",
   bkTitle:"Záloha",bkDesc:"Ulož všetky údaje do súboru alebo nahraj zálohu späť.",trT:"Presun na iné zariadenie",trDesc:"Zobraz tu kód (alebo QR kód) a zadaj ho na druhom zariadení.",trSend:"Zobraziť kód",trRecv:"Zadať kód",
   trSendT:"Presun na iné zariadenie",trSendHow:"Naskenuj QR kód fotoaparátom mobilu: otvorí tam tracker s tvojimi údajmi. Alebo skopíruj kód a na druhom zariadení ho zadaj v Nastavenia → Tvoje údaje → Zadať kód.",trLen:n=>`Kód má ${n} znakov; Kopírovať kód ho vloží do schránky.`,trQrWait:"Vytváram QR kód…",trNoQr:"QR kód sa tu nepodarilo vytvoriť. Použi Kopírovať kód.",
-  trRecvT:"Zadať kód",trRecvHow:"Vlož kód z druhého zariadenia. Všetko tu sa nahradí jeho údajmi.",trPh:"FSI1.…",trCopy:"Kopírovať kód",trLoad:"Nahrať",
+  trRecvT:"Zadať kód",trRecvHow:"Vlož kód z druhého zariadenia. Všetko tu sa nahradí jeho údajmi.",trPh:"FSI1.…",trCopy:"Kopírovať kód",trShare:"Poslať kód",shareT:"Moje údaje z Hulka",shareText:"Otvor tento odkaz na druhom zariadení a nahrajú sa moje údaje z Hulka.",shareFail:"Ponuku zdieľania sa nepodarilo otvoriť. Použi Kopírovať kód.",
+  accT:"Farba",acc:{mono:"Pôvodná",red:"Červená",yellow:"Žltá",blue:"Modrá",green:"Zelená",orange:"Oranžová",purple:"Fialová"},
+  welNew:"Som tu nový",welOldB:"Hulko som už používal(a)",welOldH:"Prenes svoje údaje",welOldD:"Nahraj záložný súbor alebo zadaj kód z druhého zariadenia. Prenesú sa aj tvoje nastavenia.",welBk:"Nahrať zálohu",welCode:"Zadať kód",
+  clashT:"Kolízie skúšok",clSame:(a,b,d)=>`Skúšky ${a} a ${b} sú v ten istý deň (${d})`,clNext:(a,b,d)=>`Skúšky ${a} a ${b} sú dva dni po sebe (od ${d})`,clClass:(a,c,d,tm)=>`Skúška ${a} (${d}, ${tm}) sa prekrýva s hodinou ${c}`,
+  srchT:"Nájsť predmet",srchPh:"Kód alebo názov predmetu",srchNone:"Nič sa nenašlo.",srchBtn:"Hľadať",srchHint:"/ hľadať · ↑ ↓ vybrať · Enter otvoriť · [ ] zmeniť semester",trLoad:"Nahrať",
   trCopied:"Kód skopírovaný.",trCopyHand:"Označ kód a skopíruj ho.",trBad:"Toto nie je kód z tohto trackera alebo nie je celý.",trFrom:"iného zariadenia",trQr:"Naskenuj fotoaparátom mobilu",
   bkrText:n=>`Tvoje body sú len v tomto prehliadači a zálohu si nerobil(a) ${n} dní.`,bkrLater:"Neskôr",bkrNow:"Zálohovať teraz",welNext:"Ďalej",welBack:"Späť",welSkip:"Preskočiť",welDone:"Začať",
-  wel:[["Vitaj v Hulkovi","Tracker pre študentov BIT: body, zápočty, skúšky a kredity na jednom mieste. Najprv si ho prispôsob."],
+  wel:[["Vitaj v Hulkovi","Tracker pre študentov BIT: body, zápočty, skúšky a kredity na jednom mieste. Si tu prvýkrát?"],
+    ["Prispôsob si ho","Vyber svetlý alebo tmavý vzhľad a farbu. Zmeniť ich môžeš kedykoľvek v Nastaveniach."],
     ["Kde práve si?","Vyber ročník a semester. Zmeniť to môžeš kedykoľvek hore v Predmetoch."],
     ["Tvoje rozloženie","Začni od predvoľby, potom poprehadzuj okná do poradia, ktoré ti vyhovuje, a vypni tie, ktoré nepotrebuješ. Neskôr to zmeníš v Nastaveniach."],
     ["Tvoj rozvrh","Voliteľné: importuj svoj týždeň zo Studisu ako iCal (.ics). Písomky a skúšky potom dostanú čas začiatku a odpočty môžu ukazovať hodiny a minúty."],
@@ -1327,7 +1355,7 @@ const TYPE={en:{"Cr+Ex":"Course credit + exam","Ex":"Exam","Cr":"Course credit",
 /* ---------- App version: the newest entry of the version log (data auto-saves do not count) ---------- */
 // like an app release: small fixes go into the current version, a new feature set gets the next number (3.5 → 3.6),
 // a big change starts a new major (3.x → 4.0)
-const APP_VER="4.1",APP_DATE="2026-10-29";
+const APP_VER="4.2",APP_DATE="2026-10-30";
 // every major version is named after a Brno landmark, the way macOS versions are named after places in California:
 // its x.0 opens with the name in big letters, and the updates after it (x.1, x.2 …) wear the same colours, quieter
 const CODENAMES={4:{n:"Orloj",why:["Named after the astronomical clock on Brno's Freedom Square, because version 4 is all about time: exam dates, deadlines and countdowns.","Pomenovaná podľa orloja na náměstí Svobody v Brne, lebo verzia 4 je celá o čase: termíny skúšok, odovzdania a odpočty."]}};
@@ -1337,6 +1365,13 @@ const codeOf=e=>CODENAMES[parseInt(e.v,10)];
    v = version; major = a major update (glows in the list and opens with its codename); n / i / f = new / improved /
    fixed, each item [English, Slovak] */
 const CHANGELOG=[
+ {v:"4.2",d:"2026-10-30",t:["Colours, search & clashes","Farby, hľadanie a kolízie"],
+  n:[["Colour themes: red, yellow, blue, green, orange and purple next to the original look, in Settings and in the setup. They work in light and dark","Farebné vzhľady: červená, žltá, modrá, zelená, oranžová a fialová popri pôvodnom vzhľade, v Nastaveniach aj v sprievodcovi. Fungujú vo svetlom aj tmavom režime"],
+     ["Setup asks if you are new or have used Hulko before; returning users can load a backup file or enter a code right away","Sprievodca sa pýta, či si nový alebo si Hulko už používal(a); kto sa vracia, môže hneď nahrať zálohu alebo zadať kód"],
+     ["Send code: the phone's share sheet (AirDrop, Messages…) sends your data link when there is no second screen to scan","Poslať kód: ponuka zdieľania v mobile (AirDrop, správy…) pošle odkaz na tvoje údaje, keď nie je druhá obrazovka na skenovanie"],
+     ["Exam clash warnings in Dates: two exams on the same or back-to-back days, and, with a timetable imported, an exam during a class","Upozornenia na kolízie skúšok v Dátumoch: dve skúšky v ten istý alebo dva dni po sebe a, s importovaným rozvrhom, skúška počas hodiny"],
+     ["Search: press / (or Ctrl / ⌘ K, or the magnifier) to find a course; [ and ] change the semester","Hľadanie: stlač / (alebo Ctrl / ⌘ K, alebo lupu) a nájdeš predmet; [ a ] menia semester"]],
+  i:[["Version history shows the Hulko mark and name beside the faculty logo, like the main page","História verzií ukazuje znak a názov Hulko vedľa loga fakulty, ako hlavná stránka"]]},
  {v:"4.1",d:"2026-10-29",t:["Presets & polish","Predvoľby a doladenie"],
   n:[["New name and logo: Hulko, like the site’s address hulko.xyz, with its own mark first (also the browser tab icon) and the faculty logo beside it. The line below says it is a study index","Nový názov a logo: Hulko, ako adresa stránky hulko.xyz, s vlastným znakom na začiatku (aj ako ikona na karte prehliadača) a logom fakulty vedľa neho. Riadok pod nimi hovorí, že ide o študijný index"],
      ["Layout presets in Settings and in the setup: Minimal, Standard and Everything","Predvoľby rozloženia v Nastaveniach aj v sprievodcovi: Minimálne, Štandardné a Všetko"],
@@ -2318,12 +2353,24 @@ function syncSegs(){
     segPrev[key]=idx;
   });
 }
+// colour themes: primary (red, yellow, blue) and secondary (green, orange, purple) colours for the buttons, the sliding
+// pill and the logo's sand; [light page, dark page]. "mono" is the original look and sets nothing
+const ACC={red:["#d0102b","#ff4d64"],yellow:["#f2b705","#f5c542"],blue:["#1f5fbf","#6fa8f5"],green:["#1d7a4a","#4cc585"],orange:["#c2540a","#ff9040"],purple:["#7a3fc0","#b58cf0"]};
+function accNow(){let a=null;try{a=localStorage.getItem("fit-accent")}catch(e){}return ACC[a]?a:"mono"}
+function swHtml(dark){const t=L(),on=accNow();
+  return ["mono",...Object.keys(ACC)].map(k=>`<button type="button" class="sw" data-acc="${k}" style="--sw:${ACC[k]?ACC[k][dark?1:0]:"transparent"}" aria-pressed="${k===on}" aria-label="${t.acc[k]}" title="${t.acc[k]}"></button>`).join("")}
+function setAcc(a){try{if(a==="mono")localStorage.removeItem("fit-accent");else localStorage.setItem("fit-accent",a)}catch(e){}applyTheme()}
 function applyTheme(){
   let m=null;try{m=localStorage.getItem("fit-theme")}catch(e){}
   if(m)document.documentElement.setAttribute("data-mode",m);
   const dark=m?m==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
   // the browser's own bars (the public site's theme-color) wear the page colour of the theme in use
   document.querySelectorAll('meta[name="theme-color"]').forEach(x=>x.content=(m?dark:/dark/.test(x.media))?"#0f151d":"#f4f6f8");
+  const a=accNow(),st=document.documentElement.style;
+  if(a==="mono")["--pri","--on-pri","--accent","--accent-soft"].forEach(k=>st.removeProperty(k));
+  else{const c=ACC[a][dark?1:0];st.setProperty("--pri",c);st.setProperty("--accent",c);st.setProperty("--on-pri",dark?"#0f151d":a==="yellow"?"#1a1300":"#fff");
+    st.setProperty("--accent-soft",`color-mix(in srgb,${c} 14%,var(--card))`)}
+  document.querySelectorAll(".swatches").forEach(e=>{e.innerHTML=swHtml(dark);e.setAttribute("aria-label",L().accT)});
   document.getElementById("th-light").setAttribute("aria-pressed",!dark);
   document.getElementById("th-dark").setAttribute("aria-pressed",dark);
   syncSegs();
@@ -2542,6 +2589,7 @@ function renderSettings(){
   renderInstall();
   document.getElementById("set-close").setAttribute("aria-label",t.close);
   const g=document.getElementById("set-btn");g.setAttribute("aria-label",t.settings);g.title=t.settings;
+  const sr=document.getElementById("srch-btn");sr.setAttribute("aria-label",t.srchBtn);sr.title=t.srchBtn+" (/)";
   const x=document.getElementById("exit-btn");x.setAttribute("aria-label",t.exitBtn);x.title=t.exitBtn;
 }
 function setPerf(p){
@@ -2625,18 +2673,22 @@ async function saveFile(filename,data,type){
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type}));a.download=filename;
   document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);
 }
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>applyTheme());
 /* ---------- Welcome: one window for first-time visitors; its pages slide (the old one out to the side, behind the
    window's edge, the new one in from the other side) while the window itself stays ---------- */
-let welStep=0,welBusy=false;
+let welStep=0,welBusy=false,welOld=false;
 function welPane(i){
   const t=L(),W=t.wel[i],c=cur(),l=lay();let x="";
   const seg=(attr,items,on)=>`<div class="seg slide" data-key="${attr}" role="group">${items.map(([v,txt])=>`<button type="button" ${attr}="${v}" aria-pressed="${v===on}">${txt}</button>`).join("")}</div>`;
-  if(i===0){let m=null;try{m=localStorage.getItem("fit-theme")}catch(e){}const dark=m?m==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
-    x=`<div class="welrow"><span>${t.setLang}</span>${seg("data-wl",[["en","EN"],["sk","SK"]],S.lang)}</div><div class="welrow"><span>${t.setTheme}</span>${seg("data-wt",[["light",t.light],["dark",t.dark]],dark?"dark":"light")}</div>`}
-  if(i===1)x=`<div class="welrow"><span>${t.yearLbl}</span>${seg("data-wy",[["1","1."],["2","2."],["3","3."]],c[0])}</div><div class="welrow"><span>${t.semLbl}</span>${seg("data-wh",[["W",t.semCap.W],["S",t.semCap.S]],c[1])}</div>`;
+  if(i===0)x=`<div class="welrow"><span>${t.setLang}</span>${seg("data-wl",[["en","EN"],["sk","SK"]],S.lang)}</div>
+    <div class="welchoice"><button type="button" class="btn" data-wnew="1">${t.welNew}</button><button type="button" class="btn plain" data-wold="1" aria-expanded="${welOld}">${t.welOldB}</button></div>
+    ${welOld?`<div class="welrow"><span>${t.welOldH}<small>${t.welOldD}</small></span><div class="bkbtns"><button type="button" class="btn plain" data-wbk="1">${t.welBk}</button><button type="button" class="btn plain" data-wcode="1">${t.welCode}</button></div></div>`:""}`;
+  if(i===1){let m=null;try{m=localStorage.getItem("fit-theme")}catch(e){}const dark=m?m==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+    x=`<div class="welrow"><span>${t.setTheme}</span>${seg("data-wt",[["light",t.light],["dark",t.dark]],dark?"dark":"light")}</div><div class="welrow"><span>${t.accT}</span><div class="swatches" role="group" aria-label="${t.accT}">${swHtml(dark)}</div></div>`}
+  if(i===2)x=`<div class="welrow"><span>${t.yearLbl}</span>${seg("data-wy",[["1","1."],["2","2."],["3","3."]],c[0])}</div><div class="welrow"><span>${t.semLbl}</span>${seg("data-wh",[["W",t.semCap.W],["S",t.semCap.S]],c[1])}</div>`;
   // every window in its current order: drag by the grip (or Alt + ↑ / ↓) to reorder, switch the optional ones on or off
-  if(i===2)x=`<div class="welrow"><span>${t.layPre}<small id="wlp-desc">${t.layPDesc[presetNow()||"own"]}</small></span>${seg("data-wlp",Object.keys(PRESETS).map(p=>[p,t.layP[p]]),presetNow())}</div><ol class="wellay">${l.order.map(w=>`<li class="wlrow" data-w="${w}"><span class="wlgrip" tabindex="0" title="${t.layMove}" aria-label="${esc(t.winT[w])} · ${t.layMove}">⠿</span><span class="wltxt">${t.winT[w]}<small>${t.welWin[w]}</small></span>${WIN_FIXED.includes(w)?`<span class="wfix">${t.layFixed}</span>`:`<button type="button" class="wsw" role="switch" aria-checked="${!l.off[w]}" aria-label="${t.winT[w]}" data-wwin="${w}"><span></span></button>`}</li>`).join("")}</ol>`;
-  if(i===3)x=`<div class="welrow"><span>${t.ttT}<small>${ttDesc()}</small></span><button type="button" class="btn plain" data-wtt="1">${t.ttLoad}</button></div>
+  if(i===3)x=`<div class="welrow"><span>${t.layPre}<small id="wlp-desc">${t.layPDesc[presetNow()||"own"]}</small></span>${seg("data-wlp",Object.keys(PRESETS).map(p=>[p,t.layP[p]]),presetNow())}</div><ol class="wellay">${l.order.map(w=>`<li class="wlrow" data-w="${w}"><span class="wlgrip" tabindex="0" title="${t.layMove}" aria-label="${esc(t.winT[w])} · ${t.layMove}">⠿</span><span class="wltxt">${t.winT[w]}<small>${t.welWin[w]}</small></span>${WIN_FIXED.includes(w)?`<span class="wfix">${t.layFixed}</span>`:`<button type="button" class="wsw" role="switch" aria-checked="${!l.off[w]}" aria-label="${t.winT[w]}" data-wwin="${w}"><span></span></button>`}</li>`).join("")}</ol>`;
+  if(i===4)x=`<div class="welrow"><span>${t.ttT}<small>${ttDesc()}</small></span><button type="button" class="btn plain" data-wtt="1">${t.ttLoad}</button></div>
     <div class="welrow"><span>${t.pcT}<small>${t.pcDesc}</small></span><button type="button" class="wsw" role="switch" aria-checked="${!!S.preciseCd}" aria-label="${t.pcT}" data-wpc="1"><span></span></button></div>`;
   return `<h2 id="m-title">${W[0]}</h2><p>${W[1]}</p>${x}`;
 }
@@ -2644,7 +2696,7 @@ function welActs(){const t=L(),last=welStep===t.wel.length-1;
   return `${welStep?`<button class="btn plain" type="button" id="wel-back">${t.welBack}</button>`:`<button class="btn plain" type="button" id="wel-skip">${t.welSkip}</button>`}<button class="btn" type="button" id="wel-next">${last?t.welDone:t.welNext}</button>`}
 function welDots(){return L().wel.map((_,i)=>`<i class="${i===welStep?"on":i<welStep?"was":""}"></i>`).join("")}
 function openWelcome(){
-  closeModal();welStep=0;
+  closeModal();welStep=0;welOld=false;
   const m=document.createElement("div");m.className="modal";m.id="modal";m.dataset.kind="exit";
   m.innerHTML=`<div class="mbox imp wel" role="dialog" aria-modal="true" aria-labelledby="m-title"><div class="weldots" aria-hidden="true">${welDots()}</div>
     <div class="welview"><div class="welpane">${welPane(0)}</div></div><div class="acts">${welActs()}</div></div>`;
@@ -2656,6 +2708,10 @@ function openWelcome(){
     if(b.id==="wel-next")return welStep===L().wel.length-1?done():welGo(welStep+1);
     if(b.id==="wel-back")return welGo(welStep-1);
     if(b.id==="wel-skip")return done();
+    if(b.dataset.wnew)return welGo(1);
+    if(b.dataset.wold){welOld=!welOld;return welRefresh()}
+    if(b.dataset.wbk)return document.getElementById("bk-file").click();
+    if(b.dataset.wcode)return openTransfer(false);
     if(b.dataset.wl){S.lang=b.dataset.wl;rerender();changed();return welRefresh()}
     if(b.dataset.wt){try{localStorage.setItem("fit-theme",b.dataset.wt)}catch(e){}applyTheme();return welRefresh()}
     if(b.dataset.wy||b.dataset.wh){const c=cur();S.current=(b.dataset.wy||c[0])+(b.dataset.wh||c[1]);render();changed();return welRefresh()}
@@ -2767,7 +2823,7 @@ async function openTransfer(send){
   const m=document.createElement("div");m.className="modal";m.id="modal";m.dataset.kind="exit";
   m.innerHTML=`<div class="mbox imp" role="dialog" aria-modal="true" aria-labelledby="m-title"><h2 id="m-title">${send?t.trSendT:t.trRecvT}</h2><p>${send?t.trSendHow:t.trRecvHow}</p>
     ${send?`<div class="qrbox" id="tr-qr"><span>${t.trQrWait}</span></div><p class="setnote" id="tr-len"></p>`:""}<textarea id="tr-code" ${send?"readonly hidden":`placeholder="${t.trPh}"`} aria-label="${t.trT}"></textarea><p class="setnote" id="tr-msg" hidden></p>
-    <div class="acts"><button class="btn plain" type="button" id="m-cancel">${t.close}</button><button class="btn" type="button" id="tr-go">${send?t.trCopy:t.trLoad}</button></div></div>`;
+    <div class="acts"><button class="btn plain" type="button" id="m-cancel">${t.close}</button>${send&&navigator.share?`<button class="btn plain" type="button" id="tr-share">${t.trShare}</button>`:""}<button class="btn" type="button" id="tr-go">${send?t.trCopy:t.trLoad}</button></div></div>`;
   document.body.append(m);
   m.addEventListener("click",e=>{if(e.target===m)closeModal(true)});m.querySelector("#m-cancel").onclick=()=>closeModal(true);
   document.addEventListener("keydown",modalKey);
@@ -2784,6 +2840,8 @@ async function openTransfer(send){
   // the QR code opens the public site with the data after # (that part never reaches a server); from claude.ai or a
   // local copy it points to the public site too, since those pages can't be opened on another device
   const base=!window.claude&&location.protocol==="https:"?location.origin+location.pathname:PUBLIC_URL;
+  // the share sheet (AirDrop, Messages…) sends the same link as the QR code, for when there is no second screen to scan
+  const sh=m.querySelector("#tr-share");if(sh)sh.onclick=async()=>{try{await navigator.share({title:t.shareT,text:t.shareText,url:base+"#import="+code})}catch(e){if(e&&e.name!=="AbortError")say(t.shareFail,true)}};
   try{const qr=await loadQr(),box=m.querySelector("#tr-qr");if(!box)return;
     const q=qr(0,"L");q.addData(base+"#import="+code);q.make();box.innerHTML=q.createSvgTag({cellSize:4,margin:4,scalable:true})+`<span>${t.trQr}</span>`;box.hidden=false}
   catch(e){const box=m.querySelector("#tr-qr");if(box){box.hidden=false;box.innerHTML=`<span>${t.trNoQr}</span>`}}
@@ -2825,7 +2883,7 @@ const KEEP=["lang","layout","noDates","preciseCd","tt","crView","view","msOpt","
 // defaults, and the setup guide runs again
 function resetStudy(quiet,all){
   const keep={lang:S.lang};if(!all)for(const k of KEEP)if(S[k]!=null)keep[k]=S[k];
-  if(all){try{localStorage.removeItem("fit-theme");localStorage.removeItem(PERF_KEY)}catch(e){}perf="full";document.documentElement.setAttribute("data-perf",perf);document.documentElement.removeAttribute("data-mode")}
+  if(all){try{localStorage.removeItem("fit-theme");localStorage.removeItem("fit-accent");localStorage.removeItem(PERF_KEY)}catch(e){}perf="full";document.documentElement.setAttribute("data-perf",perf);document.documentElement.removeAttribute("data-mode")}
   closeModal();S=Object.assign(defaults(),keep,{idm5:1,optV2:1,welcomed:all?0:1,since:Date.now()});if(all)S.layout=stdLayout();
   metPrev=null;nfPrev=null;snapPrev=null;dtEdit=null;rerender();changed();
   if(all&&!quiet)return setTimeout(openWelcome,300);
@@ -3333,12 +3391,12 @@ function parseTimetable(text){
     const txt=`${ev.SUMMARY||""} ${ev.DESCRIPTION||""}`.replace(/\\[,;n]/g," ");
     const c=(txt.match(/\b[A-Z][A-Z0-9]{1,5}\b/g)||[]).find(x=>codes.has(x));const st=icsWhen(ev.DTSTART);if(!c||!st)continue;
     const f=fold(txt),k=/zkous|skusk|exam|zapoct|test|pisem|pisom|zkouska/.test(f)?"exam":/cvic|exerc|lab|semin|pocitac/.test(f)?"ex":/predn|lecture|prednas/.test(f)?"lec":"other";
-    const s=st.getHours()*60+st.getMinutes(),days=[];
+    const s=st.getHours()*60+st.getMinutes(),en=icsWhen(ev.DTEND),days=[],e=en&&en.getHours()*60+en.getMinutes()>s?en.getHours()*60+en.getMinutes():s+90;
     const rr=Object.fromEntries((ev.RRULE||"").split(";").filter(Boolean).map(x=>x.split("=")));
     if(rr.FREQ==="WEEKLY"){const step=7*(+rr.INTERVAL||1),until=rr.UNTIL?icsWhen(rr.UNTIL):null,count=+rr.COUNT||0;
       for(let n=0,d=new Date(st);n<(count||40);n++,d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+step)){if(until&&d>until)break;days.push(isoOf(d))}}
     else days.push(isoOf(st));
-    for(const d of days)if(!ev.ex.includes(d))out.push({c,k,d,s});
+    for(const d of days)if(!ev.ex.includes(d))out.push({c,k,d,s,e});
   }
   return out;
 }
@@ -3381,13 +3439,28 @@ function allDates(){
   const now=Date.now();
   return out.map(x=>({...x,n:daysTo(x.iso)})).filter(x=>x.n>=0&&!(x.m!=null&&atOf(x.iso,x.m)<now)).sort((a,b)=>a.n-b.n||(a.m??1440)-(b.m??1440)||a.d.c.localeCompare(b.d.c));
 }
+// exam clashes among the dates ahead: two exams on one day or on back-to-back days, and, once a timetable is imported, an
+// exam that starts during another course's class. shortcut: an exam is taken to last 2 hours and a class without a known
+// end 90 minutes (the timetable has no exam length); change if a course's exam is longer
+const EXAM_MIN=120;
+function clashes(list){
+  const t=L(),ex=list.filter(x=>x.uid.startsWith("exam")),out=[],hit=new Set(),key=x=>x.d.c+"|"+x.uid;
+  for(let i=0;i<ex.length;i++)for(let j=i+1;j<ex.length;j++){const a=ex[i],b=ex[j],gap=Math.abs(a.n-b.n);
+    if(a.d.c===b.d.c||gap>1)continue;
+    out.push(gap?t.clNext(a.d.c,b.d.c,fmtDay(a.iso)):t.clSame(a.d.c,b.d.c,fmtDay(a.iso)));hit.add(key(a));hit.add(key(b))}
+  for(const x of ex){if(x.m==null)continue;
+    const cl=((S.tt&&S.tt.ev)||[]).filter(e=>e.d===x.iso&&e.c!==x.d.c&&e.k!=="exam"&&e.s<x.m+EXAM_MIN&&(e.e??e.s+90)>x.m);
+    for(const c of new Set(cl.map(e=>e.c))){out.push(t.clClass(x.d.c,c,fmtDay(x.iso),hhmm(x.m)));hit.add(key(x))}}
+  return {out,hit,key};
+}
 const fmtDay=iso=>{const [y,m,d]=iso.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString(S.lang==="sk"?"sk-SK":"en-GB",{weekday:"short",day:"numeric",month:"short"})};
 function renderDates(){
   const t=L(),box=document.getElementById("datesbox");if(!box)return;
   box.parentElement.classList.toggle("empty",!!S.noDates);if(S.noDates){box.innerHTML="";return}
-  const list=allDates(),shown=datesAll?list:list.slice(0,6);
+  const list=allDates(),shown=datesAll?list:list.slice(0,6),cl=clashes(list);
   box.innerHTML=`<div class="dhead"><h2 class="uptitle">${t.datesT}</h2>${list.length?`<button type="button" class="btn plain icsb" data-ics="1">${SVG_CAL}<span>${t.icsBtn}</span></button>`:""}</div>`
-    +(list.length?`<ol class="uplist">${shown.map(x=>`<li><button type="button" class="upitem${x.n<=3?" hot":""}" data-goto="${x.d.c}"><span class="dday">${fmtDay(x.iso)}${x.m!=null?` · ${hhmm(x.m)}`:""}</span><span class="code">${esc(x.d.c)}</span><span class="uptext">${esc(x.what)}</span><span class="updue${x.n<=3?" soon":""}">${cdText(x.iso,x.m)}</span></button></li>`).join("")}</ol>`
+    +(cl.out.length?`<ul class="clashes" role="status" aria-label="${t.clashT}">${cl.out.map(x=>`<li>⚠ ${esc(x)}</li>`).join("")}</ul>`:"")
+    +(list.length?`<ol class="uplist">${shown.map(x=>`<li><button type="button" class="upitem${x.n<=3?" hot":""}${cl.hit.has(cl.key(x))?" clash":""}" data-goto="${x.d.c}"><span class="dday">${fmtDay(x.iso)}${x.m!=null?` · ${hhmm(x.m)}`:""}</span><span class="code">${esc(x.d.c)}</span><span class="uptext">${esc(x.what)}</span><span class="updue${x.n<=3?" soon":""}">${cdText(x.iso,x.m)}</span></button></li>`).join("")}</ol>`
       +(list.length>6?`<button type="button" class="linkbtn upmore" data-datesmore="1">${datesAll?t.upLess:t.upMore(list.length)}</button>`:""):`<p class="emptyopt">${t.datesEmpty}</p>`);
 }
 // one .ics file with every date ahead as an all-day event; the same course + item keeps its id, so importing
@@ -3430,6 +3503,31 @@ function goTo(c){
   el.scrollIntoView({behavior:noMotion()?"auto":"smooth",block:"center"});
   el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash");setTimeout(()=>el.classList.remove("flash"),1600);
 }
+
+/* ---------- Search: / (Ctrl or ⌘ K, or the magnifier) opens a course finder; ↑ ↓ and Enter pick; [ and ] change the semester ---------- */
+function openSearch(){
+  const app=document.getElementById("app");if(app.hidden||document.getElementById("modal")||!document.getElementById("settings").hidden)return;
+  const t=L(),m=document.createElement("div");m.className="modal srch";m.id="modal";m.dataset.kind="exit";
+  m.innerHTML=`<div class="mbox imp" role="dialog" aria-modal="true" aria-label="${t.srchT}"><input id="sq" type="search" placeholder="${t.srchPh}" aria-label="${t.srchT}" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go"><ol class="sres" id="sres"></ol><p class="setnote">${t.srchHint}</p></div>`;
+  document.body.append(m);
+  const q=m.querySelector("#sq"),res=m.querySelector("#sres");let hits=[],on=0;
+  const draw=()=>{const w=fold(q.value).split(" ").filter(Boolean);
+    hits=allCourses().filter(d=>{const h=fold(`${d.c} ${d.en||""} ${d.sk||""}`);return w.every(x=>h.includes(x))&&(w.length||cs(d.c).taken===cur())}).slice(0,8);on=Math.min(on,Math.max(hits.length-1,0));
+    res.innerHTML=hits.length?hits.map((d,i)=>`<li><button type="button" data-sc="${d.c}" class="${i===on?"on":""}"><span class="code">${esc(d.c)}</span><span>${esc(nm(d))}</span><span class="sem">${slotName(cs(d.c).taken)}</span></button></li>`).join(""):`<li class="setnote">${t.srchNone}</li>`};
+  const pick=c=>{closeModal();goTo(c)};
+  q.addEventListener("input",()=>{on=0;draw()});
+  q.addEventListener("keydown",e=>{
+    if(e.key==="Enter"&&hits[on]){e.preventDefault();pick(hits[on].c)}
+    else if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();on=(on+(e.key==="ArrowDown"?1:hits.length-1))%Math.max(hits.length,1);draw()}});
+  m.addEventListener("click",e=>{if(e.target===m)return closeModal(true);const b=e.target.closest("[data-sc]");if(b)pick(b.dataset.sc)});
+  document.addEventListener("keydown",modalKey);draw();q.focus();
+}
+document.addEventListener("keydown",e=>{
+  if(e.defaultPrevented||e.altKey||document.getElementById("app").hidden)return;
+  const el=e.target,typing=el.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName),mod=e.metaKey||e.ctrlKey;
+  if((mod&&e.key.toLowerCase()==="k")||(!mod&&!typing&&e.key==="/")){e.preventDefault();openSearch();return}
+  if(!typing&&!mod&&(e.key==="["||e.key==="]")&&!document.getElementById("modal")&&document.getElementById("settings").hidden)goSlot(e.key==="]"?1:-1);
+});
 
 /* ---------- Card order: drag a card (or Alt + ↑ / ↓) to place it where you want within its group ---------- */
 // order is kept per semester and group: S.order["1W:C"] = ["IZP","IDM",…]; courses not in the list keep their place after it
@@ -3712,6 +3810,7 @@ document.addEventListener("click",e=>{
   if(b.id==="go-band-undo"){const c=lastFailed();if(c){const u=document.createElement("button");u.type="button";u.dataset.unfail=c;u.hidden=true;document.body.append(u);u.click();u.remove()}return}
   if(b.id==="go-band-over"){openReset("over");return}
   if(b.id==="wel-replay"){closeSettings(true);openWelcome();return}
+  if(b.id==="srch-btn"){openSearch();return}
   if(b.id==="set-btn"){openSettings();return}
   if(b.id==="set-close"){closeSettings();return}
   if(b.id==="bk-save"){saveBackup();return}
@@ -3735,6 +3834,7 @@ document.addEventListener("click",e=>{
   if(b.id==="tt-load"){document.getElementById("tt-file").click();return}
   if(b.id==="tt-del"){delete S.tt;renderSettings();rerender();changed();return}
   if(b.id==="dt-sw"){S.noDates=!S.noDates;if(!S.noDates)delete S.noDates;b.setAttribute("aria-checked",String(!S.noDates));rerender();changed();return}
+  if(b.dataset.acc){setAcc(b.dataset.acc);return}
   if(b.id==="th-light"||b.id==="th-dark"){try{localStorage.setItem("fit-theme",b.id.slice(3))}catch(e){}applyTheme();return}
   if(b.dataset.view){S.view=b.dataset.view;stay("#summary",render);changed();return}
   if(b.dataset.year||b.dataset.half){const c=cur();toSlot((b.dataset.year||c[0])+(b.dataset.half||c[1]));return}
