@@ -31,7 +31,7 @@ On a phone you can add it to your home screen: it then opens like an app and wor
 
 ## Your data
 
-Your points stay **in your own browser** on your device and are never sent anywhere. Every browser keeps its own copy. To move to another device, use **Settings → Your data → Move to another device** (a code or QR code), or **Backup** to save a file.
+Your points stay **in your own browser** on your device and are never sent anywhere, unless you turn on **Cloud sync** (Settings → Your data): then they are encrypted on your device with a code only your devices have, and the server keeps only that encrypted copy. Every browser keeps its own copy. To move to another device, use **Settings → Your data → Move to another device** (a code or QR code), or **Backup** to save a file.
 
 ## Run it yourself
 
@@ -84,7 +84,7 @@ Na mobile si ho môžeš pridať na plochu: potom sa otvára ako aplikácia a fu
 
 ## Tvoje údaje
 
-Tvoje body ostávajú **v tvojom prehliadači** na tvojom zariadení a nikam sa neposielajú. Každý prehliadač má vlastnú kópiu. Na presun do iného zariadenia použi **Nastavenia → Tvoje údaje → Presun na iné zariadenie** (kód alebo QR kód), alebo **Záloha** na uloženie do súboru.
+Tvoje body ostávajú **v tvojom prehliadači** na tvojom zariadení a nikam sa neposielajú, iba ak zapneš **Synchronizáciu v cloude** (Nastavenia → Tvoje údaje): vtedy sa zašifrujú v zariadení kódom, ktorý majú len tvoje zariadenia, a server uchováva len túto zašifrovanú kópiu. Každý prehliadač má vlastnú kópiu. Na presun do iného zariadenia použi **Nastavenia → Tvoje údaje → Presun na iné zariadenie** (kód alebo QR kód), alebo **Záloha** na uloženie do súboru.
 
 ## Spustenie u seba
 
